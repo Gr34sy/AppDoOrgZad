@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { LoginPanel } from "@/components/layout/login-panel";
-import { authOptions } from "@/lib/auth";
+import { authOptions, enabledOAuthProviders } from "@/lib/auth";
 
 export default async function LoginPage() {
   const session = await getServerSession(authOptions);
@@ -10,5 +10,5 @@ export default async function LoginPage() {
     redirect("/dashboard");
   }
 
-  return <LoginPanel />;
+  return <LoginPanel providers={enabledOAuthProviders} />;
 }
