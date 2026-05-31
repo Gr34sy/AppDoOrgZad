@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SignOutButton } from "@/components/layout/sign-out-button";
 import { ThemeSelector } from "@/components/theme/theme-selector";
 
 const navigationItems = [
@@ -26,6 +27,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               ))}
             </nav>
             <ThemeSelector />
+            <SignOutButton />
           </div>
         </div>
       </header>
