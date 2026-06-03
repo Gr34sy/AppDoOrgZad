@@ -7,7 +7,7 @@ Projekt zakłada MongoDB jako główną bazę dokumentową oraz NextAuth jako ź
 Adapter `@next-auth/mongodb-adapter` tworzy i obsługuje:
 
 - `users` - użytkownicy OAuth
-- `accounts` - powiązane konta Google, GitHub, Facebook
+- `accounts` - powiązane konta Google, GitHub
 - `sessions` - sesje, gdy zostanie użyta strategia bazodanowa
 - `verification_tokens` - tokeny weryfikacyjne
 
@@ -17,13 +17,13 @@ W aplikacji używana jest strategia `jwt`, ale kolekcje `users` i `accounts` nad
 
 Preferencje użytkownika.
 
-| Pole | Typ | Opis |
-| --- | --- | --- |
-| `userId` | `ObjectId` | Referencja do `users._id`, unikalna |
-| `theme` | `string` | `system`, `light`, `dark`, `forest`, `sky`, `rose` |
-| `dashboardLayout` | `string` | `compact` albo `comfortable` |
-| `createdAt` | `Date` | Data utworzenia |
-| `updatedAt` | `Date` | Data aktualizacji |
+| Pole              | Typ        | Opis                                               |
+| ----------------- | ---------- | -------------------------------------------------- |
+| `userId`          | `ObjectId` | Referencja do `users._id`, unikalna                |
+| `theme`           | `string`   | `system`, `light`, `dark`, `forest`, `sky`, `rose` |
+| `dashboardLayout` | `string`   | `compact` albo `comfortable`                       |
+| `createdAt`       | `Date`     | Data utworzenia                                    |
+| `updatedAt`       | `Date`     | Data aktualizacji                                  |
 
 Indeksy:
 
@@ -33,17 +33,17 @@ Indeksy:
 
 Notatki w stylu kartek z notatnika.
 
-| Pole | Typ | Opis |
-| --- | --- | --- |
-| `ownerId` | `ObjectId` | Właściciel notatki |
-| `title` | `string` | Tytuł |
-| `content` | `string` | Treść notatki |
-| `color` | `string` | Kolor kartki |
-| `tags` | `string[]` | Tagi |
-| `position` | `number` | Kolejność na liście |
-| `archivedAt` | `Date \| null` | Archiwizacja |
-| `createdAt` | `Date` | Data utworzenia |
-| `updatedAt` | `Date` | Data aktualizacji |
+| Pole         | Typ            | Opis                |
+| ------------ | -------------- | ------------------- |
+| `ownerId`    | `ObjectId`     | Właściciel notatki  |
+| `title`      | `string`       | Tytuł               |
+| `content`    | `string`       | Treść notatki       |
+| `color`      | `string`       | Kolor kartki        |
+| `tags`       | `string[]`     | Tagi                |
+| `position`   | `number`       | Kolejność na liście |
+| `archivedAt` | `Date \| null` | Archiwizacja        |
+| `createdAt`  | `Date`         | Data utworzenia     |
+| `updatedAt`  | `Date`         | Data aktualizacji   |
 
 Indeksy:
 
@@ -54,28 +54,28 @@ Indeksy:
 
 Checklisty mogą istnieć samodzielnie albo należeć do taska/projektu.
 
-| Pole | Typ | Opis |
-| --- | --- | --- |
-| `ownerId` | `ObjectId` | Właściciel checklisty |
-| `title` | `string` | Tytuł |
-| `description` | `string` | Opis |
-| `items` | `ChecklistItem[]` | Elementy checklisty |
-| `tags` | `string[]` | Tagi |
-| `parentType` | `string \| null` | `task`, `project` albo `null` |
-| `parentId` | `ObjectId \| null` | Identyfikator rodzica |
-| `position` | `number` | Kolejność |
-| `archivedAt` | `Date \| null` | Archiwizacja |
-| `createdAt` | `Date` | Data utworzenia |
-| `updatedAt` | `Date` | Data aktualizacji |
+| Pole          | Typ                | Opis                          |
+| ------------- | ------------------ | ----------------------------- |
+| `ownerId`     | `ObjectId`         | Właściciel checklisty         |
+| `title`       | `string`           | Tytuł                         |
+| `description` | `string`           | Opis                          |
+| `items`       | `ChecklistItem[]`  | Elementy checklisty           |
+| `tags`        | `string[]`         | Tagi                          |
+| `parentType`  | `string \| null`   | `task`, `project` albo `null` |
+| `parentId`    | `ObjectId \| null` | Identyfikator rodzica         |
+| `position`    | `number`           | Kolejność                     |
+| `archivedAt`  | `Date \| null`     | Archiwizacja                  |
+| `createdAt`   | `Date`             | Data utworzenia               |
+| `updatedAt`   | `Date`             | Data aktualizacji             |
 
 `ChecklistItem`:
 
-| Pole | Typ | Opis |
-| --- | --- | --- |
-| `title` | `string` | Nazwa punktu |
-| `isCompleted` | `boolean` | Czy ukończony |
+| Pole          | Typ            | Opis            |
+| ------------- | -------------- | --------------- |
+| `title`       | `string`       | Nazwa punktu    |
+| `isCompleted` | `boolean`      | Czy ukończony   |
 | `completedAt` | `Date \| null` | Data ukończenia |
-| `position` | `number` | Kolejność |
+| `position`    | `number`       | Kolejność       |
 
 Indeksy:
 
@@ -86,23 +86,23 @@ Indeksy:
 
 Taski z opisem, priorytetem, datą, tagami, przewidywanym czasem realizacji, statusem Kanbana i checklistami.
 
-| Pole | Typ | Opis |
-| --- | --- | --- |
-| `ownerId` | `ObjectId` | Właściciel taska |
-| `projectId` | `ObjectId \| null` | Projekt nadrzędny |
-| `title` | `string` | Tytuł |
-| `description` | `string` | Opis |
-| `priority` | `string` | `low`, `medium`, `high`, `urgent` |
-| `statusId` | `string` | Identyfikator kolumny Kanbana, np. `todo`, `testing`, `done` |
-| `dueDate` | `Date \| null` | Termin |
-| `estimatedMinutes` | `number \| null` | Przewidywany czas realizacji w minutach |
-| `tags` | `string[]` | Tagi |
-| `checklistIds` | `ObjectId[]` | Checklisty zagnieżdżone w tasku |
-| `position` | `number` | Kolejność w statusie albo projekcie |
-| `completedAt` | `Date \| null` | Data ukończenia |
-| `archivedAt` | `Date \| null` | Archiwizacja |
-| `createdAt` | `Date` | Data utworzenia |
-| `updatedAt` | `Date` | Data aktualizacji |
+| Pole               | Typ                | Opis                                                         |
+| ------------------ | ------------------ | ------------------------------------------------------------ |
+| `ownerId`          | `ObjectId`         | Właściciel taska                                             |
+| `projectId`        | `ObjectId \| null` | Projekt nadrzędny                                            |
+| `title`            | `string`           | Tytuł                                                        |
+| `description`      | `string`           | Opis                                                         |
+| `priority`         | `string`           | `low`, `medium`, `high`, `urgent`                            |
+| `statusId`         | `string`           | Identyfikator kolumny Kanbana, np. `todo`, `testing`, `done` |
+| `dueDate`          | `Date \| null`     | Termin                                                       |
+| `estimatedMinutes` | `number \| null`   | Przewidywany czas realizacji w minutach                      |
+| `tags`             | `string[]`         | Tagi                                                         |
+| `checklistIds`     | `ObjectId[]`       | Checklisty zagnieżdżone w tasku                              |
+| `position`         | `number`           | Kolejność w statusie albo projekcie                          |
+| `completedAt`      | `Date \| null`     | Data ukończenia                                              |
+| `archivedAt`       | `Date \| null`     | Archiwizacja                                                 |
+| `createdAt`        | `Date`             | Data utworzenia                                              |
+| `updatedAt`        | `Date`             | Data aktualizacji                                            |
 
 Indeksy:
 
@@ -114,34 +114,34 @@ Indeksy:
 
 Projekty mają pola podobne do tasków, listę tasków i konfigurację kanbana.
 
-| Pole | Typ | Opis |
-| --- | --- | --- |
-| `ownerId` | `ObjectId` | Właściciel projektu |
-| `title` | `string` | Tytuł |
-| `description` | `string` | Opis |
-| `priority` | `string` | `low`, `medium`, `high`, `urgent` |
-| `lifecycleStatus` | `string` | `active`, `paused`, `completed`, `archived` |
-| `dueDate` | `Date \| null` | Termin |
+| Pole               | Typ              | Opis                                             |
+| ------------------ | ---------------- | ------------------------------------------------ |
+| `ownerId`          | `ObjectId`       | Właściciel projektu                              |
+| `title`            | `string`         | Tytuł                                            |
+| `description`      | `string`         | Opis                                             |
+| `priority`         | `string`         | `low`, `medium`, `high`, `urgent`                |
+| `lifecycleStatus`  | `string`         | `active`, `paused`, `completed`, `archived`      |
+| `dueDate`          | `Date \| null`   | Termin                                           |
 | `estimatedMinutes` | `number \| null` | Przewidywany czas realizacji projektu w minutach |
-| `tags` | `string[]` | Tagi |
-| `checklistIds` | `ObjectId[]` | Checklisty projektu |
-| `taskIds` | `ObjectId[]` | Taski w projekcie |
-| `kanbanColumns` | `KanbanColumn[]` | Kolumny kanbana |
-| `position` | `number` | Kolejność |
-| `completedAt` | `Date \| null` | Data ukończenia |
-| `archivedAt` | `Date \| null` | Archiwizacja |
-| `createdAt` | `Date` | Data utworzenia |
-| `updatedAt` | `Date` | Data aktualizacji |
+| `tags`             | `string[]`       | Tagi                                             |
+| `checklistIds`     | `ObjectId[]`     | Checklisty projektu                              |
+| `taskIds`          | `ObjectId[]`     | Taski w projekcie                                |
+| `kanbanColumns`    | `KanbanColumn[]` | Kolumny kanbana                                  |
+| `position`         | `number`         | Kolejność                                        |
+| `completedAt`      | `Date \| null`   | Data ukończenia                                  |
+| `archivedAt`       | `Date \| null`   | Archiwizacja                                     |
+| `createdAt`        | `Date`           | Data utworzenia                                  |
+| `updatedAt`        | `Date`           | Data aktualizacji                                |
 
 `KanbanColumn`:
 
-| Pole | Typ | Opis |
-| --- | --- | --- |
-| `id` | `string` | Stabilny identyfikator statusu używany w `tasks.statusId` |
-| `title` | `string` | Nazwa kolumny |
-| `position` | `number` | Kolejność kolumny |
-| `color` | `string` | Kolor statusu w interfejsie |
-| `isDone` | `boolean` | Czy status oznacza zakończenie zadania |
+| Pole       | Typ       | Opis                                                      |
+| ---------- | --------- | --------------------------------------------------------- |
+| `id`       | `string`  | Stabilny identyfikator statusu używany w `tasks.statusId` |
+| `title`    | `string`  | Nazwa kolumny                                             |
+| `position` | `number`  | Kolejność kolumny                                         |
+| `color`    | `string`  | Kolor statusu w interfejsie                               |
+| `isDone`   | `boolean` | Czy status oznacza zakończenie zadania                    |
 
 Indeksy:
 
@@ -153,14 +153,14 @@ Indeksy:
 
 Przypięte elementy dashboardu.
 
-| Pole | Typ | Opis |
-| --- | --- | --- |
-| `ownerId` | `ObjectId` | Właściciel przypięcia |
-| `targetType` | `string` | `note`, `checklist`, `task`, `project` |
-| `targetId` | `ObjectId` | Identyfikator przypiętego elementu |
-| `position` | `number` | Kolejność na dashboardzie |
-| `createdAt` | `Date` | Data utworzenia |
-| `updatedAt` | `Date` | Data aktualizacji |
+| Pole         | Typ        | Opis                                   |
+| ------------ | ---------- | -------------------------------------- |
+| `ownerId`    | `ObjectId` | Właściciel przypięcia                  |
+| `targetType` | `string`   | `note`, `checklist`, `task`, `project` |
+| `targetId`   | `ObjectId` | Identyfikator przypiętego elementu     |
+| `position`   | `number`   | Kolejność na dashboardzie              |
+| `createdAt`  | `Date`     | Data utworzenia                        |
+| `updatedAt`  | `Date`     | Data aktualizacji                      |
 
 Indeksy:
 
@@ -171,16 +171,16 @@ Indeksy:
 
 Log zdarzeń używany do synchronizacji danych, odświeżania dashboardu i przyszłej obsługi realtime przez SSE/WebSocket albo MongoDB Change Streams.
 
-| Pole | Typ | Opis |
-| --- | --- | --- |
-| `ownerId` | `ObjectId` | Właściciel zdarzenia |
-| `entityType` | `string` | `note`, `checklist`, `task`, `project` |
-| `entityId` | `ObjectId` | Dokument, którego dotyczy zdarzenie |
-| `action` | `string` | `created`, `updated`, `deleted`, `moved`, `pinned`, `unpinned` |
-| `metadata` | `object` | Dodatkowy kontekst zdarzenia |
-| `occurredAt` | `Date` | Moment wystąpienia zdarzenia |
-| `createdAt` | `Date` | Data utworzenia wpisu |
-| `updatedAt` | `Date` | Data aktualizacji wpisu |
+| Pole         | Typ        | Opis                                                           |
+| ------------ | ---------- | -------------------------------------------------------------- |
+| `ownerId`    | `ObjectId` | Właściciel zdarzenia                                           |
+| `entityType` | `string`   | `note`, `checklist`, `task`, `project`                         |
+| `entityId`   | `ObjectId` | Dokument, którego dotyczy zdarzenie                            |
+| `action`     | `string`   | `created`, `updated`, `deleted`, `moved`, `pinned`, `unpinned` |
+| `metadata`   | `object`   | Dodatkowy kontekst zdarzenia                                   |
+| `occurredAt` | `Date`     | Moment wystąpienia zdarzenia                                   |
+| `createdAt`  | `Date`     | Data utworzenia wpisu                                          |
+| `updatedAt`  | `Date`     | Data aktualizacji wpisu                                        |
 
 Indeksy:
 
