@@ -359,3 +359,159 @@ Ryzyka lub uwagi:
   przed wykonaniem commita;
 - jeśli nazwa bazy danych zostanie zmieniona z domyślnej `test`, należy
   odnotować to w dokumentacji bazy i konfiguracji środowiskowej.
+
+### `98ee2c0` - `feat: add notes workspace pages`
+
+Data: 2026-06-04
+
+Commit rozwija funkcjonalność notatek z poziomu dashboardu oraz porządkuje
+bezpieczny zapis danych notatki do MongoDB.
+
+Dodane lub zmienione obszary:
+
+- endpointy `/api/notes` oraz `/api/notes/[noteId]`;
+- strony `/dashboard/notes`, `/dashboard/notes/new` i
+  `/dashboard/notes/[noteId]`;
+- komponenty formularzy i podglądu notatek w `src/components/notes`;
+- zakładki dashboardu i wspólne kontrolki list: search, filter oraz sort;
+- helpery `note-mutations` i `list-query`;
+- test mapowania i sanitizacji mutacji notatki;
+- konfiguracja `tsconfig.json` bez przestarzałego `baseUrl`.
+
+Najważniejsze zmiany funkcjonalne:
+
+- użytkownik może dodać notatkę z poziomu chronionej strony dashboardu;
+- lista notatek pobiera dane aktualnego użytkownika z bazy;
+- notatki można wyszukiwać, filtrować po tagu i sortować;
+- kliknięcie notatki otwiera stronę szczegółów;
+- szczegóły notatki mają tryb podglądu i tryb edycji przełączany przyciskiem
+  `Edytuj`;
+- tagi są obsługiwane jako osobne pola, a nie pojedynczy tekst rozdzielany
+  przecinkami;
+- kolory można wybrać z listy nazw albo podać jako wartość heksadecymalną;
+- nazwy kolorów są mapowane na wartości HEX przed zapisem w bazie;
+- endpointy notatek zapisują poprawne zdarzenia aktywności dla create, update i
+  delete.
+
+Znaczenie architektoniczne:
+
+- wprowadza pierwszą w pełni połączoną z bazą sekcję workspace;
+- tworzy wzorzec dla kolejnych typów elementów: lista, szczegóły, kontrolki
+  filtrowania oraz zabezpieczenie po `ownerId`;
+- przenosi ochronę pól notatki do dedykowanego helpera whitelisty.
+
+Ryzyka lub uwagi:
+
+- UI jest nadal celowo surowy, bo priorytetem była funkcjonalność;
+- testy obejmują helpery, ale nie pełne przepływy API i stron;
+- po zapisie przez edycję strona odświeża dane, ale nie ma jeszcze
+  optymistycznej aktualizacji widoku.
+
+### `8472d7e` - `feat: add lists workspace pages`
+
+Data: 2026-06-04
+
+Commit dodaje sekcję `lists`, opartą o kolekcję `checklists`.
+
+Dodane pliki:
+
+- `src/app/dashboard/lists/page.tsx`;
+- `src/app/dashboard/lists/[listId]/page.tsx`.
+
+Najważniejsze zmiany funkcjonalne:
+
+- użytkownik może wejść na `/dashboard/lists`;
+- strona list pobiera checklisty aktualnego użytkownika z MongoDB;
+- listy można wyszukiwać po tytule, opisie i tagach;
+- listy można filtrować po tagu;
+- listy można sortować wspólnym mechanizmem list;
+- kliknięcie listy otwiera szczegóły `/dashboard/lists/[listId]`;
+- szczegóły pokazują tytuł, opis, tagi, informacje o rodzicu oraz elementy
+  checklisty z oznaczeniem ukończenia.
+
+Znaczenie architektoniczne:
+
+- sekcja checklist używa tych samych kontrolek `SearchInput`, `FilterSelect` i
+  `SortSelect`, co notatki;
+- route szczegółów waliduje identyfikator i sprawdza właściciela dokumentu;
+- nazwa ścieżki `lists` upraszcza język UI, mimo że modelem domenowym pozostaje
+  `Checklist`.
+
+Ryzyka lub uwagi:
+
+- strona nie ma jeszcze formularzy tworzenia i edycji list;
+- endpointy checklist nadal wymagają dopracowania zdarzeń aktywności na wzór
+  notatek;
+- elementy checklisty są tylko odczytywane, bez możliwości zmiany statusu w UI.
+
+### `30a1c6c` - `feat: add tasks workspace pages`
+
+Data: 2026-06-04
+
+Commit dodaje sekcję `tasks` do dashboardu.
+
+Dodane pliki:
+
+- `src/app/dashboard/tasks/page.tsx`;
+- `src/app/dashboard/tasks/[taskId]/page.tsx`.
+
+Najważniejsze zmiany funkcjonalne:
+
+- użytkownik może wejść na `/dashboard/tasks`;
+- taski są pobierane z MongoDB tylko dla aktualnego właściciela;
+- taski można wyszukiwać po tytule, opisie, tagach i statusie;
+- taski można filtrować po priorytecie;
+- sortowanie obejmuje opcje wspólne oraz termin i priorytet;
+- kliknięcie taska otwiera szczegóły `/dashboard/tasks/[taskId]`;
+- szczegóły pokazują tytuł, opis, priorytet, status, projekt, termin,
+  estymację czasu, tagi, checklisty i daty.
+
+Znaczenie architektoniczne:
+
+- taski korzystają z tego samego wzorca list i szczegółów co notatki i listy;
+- route szczegółów waliduje `taskId` i ogranicza odczyt przez `ownerId`;
+- sekcja przygotowuje bazę pod późniejszy widok Kanban i edycję statusów.
+
+Ryzyka lub uwagi:
+
+- nie dodano jeszcze formularzy tworzenia ani edycji tasków;
+- relacje `projectId` i `checklistIds` są obecnie prezentowane technicznie,
+  bez doczytywania pełnych nazw powiązanych dokumentów;
+- API tasków używa jeszcze ogólnego `sanitizeMutation`, a nie dedykowanej
+  whitelisty pól.
+
+### `ea5388e` - `feat: add projects workspace pages`
+
+Data: 2026-06-04
+
+Commit dodaje sekcję `projects` do dashboardu.
+
+Dodane pliki:
+
+- `src/app/dashboard/projects/page.tsx`;
+- `src/app/dashboard/projects/[projectId]/page.tsx`.
+
+Najważniejsze zmiany funkcjonalne:
+
+- użytkownik może wejść na `/dashboard/projects`;
+- projekty są pobierane z MongoDB tylko dla aktualnego użytkownika;
+- projekty można wyszukiwać po tytule, opisie i tagach;
+- projekty można filtrować po statusie cyklu życia;
+- sortowanie obejmuje opcje wspólne oraz termin i priorytet;
+- kliknięcie projektu otwiera szczegóły `/dashboard/projects/[projectId]`;
+- szczegóły pokazują tytuł, opis, status, priorytet, termin, estymację,
+  tagi, liczbę tasków/list, daty oraz kolumny Kanbana projektu.
+
+Znaczenie architektoniczne:
+
+- projekty korzystają ze wspólnego mechanizmu list, filtrowania i sortowania;
+- szczegóły projektu prezentują konfigurację Kanbana zapisaną w dokumencie
+  projektu;
+- route szczegółów sprawdza poprawność `projectId`, sesję oraz właściciela.
+
+Ryzyka lub uwagi:
+
+- nie dodano jeszcze formularzy tworzenia i edycji projektów;
+- nie ma jeszcze pełnego widoku Kanban z taskami pogrupowanymi po kolumnach;
+- powiązania `taskIds` i `checklistIds` są pokazane jako liczby, bez pełnej
+  eksploracji powiązanych dokumentów.
