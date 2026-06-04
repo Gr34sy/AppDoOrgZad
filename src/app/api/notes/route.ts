@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDatabase } from "@/lib/mongoose";
-import { getCurrentUserId, sanitizeMutation, unauthorizedResponse } from "@/lib/session";
+import { getCurrentUserId, unauthorizedResponse } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { sanitizeNoteMutation } from "@/lib/note-mutations";
 import { Note } from "@/models/note";
 
 export async function GET() {
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
   }
 
   await connectDatabase();
-  const payload = sanitizeMutation(await request.json());
+  const payload = sanitizeNoteMutation(await request.json());
   const note = await Note.create({ ...payload, ownerId });
   await recordActivityEvent({ ownerId, entityType: "note", entityId: note.id, action: "created" });
 

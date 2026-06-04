@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { DashboardTabs } from "@/components/dashboard/dashboard-tabs";
+
 const pinnedItems = [
   {
     title: "Product launch",
@@ -36,14 +39,19 @@ const workflowColumns = [
 export function PinnedBoard() {
   return (
     <div className="grid gap-8">
+      <DashboardTabs />
+
       <section className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-medium text-brand-600 dark:text-brand-100">Dashboard</p>
           <h1 className="mt-1 text-3xl font-semibold tracking-normal">Pinned workspace</h1>
         </div>
-        <button className="w-fit rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-500">
+        <Link
+          href="/dashboard/notes/new"
+          className="w-fit rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-brand-500"
+        >
           Add item
-        </button>
+        </Link>
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

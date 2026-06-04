@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isValidObjectId } from "mongoose";
 import { connectDatabase } from "@/lib/mongoose";
 import {
   getCurrentUserId,
   notFoundResponse,
-  sanitizeMutation,
   unauthorizedResponse
 } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { sanitizeNoteMutation } from "@/lib/note-mutations";
 import { Note } from "@/models/note";
 
 type RouteContext = {
@@ -22,14 +23,16 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
     return unauthorizedResponse();
   }
 
+  if (!isValidObjectId(params.noteId)) {
+    return notFoundResponse();
+  }
+
   await connectDatabase();
   const note = await Note.findOne({ _id: params.noteId, ownerId, archivedAt: null });
 
   if (!note) {
     return notFoundResponse();
   }
-
-  await recordActivityEvent({ ownerId, entityType: "note", entityId: note.id, action: "updated" });
 
   return NextResponse.json({ note });
 }
@@ -41,8 +44,12 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     return unauthorizedResponse();
   }
 
+  if (!isValidObjectId(params.noteId)) {
+    return notFoundResponse();
+  }
+
   await connectDatabase();
-  const payload = sanitizeMutation(await request.json());
+  const payload = sanitizeNoteMutation(await request.json());
   const note = await Note.findOneAndUpdate(
     { _id: params.noteId, ownerId, archivedAt: null },
     { $set: payload },
@@ -53,7 +60,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     return notFoundResponse();
   }
 
-  await recordActivityEvent({ ownerId, entityType: "note", entityId: note.id, action: "deleted" });
+  await recordActivityEvent({ ownerId, entityType: "note", entityId: note.id, action: "updated" });
 
   return NextResponse.json({ note });
 }
@@ -63,6 +70,10 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
 
   if (!ownerId) {
     return unauthorizedResponse();
+  }
+
+  if (!isValidObjectId(params.noteId)) {
+    return notFoundResponse();
   }
 
   await connectDatabase();
@@ -75,6 +86,8 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
   if (!note) {
     return notFoundResponse();
   }
+
+  await recordActivityEvent({ ownerId, entityType: "note", entityId: note.id, action: "deleted" });
 
   return NextResponse.json({ note });
 }
