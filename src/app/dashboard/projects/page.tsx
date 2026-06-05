@@ -90,6 +90,9 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
       <DashboardTabs />
 
       <h1>projects</h1>
+      <p>
+        <Link href="/dashboard/projects/new">add project</Link>
+      </p>
 
       <form method="get">
         <SearchInput defaultValue={search} />

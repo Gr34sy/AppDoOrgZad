@@ -94,6 +94,9 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
       <DashboardTabs />
 
       <h1>tasks</h1>
+      <p>
+        <Link href="/dashboard/tasks/new">add task</Link>
+      </p>
 
       <form method="get">
         <SearchInput defaultValue={search} />

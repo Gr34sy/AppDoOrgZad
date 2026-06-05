@@ -2,8 +2,8 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { TagInputs } from "@/components/dashboard/tag-inputs";
 import { NoteColorInput } from "@/components/notes/note-color-input";
-import { NoteTagInputs } from "@/components/notes/note-tag-inputs";
 
 type NoteEditFormProps = {
   noteId: string;
@@ -98,7 +98,7 @@ export function NoteEditForm({
         onHexColorChange={setHexColor}
       />
 
-      <NoteTagInputs tags={tags} onChange={setTags} />
+      <TagInputs tags={tags} onChange={setTags} />
 
       {error ? <p>{error}</p> : null}
       {message ? <p>{message}</p> : null}

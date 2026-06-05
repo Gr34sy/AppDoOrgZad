@@ -11,7 +11,7 @@ import { defaultSortOptions, escapeRegex, getListSort, getSearchParam } from "@/
 import { connectDatabase } from "@/lib/mongoose";
 import { Checklist } from "@/models/checklist";
 
-type ListsPageProps = {
+type ChecklistsPageProps = {
   searchParams?: {
     q?: string | string[];
     tag?: string | string[];
@@ -27,7 +27,7 @@ type ListedChecklist = {
   items?: unknown[];
 };
 
-export default async function ListsPage({ searchParams }: ListsPageProps) {
+export default async function ChecklistsPage({ searchParams }: ChecklistsPageProps) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -54,7 +54,7 @@ export default async function ListsPage({ searchParams }: ListsPageProps) {
 
   await connectDatabase();
 
-  const [lists, tags] = await Promise.all([
+  const [checklists, tags] = await Promise.all([
     Checklist.find(query).sort(getListSort(sort)).lean<ListedChecklist[]>(),
     Checklist.distinct("tags", { ownerId, archivedAt: null })
   ]);
@@ -64,7 +64,10 @@ export default async function ListsPage({ searchParams }: ListsPageProps) {
     <AppShell>
       <DashboardTabs />
 
-      <h1>lists</h1>
+      <h1>checklists</h1>
+      <p>
+        <Link href="/dashboard/checklists/new">add checklist</Link>
+      </p>
 
       <form method="get">
         <SearchInput defaultValue={search} />
@@ -76,21 +79,21 @@ export default async function ListsPage({ searchParams }: ListsPageProps) {
         />
         <SortSelect defaultValue={sort} options={defaultSortOptions} />
         <button type="submit">apply</button>
-        <Link href="/dashboard/lists">clear</Link>
+        <Link href="/dashboard/checklists">clear</Link>
       </form>
 
       <div>
-        {lists.map((list) => {
-          const listId = String(list._id);
+        {checklists.map((checklist) => {
+          const checklistId = String(checklist._id);
 
           return (
-            <article key={listId}>
-              <Link href={`/dashboard/lists/${listId}`}>
-                <h2>{list.title}</h2>
+            <article key={checklistId}>
+              <Link href={`/dashboard/checklists/${checklistId}`}>
+                <h2>{checklist.title}</h2>
               </Link>
-              {list.description ? <p>{list.description}</p> : null}
-              <p>items: {list.items?.length ?? 0}</p>
-              {list.tags?.length ? <p>{list.tags.join(", ")}</p> : null}
+              {checklist.description ? <p>{checklist.description}</p> : null}
+              <p>items: {checklist.items?.length ?? 0}</p>
+              {checklist.tags?.length ? <p>{checklist.tags.join(", ")}</p> : null}
             </article>
           );
         })}

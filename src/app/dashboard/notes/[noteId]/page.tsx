@@ -8,6 +8,7 @@ import { NoteDetailsPanel } from "@/components/notes/note-details-panel";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
 import { Note } from "@/models/note";
+import { Pin } from "@/models/pin";
 
 type NotePageProps = {
   params: {
@@ -37,11 +38,18 @@ export default async function NotePage({ params }: NotePageProps) {
 
   await connectDatabase();
 
-  const note = await Note.findOne({
-    _id: params.noteId,
-    ownerId: session.user.id,
-    archivedAt: null
-  }).lean<NoteDetails>();
+  const [note, pin] = await Promise.all([
+    Note.findOne({
+      _id: params.noteId,
+      ownerId: session.user.id,
+      archivedAt: null
+    }).lean<NoteDetails>(),
+    Pin.findOne({
+      ownerId: session.user.id,
+      targetType: "note",
+      targetId: params.noteId
+    }).lean<{ _id: unknown }>()
+  ]);
 
   if (!note) {
     notFound();
@@ -63,6 +71,7 @@ export default async function NotePage({ params }: NotePageProps) {
         tags={note.tags ?? []}
         createdAtLabel={note.createdAt?.toLocaleString("pl-PL")}
         updatedAtLabel={note.updatedAt?.toLocaleString("pl-PL")}
+        pinId={pin ? String(pin._id) : undefined}
       />
     </AppShell>
   );

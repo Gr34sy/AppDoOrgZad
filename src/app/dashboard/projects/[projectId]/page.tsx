@@ -4,9 +4,13 @@ import { notFound, redirect } from "next/navigation";
 import { isValidObjectId } from "mongoose";
 import { DashboardTabs } from "@/components/dashboard/dashboard-tabs";
 import { AppShell } from "@/components/layout/app-shell";
+import { ProjectDetailsPanel } from "@/components/projects/project-details-panel";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
+import { Checklist } from "@/models/checklist";
+import { Pin } from "@/models/pin";
 import { Project } from "@/models/project";
+import { Task } from "@/models/task";
 
 type ProjectPageProps = {
   params: {
@@ -38,6 +42,19 @@ type ProjectDetails = {
   updatedAt?: Date;
 };
 
+type EntityOptionDocument = {
+  _id: unknown;
+  title: string;
+};
+
+function getDateInputValue(date?: Date | null) {
+  if (!date) {
+    return "";
+  }
+
+  return date.toISOString().slice(0, 10);
+}
+
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const session = await getServerSession(authOptions);
 
@@ -51,11 +68,26 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   await connectDatabase();
 
-  const project = await Project.findOne({
-    _id: params.projectId,
-    ownerId: session.user.id,
-    archivedAt: null
-  }).lean<ProjectDetails>();
+  const [project, checklists, taskCount, pin] = await Promise.all([
+    Project.findOne({
+      _id: params.projectId,
+      ownerId: session.user.id,
+      archivedAt: null
+    }).lean<ProjectDetails>(),
+    Checklist.find({ ownerId: session.user.id, archivedAt: null })
+      .sort({ title: 1 })
+      .lean<EntityOptionDocument[]>(),
+    Task.countDocuments({
+      ownerId: session.user.id,
+      projectId: params.projectId,
+      archivedAt: null
+    }),
+    Pin.findOne({
+      ownerId: session.user.id,
+      targetType: "project",
+      targetId: params.projectId
+    }).lean<{ _id: unknown }>()
+  ]);
 
   if (!project) {
     notFound();
@@ -73,29 +105,32 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         <Link href="/dashboard/projects">back to projects</Link>
       </p>
 
-      <article>
-        <h1>{project.title}</h1>
-        {project.description ? <p>{project.description}</p> : null}
-        <p>status: {project.lifecycleStatus}</p>
-        <p>priority: {project.priority}</p>
-        {project.dueDate ? <p>due: {project.dueDate.toLocaleString("pl-PL")}</p> : null}
-        {project.estimatedMinutes ? <p>estimated minutes: {project.estimatedMinutes}</p> : null}
-        {project.tags?.length ? <p>{project.tags.join(", ")}</p> : null}
-        {project.taskIds?.length ? <p>tasks: {project.taskIds.length}</p> : null}
-        {project.checklistIds?.length ? <p>lists: {project.checklistIds.length}</p> : null}
-        {project.completedAt ? <p>completed: {project.completedAt.toLocaleString("pl-PL")}</p> : null}
-        {project.createdAt ? <p>created: {project.createdAt.toLocaleString("pl-PL")}</p> : null}
-        {project.updatedAt ? <p>updated: {project.updatedAt.toLocaleString("pl-PL")}</p> : null}
-
-        <h2>kanban columns</h2>
-        <ul>
-          {kanbanColumns.map((column) => (
-            <li key={column.id}>
-              {column.title} - {column.id} - {column.isDone ? "done" : "open"}
-            </li>
-          ))}
-        </ul>
-      </article>
+      <ProjectDetailsPanel
+        projectId={params.projectId}
+        checklistOptions={checklists.map((checklist) => ({
+          id: String(checklist._id),
+          title: checklist.title
+        }))}
+        title={project.title}
+        description={project.description ?? ""}
+        priority={project.priority ?? "medium"}
+        lifecycleStatus={project.lifecycleStatus ?? "active"}
+        dueDate={getDateInputValue(project.dueDate)}
+        dueDateLabel={project.dueDate?.toLocaleString("pl-PL")}
+        estimatedMinutes={project.estimatedMinutes}
+        tags={project.tags ?? []}
+        checklistIds={(project.checklistIds ?? []).map((checklistId) => String(checklistId))}
+        taskCount={taskCount}
+        kanbanColumns={kanbanColumns.map((column) => ({
+          id: column.id,
+          title: column.title,
+          isDone: Boolean(column.isDone)
+        }))}
+        completedAtLabel={project.completedAt?.toLocaleString("pl-PL")}
+        createdAtLabel={project.createdAt?.toLocaleString("pl-PL")}
+        updatedAtLabel={project.updatedAt?.toLocaleString("pl-PL")}
+        pinId={pin ? String(pin._id) : undefined}
+      />
     </AppShell>
   );
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isValidObjectId } from "mongoose";
 import { connectDatabase } from "@/lib/mongoose";
 import {
   getCurrentUserId,
@@ -22,19 +23,16 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
     return unauthorizedResponse();
   }
 
+  if (!isValidObjectId(params.checklistId)) {
+    return notFoundResponse();
+  }
+
   await connectDatabase();
   const checklist = await Checklist.findOne({ _id: params.checklistId, ownerId, archivedAt: null });
 
   if (!checklist) {
     return notFoundResponse();
   }
-
-  await recordActivityEvent({
-    ownerId,
-    entityType: "checklist",
-    entityId: checklist.id,
-    action: "updated"
-  });
 
   return NextResponse.json({ checklist });
 }
@@ -44,6 +42,10 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
   if (!ownerId) {
     return unauthorizedResponse();
+  }
+
+  if (!isValidObjectId(params.checklistId)) {
+    return notFoundResponse();
   }
 
   await connectDatabase();
@@ -62,7 +64,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     ownerId,
     entityType: "checklist",
     entityId: checklist.id,
-    action: "deleted"
+    action: "updated"
   });
 
   return NextResponse.json({ checklist });
@@ -75,6 +77,10 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
     return unauthorizedResponse();
   }
 
+  if (!isValidObjectId(params.checklistId)) {
+    return notFoundResponse();
+  }
+
   await connectDatabase();
   const checklist = await Checklist.findOneAndUpdate(
     { _id: params.checklistId, ownerId, archivedAt: null },
@@ -85,6 +91,13 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
   if (!checklist) {
     return notFoundResponse();
   }
+
+  await recordActivityEvent({
+    ownerId,
+    entityType: "checklist",
+    entityId: checklist.id,
+    action: "deleted"
+  });
 
   return NextResponse.json({ checklist });
 }

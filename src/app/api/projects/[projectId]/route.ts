@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isValidObjectId } from "mongoose";
 import { connectDatabase } from "@/lib/mongoose";
 import {
   getCurrentUserId,
@@ -22,19 +23,16 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
     return unauthorizedResponse();
   }
 
+  if (!isValidObjectId(params.projectId)) {
+    return notFoundResponse();
+  }
+
   await connectDatabase();
   const project = await Project.findOne({ _id: params.projectId, ownerId, archivedAt: null });
 
   if (!project) {
     return notFoundResponse();
   }
-
-  await recordActivityEvent({
-    ownerId,
-    entityType: "project",
-    entityId: project.id,
-    action: "updated"
-  });
 
   return NextResponse.json({ project });
 }
@@ -44,6 +42,10 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
   if (!ownerId) {
     return unauthorizedResponse();
+  }
+
+  if (!isValidObjectId(params.projectId)) {
+    return notFoundResponse();
   }
 
   await connectDatabase();
@@ -62,7 +64,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     ownerId,
     entityType: "project",
     entityId: project.id,
-    action: "deleted"
+    action: "updated"
   });
 
   return NextResponse.json({ project });
@@ -75,6 +77,10 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
     return unauthorizedResponse();
   }
 
+  if (!isValidObjectId(params.projectId)) {
+    return notFoundResponse();
+  }
+
   await connectDatabase();
   const project = await Project.findOneAndUpdate(
     { _id: params.projectId, ownerId, archivedAt: null },
@@ -85,6 +91,13 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
   if (!project) {
     return notFoundResponse();
   }
+
+  await recordActivityEvent({
+    ownerId,
+    entityType: "project",
+    entityId: project.id,
+    action: "deleted"
+  });
 
   return NextResponse.json({ project });
 }

@@ -4,10 +4,10 @@ import { ThemeSelector } from "@/components/theme/theme-selector";
 
 const navigationItems = [
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/dashboard", label: "Notes" },
-  { href: "/dashboard", label: "Checklists" },
-  { href: "/dashboard", label: "Tasks" },
-  { href: "/dashboard", label: "Projects" }
+  { href: "/dashboard/notes", label: "Notes" },
+  { href: "/dashboard/checklists", label: "Checklists" },
+  { href: "/dashboard/tasks", label: "Tasks" },
+  { href: "/dashboard/projects", label: "Projects" }
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {

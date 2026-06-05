@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { DeleteEntityButton } from "@/components/dashboard/delete-entity-button";
+import { PinEntityButton } from "@/components/dashboard/pin-entity-button";
 import { NoteEditForm } from "@/components/notes/note-edit-form";
 
 type NoteDetailsPanelProps = {
@@ -11,6 +13,7 @@ type NoteDetailsPanelProps = {
   tags: string[];
   createdAtLabel?: string;
   updatedAtLabel?: string;
+  pinId?: string;
 };
 
 export function NoteDetailsPanel({
@@ -20,7 +23,8 @@ export function NoteDetailsPanel({
   color,
   tags,
   createdAtLabel,
-  updatedAtLabel
+  updatedAtLabel,
+  pinId
 }: NoteDetailsPanelProps) {
   const [isEditing, setIsEditing] = useState(false);
   const noteColor = color.trim();
@@ -51,6 +55,13 @@ export function NoteDetailsPanel({
       <button type="button" onClick={() => setIsEditing(true)}>
         Edytuj
       </button>
+      <DeleteEntityButton
+        endpoint={`/api/notes/${noteId}`}
+        redirectTo="/dashboard/notes"
+        label="Usuń notatkę"
+        errorLabel="Nie udało się usunąć notatki."
+      />
+      <PinEntityButton targetType="note" targetId={noteId} initialPinId={pinId} />
 
       <h1>{title}</h1>
       {content ? <p>{content}</p> : null}

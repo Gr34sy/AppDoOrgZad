@@ -50,6 +50,8 @@ Aplikacja używa App Routera. Najważniejsze ścieżki:
 - `/` - strona wejściowa aplikacji.
 - `/login` - ekran logowania.
 - `/dashboard` - widok chroniony; wymaga aktywnej sesji.
+- `/dashboard/checklists` oraz `/dashboard/checklists/[checklistId]` - lista
+  checklist i szczegóły pojedynczej checklisty.
 - `/api/auth/[...nextauth]` - handler NextAuth.
 - `/api/notes` oraz `/api/notes/[noteId]` - lista, tworzenie, odczyt,
   aktualizacja i usuwanie notatek.
@@ -407,25 +409,25 @@ Ryzyka lub uwagi:
 - po zapisie przez edycję strona odświeża dane, ale nie ma jeszcze
   optymistycznej aktualizacji widoku.
 
-### `8472d7e` - `feat: add lists workspace pages`
+### `8472d7e` - `feat: add checklists workspace pages`
 
 Data: 2026-06-04
 
-Commit dodaje sekcję `lists`, opartą o kolekcję `checklists`.
+Commit dodaje sekcję `checklists`, opartą o kolekcję `checklists`.
 
 Dodane pliki:
 
-- `src/app/dashboard/lists/page.tsx`;
-- `src/app/dashboard/lists/[listId]/page.tsx`.
+- `src/app/dashboard/checklists/page.tsx`;
+- `src/app/dashboard/checklists/[checklistId]/page.tsx`.
 
 Najważniejsze zmiany funkcjonalne:
 
-- użytkownik może wejść na `/dashboard/lists`;
-- strona list pobiera checklisty aktualnego użytkownika z MongoDB;
-- listy można wyszukiwać po tytule, opisie i tagach;
-- listy można filtrować po tagu;
-- listy można sortować wspólnym mechanizmem list;
-- kliknięcie listy otwiera szczegóły `/dashboard/lists/[listId]`;
+- użytkownik może wejść na `/dashboard/checklists`;
+- strona checklist pobiera checklisty aktualnego użytkownika z MongoDB;
+- checklisty można wyszukiwać po tytule, opisie i tagach;
+- checklisty można filtrować po tagu;
+- checklisty można sortować wspólnym mechanizmem list;
+- kliknięcie checklisty otwiera szczegóły `/dashboard/checklists/[checklistId]`;
 - szczegóły pokazują tytuł, opis, tagi, informacje o rodzicu oraz elementy
   checklisty z oznaczeniem ukończenia.
 
@@ -434,14 +436,13 @@ Znaczenie architektoniczne:
 - sekcja checklist używa tych samych kontrolek `SearchInput`, `FilterSelect` i
   `SortSelect`, co notatki;
 - route szczegółów waliduje identyfikator i sprawdza właściciela dokumentu;
-- nazwa ścieżki `lists` upraszcza język UI, mimo że modelem domenowym pozostaje
-  `Checklist`.
+- nazwa ścieżki `checklists` jest spójna z modelem domenowym `Checklist`.
 
 Ryzyka lub uwagi:
 
-- strona nie ma jeszcze formularzy tworzenia i edycji list;
-- endpointy checklist nadal wymagają dopracowania zdarzeń aktywności na wzór
-  notatek;
+- strona nie ma jeszcze formularzy tworzenia i edycji checklist;
+- API checklist używa jeszcze ogólnego `sanitizeMutation`, a nie dedykowanej
+  whitelisty pól;
 - elementy checklisty są tylko odczytywane, bez możliwości zmiany statusu w UI.
 
 ### `30a1c6c` - `feat: add tasks workspace pages`
@@ -468,7 +469,8 @@ Najważniejsze zmiany funkcjonalne:
 
 Znaczenie architektoniczne:
 
-- taski korzystają z tego samego wzorca list i szczegółów co notatki i listy;
+- taski korzystają z tego samego wzorca list i szczegółów co notatki i
+  checklisty;
 - route szczegółów waliduje `taskId` i ogranicza odczyt przez `ownerId`;
 - sekcja przygotowuje bazę pod późniejszy widok Kanban i edycję statusów.
 
@@ -500,7 +502,7 @@ Najważniejsze zmiany funkcjonalne:
 - sortowanie obejmuje opcje wspólne oraz termin i priorytet;
 - kliknięcie projektu otwiera szczegóły `/dashboard/projects/[projectId]`;
 - szczegóły pokazują tytuł, opis, status, priorytet, termin, estymację,
-  tagi, liczbę tasków/list, daty oraz kolumny Kanbana projektu.
+  tagi, liczbę tasków/checklist, daty oraz kolumny Kanbana projektu.
 
 Znaczenie architektoniczne:
 
@@ -515,3 +517,69 @@ Ryzyka lub uwagi:
 - nie ma jeszcze pełnego widoku Kanban z taskami pogrupowanymi po kolumnach;
 - powiązania `taskIds` i `checklistIds` są pokazane jako liczby, bez pełnej
   eksploracji powiązanych dokumentów.
+
+### Bieżąca zmiana - unify checklist naming
+
+Data: 2026-06-05
+
+Zmiana porządkuje nazewnictwo sekcji checklist. Elementy projektu, które
+obsługują model `Checklist`, używają teraz nazwy `checklist` także w ścieżkach
+dashboardu, API, parametrach route handlerów i payloadach JSON.
+
+Najważniejsze zmiany funkcjonalne:
+
+- `/dashboard/checklists` pokazuje listę checklist, a
+  `/dashboard/checklists/[checklistId]` szczegóły pojedynczej checklisty;
+- `/api/checklists` zwraca odpowiedź `{ checklists }` i tworzy nową checklistę
+  z odpowiedzią `{ checklist }`;
+- `/api/checklists/[checklistId]` obsługuje odczyt, aktualizację i archiwizację
+  pojedynczej checklisty;
+- nawigacja aplikacji używa etykiety `Checklists` oraz linku
+  `/dashboard/checklists`.
+
+Znaczenie architektoniczne:
+
+- nazewnictwo API, dashboardu, parametrów i payloadów JSON jest spójne z modelem
+  Mongoose `Checklist`;
+- ogólny helper `list-query` pozostaje bez zmian, bo obsługuje sortowanie list
+  wyników także dla notatek, tasków i projektów.
+
+### Bieżąca zmiana - complete dashboard CRUD
+
+Data: 2026-06-05
+
+Zmiana uzupełnia podstrony dashboardu o brakujące przepływy CRUD oraz przypięcia
+elementów do dashboardu.
+
+Najważniejsze zmiany funkcjonalne:
+
+- notatki mają pełny przepływ tworzenia, edycji i archiwizacji z poziomu UI;
+- checklisty mają stronę `/dashboard/checklists/new`, formularz edycji,
+  archiwizację oraz zarządzanie elementami checklisty;
+- taski mają stronę `/dashboard/tasks/new`, formularz edycji, archiwizację,
+  priorytet, status, termin, estymację, tagi, projekt i powiązane checklisty;
+- projekty mają stronę `/dashboard/projects/new`, formularz edycji,
+  archiwizację, status cyklu życia, priorytet, termin, estymację, tagi i
+  powiązane checklisty;
+- szczegóły notatek, checklist, tasków i projektów pozwalają przypiąć albo
+  odpiąć element z dashboardu;
+- główny dashboard pokazuje realne przypięte elementy użytkownika oraz liczniki
+  tasków według statusów.
+
+Znaczenie architektoniczne:
+
+- formularze dashboardu używają wspólnego komponentu tagów oraz wspólnego
+  przycisku archiwizacji;
+- API tasków utrzymuje relację `Project.taskIds` przy tworzeniu, zmianie
+  projektu i archiwizacji taska;
+- endpointy pojedynczych checklist, tasków i projektów walidują identyfikatory
+  przed zapytaniem do bazy;
+- zdarzenia aktywności checklist i projektów są zgodne z operacją: odczyt nie
+  zapisuje zdarzenia, aktualizacja zapisuje `updated`, a archiwizacja `deleted`.
+
+Pozostałe uwagi:
+
+- relacje są nadal zapisywane w obecnym modelu dokumentowym, bez migracji
+  schematu bazy;
+- widok Kanban pozostaje prezentacją kolumn i liczników, bez przeciągania tasków
+  między kolumnami.
