@@ -22,7 +22,8 @@ elementami dashboardu.
   `/login`.
 - `src/app/login/page.tsx` - strona logowania, powiązana z panelem OAuth.
 - `src/components` - komponenty UI podzielone według odpowiedzialności:
-  dashboard, layout oraz motywy.
+  dashboard, layout, motywy oraz sekcje domenowe notatek, checklist, tasków i
+  projektów.
 - `src/components/dashboard/pinned-board.tsx` - główna powierzchnia dashboardu
   dla przypiętych elementów.
 - `src/components/layout/app-shell.tsx` - szkielet aplikacji po zalogowaniu.
@@ -136,8 +137,9 @@ miejsce na nawigację, akcje konta użytkownika i przełączniki globalne.
 
 ### Testy i walidacja
 
-Projekt ma skonfigurowany Vitest oraz test jednostkowy dla
-`src/lib/sanitize-mutation.ts`. Skrypty walidacyjne:
+Projekt ma skonfigurowany Vitest oraz punktowe testy jednostkowe dla
+`src/lib/sanitize-mutation.ts` i `src/lib/note-mutations.ts`. Skrypty
+walidacyjne:
 
 - `npm run typecheck`
 - `npm run lint`
@@ -280,8 +282,8 @@ Ryzyka lub uwagi:
   bezpieczeństwa;
 - jeśli żaden provider nie ma kompletu zmiennych środowiskowych, ekran logowania
   powinien jasno obsługiwać brak dostępnych metod logowania;
-- README nadal wspomina Facebooka jako element stacku, podczas gdy aktualna
-  konfiguracja w `auth.ts` obejmuje Google i GitHub.
+- README zostało później doprecyzowane tak, aby lista OAuth była zgodna z
+  aktualną konfiguracją w `auth.ts`: Google i GitHub.
 
 ### `fad9cf1` - `feat: add sign out action`
 

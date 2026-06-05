@@ -8,7 +8,7 @@ Aplikacja do zarządzania zadaniami, notatkami, checklistami i projektami.
 - TypeScript
 - Tailwind CSS
 - MongoDB
-- NextAuth OAuth: Google, GitHub, Facebook
+- NextAuth OAuth: Google, GitHub
 - Vitest for unit tests
 
 ## Start
