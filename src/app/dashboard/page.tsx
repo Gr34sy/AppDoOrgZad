@@ -25,6 +25,7 @@ type PinnedTarget = {
   priority?: string;
   lifecycleStatus?: string;
   statusId?: string;
+  dueDate?: Date | string | null;
   items?: unknown[];
 };
 
@@ -63,12 +64,40 @@ export default async function DashboardPage() {
   const ownerObjectId = new Types.ObjectId(ownerId);
 
   await connectDatabase();
-  const [pins, taskStatusCounts] = await Promise.all([
+  const now = new Date();
+  const calendarStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const calendarEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+  const [pins, taskStatusCounts, calendarTasks, calendarProjects] = await Promise.all([
     Pin.find({ ownerId }).sort({ position: 1, updatedAt: -1 }).lean<PinDocument[]>(),
     Task.aggregate<{ _id: string; count: number }>([
       { $match: { ownerId: ownerObjectId, archivedAt: null } },
       { $group: { _id: "$statusId", count: { $sum: 1 } } }
-    ])
+    ]),
+    Task.find({
+      ownerId,
+      archivedAt: null,
+      dueDate: { $gte: calendarStart, $lt: calendarEnd }
+    })
+      .sort({ dueDate: 1, priority: -1 })
+      .select({ title: 1, priority: 1, dueDate: 1, statusId: 1 })
+      .lean<Array<{ _id: unknown; title: string; priority?: string; dueDate?: Date | string; statusId?: string }>>(),
+    Project.find({
+      ownerId,
+      archivedAt: null,
+      dueDate: { $gte: calendarStart, $lt: calendarEnd }
+    })
+      .sort({ dueDate: 1, priority: -1 })
+      .select({ title: 1, priority: 1, dueDate: 1, lifecycleStatus: 1 })
+      .lean<
+        Array<{
+          _id: unknown;
+          title: string;
+          priority?: string;
+          dueDate?: Date | string;
+          lifecycleStatus?: string;
+        }>
+      >()
   ]);
 
   const pinnedItems = (
@@ -104,9 +133,34 @@ export default async function DashboardPage() {
     count: taskStatusCounts.find((taskStatus) => taskStatus._id === status)?.count ?? 0
   }));
 
+  const calendarEvents = [
+    ...calendarTasks.map((task) => ({
+      id: String(task._id),
+      title: task.title,
+      type: "Task",
+      date: task.dueDate ? new Date(task.dueDate).toISOString() : "",
+      priority: task.priority ?? "medium",
+      status: task.statusId ?? "todo",
+      href: `/dashboard/tasks/${String(task._id)}`
+    })),
+    ...calendarProjects.map((project) => ({
+      id: String(project._id),
+      title: project.title,
+      type: "Project",
+      date: project.dueDate ? new Date(project.dueDate).toISOString() : "",
+      priority: project.priority ?? "medium",
+      status: project.lifecycleStatus ?? "active",
+      href: `/dashboard/projects/${String(project._id)}`
+    }))
+  ].filter((event) => event.date);
+
   return (
     <AppShell>
-      <PinnedBoard pinnedItems={pinnedItems} workflowColumns={workflowColumns} />
+      <PinnedBoard
+        pinnedItems={pinnedItems}
+        workflowColumns={workflowColumns}
+        calendarEvents={calendarEvents}
+      />
     </AppShell>
   );
 }

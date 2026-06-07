@@ -1,5 +1,43 @@
 # Dziennik aktualizacji projektu
 
+## Bieżąca zmiana - redesign dashboardu i nawigacji
+
+Data: 2026-06-07
+
+Zmiana przebudowuje główny układ aplikacji po zalogowaniu oraz wizualną
+prezentację dashboardu.
+
+Najważniejsze zmiany funkcjonalne:
+
+- górny navbar został zastąpiony lewym sidebarem;
+- sidebar pokazuje zalogowanego użytkownika z ikoną inicjału oraz pełne menu
+  nawigacyjne aplikacji;
+- sidebar można zwijać i rozwijać, a stan zwinięty pokazuje skrócone ikony;
+- przycisk zwijania sidebara używa ikon `ChevronLeft` i `ChevronRight`;
+- przycisk `Sign out` został przeprojektowany, ma ikonę `LogOut`, mniejszą
+  typografię i nie ma obramowania;
+- dodano zależność `lucide-react` jako źródło ikon UI;
+- dashboard pokazuje metryki `todo`, `in progress` oraz `completed this quarter`;
+- kafelek `completed this quarter` jest zielony i bazuje na pozycji dawnego
+  `backlog`;
+- kalendarz miesięczny został dodany jako kompaktowa karta obok sekcji
+  dashboardu;
+- usunięto dolną sekcję powielających się kolorowych boxów workflow.
+
+Znaczenie architektoniczne:
+
+- `AppShell` stał się centralnym miejscem dla nawigacji, informacji o
+  użytkowniku, wyboru motywu i akcji konta;
+- ikony aplikacji mają teraz wspólne źródło (`lucide-react`), co ułatwia dalsze
+  rozwijanie UI bez ręcznego rysowania SVG/CSS;
+- dashboard nadal korzysta z danych serwerowych, ale prezentuje je w bardziej
+  kompaktowym, panelowym układzie.
+
+Walidacja:
+
+- `npm run build` zakończyło się powodzeniem;
+- `npm run typecheck` zakończyło się powodzeniem.
+
 Ten plik jest dziennikiem pracy. Trafiają tu szczegółowe opisy zmian,
 analizy struktury projektu oraz notatki o kolejnych commitach.
 
