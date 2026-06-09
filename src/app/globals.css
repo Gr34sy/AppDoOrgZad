@@ -4,10 +4,28 @@
 
 :root {
   color-scheme: light;
+  --app-background: #fefefe;
+  --dashboard-accent: #16a085;
+  --dashboard-accent-strong: #0e806d;
+  --dashboard-accent-soft: #d4f3e8;
+  --dashboard-accent-muted: #f2fbf8;
+  --dashboard-accent-text: #06463f;
+  --app-accent: #16a085;
+  --dashboard-upcoming-color: #16a085;
+  --dashboard-todo-color: #0284c7;
+  --dashboard-progress-color: #c026d3;
+  --dashboard-completed-color: #27272a;
+  --dashboard-calendar-color: #16a085;
 }
 
 .dark {
   color-scheme: dark;
+  --app-background: #0b0b0f;
+  --dashboard-accent: #22d3ee;
+  --dashboard-accent-strong: #67e8f9;
+  --dashboard-accent-soft: rgba(34, 211, 238, 0.16);
+  --dashboard-accent-muted: rgba(34, 211, 238, 0.08);
+  --dashboard-accent-text: #ecfeff;
 }
 
 body {
@@ -16,7 +34,7 @@ body {
 
 @layer base {
   body {
-    @apply bg-zinc-50 text-zinc-950 antialiased dark:bg-zinc-950 dark:text-zinc-50;
+    @apply bg-[var(--app-background)] text-zinc-950 antialiased dark:text-zinc-50;
   }
 }
 

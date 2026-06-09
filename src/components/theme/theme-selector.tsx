@@ -1,29 +1,26 @@
 "use client";
 
-import type { ThemeName } from "@/types/domain";
+import type { ColorMode } from "@/types/domain";
 import { useTheme } from "@/components/theme/theme-provider";
 
-const themes: Array<{ label: string; value: ThemeName }> = [
+const modes: Array<{ label: string; value: ColorMode }> = [
   { label: "System", value: "system" },
   { label: "Light", value: "light" },
-  { label: "Dark", value: "dark" },
-  { label: "Forest", value: "forest" },
-  { label: "Sky", value: "sky" },
-  { label: "Rose", value: "rose" }
+  { label: "Dark", value: "dark" }
 ];
 
 export function ThemeSelector() {
-  const { theme, setTheme } = useTheme();
+  const { colorMode, setColorMode } = useTheme();
 
   return (
     <label className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-300">
-      Theme
+      Color mode
       <select
-        value={theme}
-        onChange={(event) => setTheme(event.target.value as ThemeName)}
-        className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-zinc-900 shadow-sm outline-none transition focus:border-brand-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+        value={colorMode}
+        onChange={(event) => setColorMode(event.target.value as ColorMode)}
+        className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-zinc-900 shadow-sm outline-none transition focus:border-[var(--app-accent)] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
       >
-        {themes.map((option) => (
+        {modes.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>

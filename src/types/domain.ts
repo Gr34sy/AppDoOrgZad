@@ -4,7 +4,9 @@ export type Priority = "low" | "medium" | "high" | "urgent";
 
 export type PinTargetType = "note" | "checklist" | "task" | "project";
 
-export type ThemeName = "system" | "light" | "dark" | "forest" | "sky" | "rose";
+export type ColorMode = "system" | "light" | "dark";
+
+export type ThemeName = ColorMode;
 
 export type EntityType = "note" | "checklist" | "task" | "project";
 

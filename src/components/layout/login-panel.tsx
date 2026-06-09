@@ -21,7 +21,7 @@ function getAuthorizationParams(providerId: string): Record<string, string> | un
 
 export function LoginPanel({ providers }: LoginPanelProps) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 dark:bg-zinc-950">
+    <main className="flex min-h-screen items-center justify-center bg-[var(--app-background)] px-4">
       <section className="w-full max-w-sm rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <h1 className="text-2xl font-semibold">Sign in</h1>
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
@@ -40,7 +40,7 @@ export function LoginPanel({ providers }: LoginPanelProps) {
                     getAuthorizationParams(provider.id)
                   )
                 }
-                className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium transition hover:border-brand-500 hover:text-brand-600 dark:border-zinc-700"
+                className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium transition hover:border-[var(--app-accent)] hover:text-[var(--app-accent)] dark:border-zinc-700"
               >
                 Continue with {provider.name}
               </button>
