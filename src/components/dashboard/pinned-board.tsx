@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PinnedItemsSearch } from "@/components/dashboard/pinned-items-search";
 
 type PinnedItem = {
   id: string;
@@ -12,6 +13,13 @@ type PinnedItem = {
 type WorkflowColumn = {
   title: string;
   count: number;
+  items: Array<{
+    id: string;
+    title: string;
+    priority: string;
+    dueDate: string;
+    href: string;
+  }>;
 };
 
 type CalendarEvent = {
@@ -45,21 +53,23 @@ const priorityStyles: Record<string, string> = {
 };
 
 const workflowStyles: Record<string, string> = {
-  backlog: "from-emerald-500 to-green-700",
-  todo: "from-sky-500 to-blue-700",
-  in_progress: "from-fuchsia-500 to-violet-700",
-  testing: "from-amber-400 to-orange-600",
-  done: "from-zinc-700 to-zinc-900"
+  todo: "bg-[var(--dashboard-todo-color)]",
+  in_progress: "bg-[var(--dashboard-progress-color)]",
+  done: "bg-[var(--dashboard-completed-color)]"
 };
 
-const dashboardMetricOrder = ["todo", "in_progress", "backlog"];
+const dashboardMetricOrder = ["todo", "in_progress", "done"];
 
 function formatLabel(value: string) {
   return value.replace(/_/g, " ");
 }
 
 function getDashboardLabel(value: string) {
-  return value === "backlog" ? "completed this quarter" : formatLabel(value);
+  if (value === "todo") {
+    return "to do";
+  }
+
+  return value === "done" ? "completed" : formatLabel(value);
 }
 
 function getOrderedWorkflowColumns(workflowColumns: WorkflowColumn[]) {
@@ -95,6 +105,59 @@ function buildCalendarDays(events: CalendarEvent[]) {
   });
 }
 
+function formatShortDate(date: string) {
+  return date ? new Date(date).toLocaleDateString("en") : "No due date";
+}
+
+function MetricOverlay({
+  emptyLabel,
+  items
+}: {
+  emptyLabel: string;
+  items: Array<{
+    id: string;
+    title: string;
+    href: string;
+    type?: string;
+    priority?: string;
+    date?: string;
+  }>;
+}) {
+  return (
+    <div className="absolute left-0 top-full z-30 hidden w-80 pt-2 group-hover:block">
+      <div className="rounded-lg border border-zinc-200 bg-white p-3 text-zinc-950 shadow-xl shadow-zinc-950/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50">
+        {items.length ? (
+          <div className="grid gap-2">
+            {items.map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                className="grid grid-cols-[auto_1fr] gap-3 rounded-md border border-zinc-100 p-2 transition hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700"
+              >
+                <span
+                  className={`mt-1 h-2.5 w-2.5 rounded-full ${
+                    priorityStyles[item.priority ?? ""] ?? "bg-[var(--dashboard-accent)]"
+                  }`}
+                />
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-semibold">{item.title}</span>
+                  <span className="mt-0.5 block truncate text-xs text-zinc-500 dark:text-zinc-400">
+                    {[item.type, item.date ? formatShortDate(item.date) : null, item.priority]
+                      .filter(Boolean)
+                      .join(" / ")}
+                  </span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">{emptyLabel}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function PinnedBoard({ pinnedItems, workflowColumns, calendarEvents }: PinnedBoardProps) {
   const calendarDays = buildCalendarDays(calendarEvents);
   const orderedWorkflowColumns = getOrderedWorkflowColumns(workflowColumns);
@@ -109,190 +172,98 @@ export function PinnedBoard({ pinnedItems, workflowColumns, calendarEvents }: Pi
 
   return (
     <div className="grid gap-6">
-      <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-        <section>
-          <div>
-            <div className="flex min-w-0 flex-col justify-between gap-6">
-              <div>
-                <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Dashboard</p>
+      <section className="grid gap-3">
+        <div className="grid items-stretch gap-4 xl:grid-cols-[auto_340px] xl:justify-start">
+          <div className="grid h-full max-w-[412px] grid-cols-[minmax(0,200px)] gap-3 sm:grid-cols-[repeat(2,minmax(0,200px))] sm:grid-rows-2">
+            <div className="group relative z-0 rounded-lg bg-[var(--dashboard-upcoming-color)] p-3 text-white shadow-lg shadow-black/15 transition hover:z-20 hover:-translate-y-0.5 hover:shadow-xl focus-within:z-20">
+              <div className="flex h-full flex-col items-center justify-center text-center">
+                <p className="text-[11px] font-medium uppercase text-white/80">Upcoming</p>
+                <p className="mt-2 text-2xl font-semibold text-white">{upcomingEvents.length}</p>
               </div>
-              <div className="grid gap-3 sm:grid-cols-3">
-                {dashboardMetrics.map((column) => (
-                  <div
-                    key={column.title}
-                    className={`rounded-lg bg-gradient-to-br ${
-                      workflowStyles[column.title] ?? "from-zinc-700 to-zinc-900"
-                  } p-4 shadow-lg shadow-black/20`}
-                >
-                  <p className="text-xs font-medium uppercase text-zinc-200">
+              <MetricOverlay
+                emptyLabel="No due dates"
+                items={upcomingEvents.map((event) => ({
+                  id: event.id,
+                  title: event.title,
+                  href: event.href,
+                  type: event.type,
+                  priority: event.priority,
+                  date: event.date
+                }))}
+              />
+            </div>
+            {dashboardMetrics.map((column) => (
+              <div
+                key={column.title}
+                className={`group relative z-0 rounded-lg ${
+                  workflowStyles[column.title] ?? "bg-zinc-900"
+                } p-3 shadow-lg shadow-black/20 transition hover:z-20 hover:-translate-y-0.5 hover:shadow-xl focus-within:z-20`}
+              >
+                <div className="flex h-full flex-col items-center justify-center text-center">
+                  <p className="text-[11px] font-medium uppercase text-zinc-200">
                     {getDashboardLabel(column.title)}
                   </p>
-                  <p className="mt-3 text-3xl font-semibold text-zinc-100">{column.count}</p>
+                  <p className="mt-2 text-2xl font-semibold text-zinc-100">{column.count}</p>
+                </div>
+                <MetricOverlay
+                  emptyLabel={`Nothing ${getDashboardLabel(column.title)}`}
+                  items={column.items.map((item) => ({
+                    id: item.id,
+                    title: item.title,
+                    href: item.href,
+                    priority: item.priority,
+                    date: item.dueDate
+                  }))}
+                />
+              </div>
+            ))}
+          </div>
+
+          <section className="rounded-lg border border-zinc-200 bg-white p-4 text-zinc-950 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-sm font-semibold text-zinc-950 dark:text-zinc-50">{monthLabel}</h2>
+              <span className="rounded-md bg-[color-mix(in_srgb,var(--dashboard-calendar-color)_18%,transparent)] px-2 py-1 text-xs font-semibold text-[var(--dashboard-calendar-color)]">
+                {calendarEvents.length}
+              </span>
+            </div>
+            <div className="mt-4 grid grid-cols-7 gap-1 text-center text-[10px] font-semibold uppercase text-zinc-400 dark:text-zinc-500">
+              {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => (
+                <span key={`${day}-${index}`}>{day}</span>
+              ))}
+            </div>
+            <div className="mt-2 grid grid-cols-7 gap-1">
+              {calendarDays.map((day) => (
+                <div
+                  key={day.dateKey}
+                  className={`relative aspect-square rounded-md border p-1 text-[11px] ${
+                    day.isToday
+                      ? "border-[var(--dashboard-calendar-color)] bg-[var(--dashboard-calendar-color)] font-semibold text-white"
+                    : day.isCurrentMonth
+                        ? "border-zinc-200 bg-[color-mix(in_srgb,var(--dashboard-calendar-color)_8%,transparent)] text-zinc-700 dark:border-zinc-800 dark:text-zinc-200"
+                        : "border-transparent bg-transparent text-zinc-300 dark:text-zinc-700"
+                  }`}
+                >
+                  <span>{day.date.getDate()}</span>
+                  {day.events.length > 0 ? (
+                    <div className="absolute inset-x-1 bottom-1 flex justify-center gap-0.5">
+                      {day.events.slice(0, 3).map((event) => (
+                        <span
+                          key={event.id}
+                          className={`h-1 w-1 rounded-full ${
+                            priorityStyles[event.priority] ?? "bg-[var(--dashboard-calendar-color)]"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               ))}
-              </div>
             </div>
-          </div>
-        </section>
-
-        <section className="rounded-lg bg-zinc-950 p-4 text-white shadow-2xl shadow-zinc-950/15">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold text-white">{monthLabel}</h2>
-            <span className="rounded-md bg-white/15 px-2 py-1 text-xs font-semibold text-white">
-              {calendarEvents.length}
-            </span>
-          </div>
-          <div className="mt-4 grid grid-cols-7 gap-1 text-center text-[10px] font-semibold uppercase text-white/45">
-            {["M", "T", "W", "T", "F", "S", "S"].map((day, index) => (
-              <span key={`${day}-${index}`}>{day}</span>
-            ))}
-          </div>
-          <div className="mt-2 grid grid-cols-7 gap-1">
-            {calendarDays.map((day) => (
-              <div
-                key={day.dateKey}
-                className={`relative aspect-square rounded-md border p-1 text-[11px] ${
-                  day.isToday
-                    ? "border-fuchsia-300 bg-fuchsia-300 text-zinc-950"
-                    : day.isCurrentMonth
-                      ? "border-white/10 bg-white/10 text-white"
-                      : "border-transparent bg-transparent text-white/25"
-                }`}
-              >
-                <span>{day.date.getDate()}</span>
-                {day.events.length > 0 ? (
-                  <div className="absolute inset-x-1 bottom-1 flex justify-center gap-0.5">
-                    {day.events.slice(0, 3).map((event) => (
-                      <span
-                        key={event.id}
-                        className={`h-1 w-1 rounded-full ${
-                          priorityStyles[event.priority] ?? "bg-white"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      <section className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-semibold tracking-normal">Pinned items</h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            {pinnedItems.length ? `${pinnedItems.length} saved items` : "No saved items"}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2 text-sm">
-          <Link
-            href="/dashboard/notes/new"
-            className="rounded-md bg-zinc-950 px-4 py-2 font-medium text-white transition hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
-          >
-            Note
-          </Link>
-          <Link
-            href="/dashboard/checklists/new"
-            className="rounded-md border border-zinc-200 px-4 py-2 font-medium transition hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
-          >
-            Checklist
-          </Link>
-          <Link
-            href="/dashboard/tasks/new"
-            className="rounded-md border border-zinc-200 px-4 py-2 font-medium transition hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
-          >
-            Task
-          </Link>
-          <Link
-            href="/dashboard/projects/new"
-            className="rounded-md border border-zinc-200 px-4 py-2 font-medium transition hover:border-zinc-400 dark:border-zinc-800 dark:hover:border-zinc-600"
-          >
-            Project
-          </Link>
+          </section>
         </div>
       </section>
 
-      <div className="grid gap-6">
-        <section className="grid content-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {pinnedItems.length ? (
-            pinnedItems.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                className="group min-h-44 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-950/10 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <span
-                    className={`rounded-md border px-2.5 py-1 text-xs font-semibold ${
-                      typeStyles[item.type] ?? "border-zinc-300 bg-zinc-100 text-zinc-900"
-                    }`}
-                  >
-                    {item.type}
-                  </span>
-                  <span className="max-w-[9rem] truncate rounded-md bg-zinc-100 px-2 py-1 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-                    {formatLabel(item.status)}
-                  </span>
-                </div>
-                <h3 className="mt-5 line-clamp-2 text-lg font-semibold tracking-normal">
-                  {item.title}
-                </h3>
-                <p className="mt-3 line-clamp-3 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-                  {item.meta}
-                </p>
-                <div className="mt-5 h-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800">
-                  <div
-                    className={`h-1.5 rounded-full ${
-                      item.type === "Note"
-                        ? "bg-fuchsia-400"
-                        : item.type === "Checklist"
-                          ? "bg-emerald-400"
-                          : item.type === "Project"
-                            ? "bg-violet-400"
-                            : "bg-sky-400"
-                    }`}
-                    style={{ width: "42%" }}
-                  />
-                </div>
-              </Link>
-            ))
-          ) : (
-            <article className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-              <h3 className="text-lg font-semibold">No pinned items</h3>
-            </article>
-          )}
-        </section>
-
-        <section className="max-w-xl rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="text-lg font-semibold tracking-normal">Upcoming</h2>
-            <div className="mt-4 grid gap-3">
-              {upcomingEvents.length ? (
-                upcomingEvents.map((event) => (
-                  <Link
-                    key={`${event.type}-${event.id}`}
-                    href={event.href}
-                    className="grid grid-cols-[auto_1fr] gap-3 rounded-lg border border-zinc-100 p-3 transition hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700"
-                  >
-                    <span
-                      className={`mt-1 h-3 w-3 rounded-full ${
-                        priorityStyles[event.priority] ?? "bg-zinc-400"
-                      }`}
-                    />
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm font-semibold">{event.title}</span>
-                      <span className="mt-1 block text-xs text-zinc-500 dark:text-zinc-400">
-                        {event.type} / {new Date(event.date).toLocaleDateString("en")}
-                      </span>
-                    </span>
-                  </Link>
-                ))
-              ) : (
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">No due dates this month</p>
-              )}
-            </div>
-        </section>
-      </div>
-
+      <PinnedItemsSearch pinnedItems={pinnedItems} typeStyles={typeStyles} />
     </div>
   );
 }

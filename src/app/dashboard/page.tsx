@@ -29,6 +29,14 @@ type PinnedTarget = {
   items?: unknown[];
 };
 
+type WorkflowTask = {
+  _id: unknown;
+  title: string;
+  priority?: string;
+  statusId?: string;
+  dueDate?: Date | string | null;
+};
+
 const targetConfig: Record<PinTargetType, { hrefBase: string; label: string }> = {
   note: { hrefBase: "/dashboard/notes", label: "Note" },
   checklist: { hrefBase: "/dashboard/checklists", label: "Checklist" },
@@ -68,12 +76,20 @@ export default async function DashboardPage() {
   const calendarStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const calendarEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
-  const [pins, taskStatusCounts, calendarTasks, calendarProjects] = await Promise.all([
+  const [pins, taskStatusCounts, workflowTasks, calendarTasks, calendarProjects] = await Promise.all([
     Pin.find({ ownerId }).sort({ position: 1, updatedAt: -1 }).lean<PinDocument[]>(),
     Task.aggregate<{ _id: string; count: number }>([
       { $match: { ownerId: ownerObjectId, archivedAt: null } },
       { $group: { _id: "$statusId", count: { $sum: 1 } } }
     ]),
+    Task.find({
+      ownerId,
+      archivedAt: null,
+      statusId: { $in: ["todo", "in_progress", "done"] }
+    })
+      .sort({ updatedAt: -1 })
+      .select({ title: 1, priority: 1, dueDate: 1, statusId: 1 })
+      .lean<WorkflowTask[]>(),
     Task.find({
       ownerId,
       archivedAt: null,
@@ -128,9 +144,19 @@ export default async function DashboardPage() {
     )
   ).filter((item) => item !== null);
 
-  const workflowColumns = ["backlog", "todo", "in_progress", "testing", "done"].map((status) => ({
+  const workflowColumns = ["todo", "in_progress", "done"].map((status) => ({
     title: status,
-    count: taskStatusCounts.find((taskStatus) => taskStatus._id === status)?.count ?? 0
+    count: taskStatusCounts.find((taskStatus) => taskStatus._id === status)?.count ?? 0,
+    items: workflowTasks
+      .filter((task) => task.statusId === status)
+      .slice(0, 5)
+      .map((task) => ({
+        id: String(task._id),
+        title: task.title,
+        priority: task.priority ?? "medium",
+        dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : "",
+        href: `/dashboard/tasks/${String(task._id)}`
+      }))
   }));
 
   const calendarEvents = [
