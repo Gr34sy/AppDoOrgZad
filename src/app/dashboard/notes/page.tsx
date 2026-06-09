@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { FileText, Plus, StickyNote, Tag } from "lucide-react";
 import { FilterSelect } from "@/components/dashboard/filter-select";
 import { AppShell } from "@/components/layout/app-shell";
-import { DashboardTabs } from "@/components/dashboard/dashboard-tabs";
 import { SearchInput } from "@/components/dashboard/search-input";
 import { SortSelect } from "@/components/dashboard/sort-select";
 import { authOptions } from "@/lib/auth";
 import { defaultSortOptions, escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
 import { connectDatabase } from "@/lib/mongoose";
+import { getNoteCardStyle } from "@/lib/note-colors";
 import { Note } from "@/models/note";
 
 type NotesPageProps = {
@@ -62,55 +63,112 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
 
   return (
     <AppShell>
-      <DashboardTabs />
+      <section className="grid gap-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
+              Notes
+            </h1>
+          </div>
+          <Link
+            href="/dashboard/notes/new"
+            className="inline-flex h-11 items-center gap-2 rounded-md bg-[var(--app-accent)] px-4 text-sm font-medium text-white shadow-sm transition hover:opacity-90"
+          >
+            <Plus aria-hidden="true" className="h-4 w-4" />
+            New note
+          </Link>
+        </div>
 
-      <h1>notes</h1>
+        <form
+          method="get"
+          className="grid gap-3 rounded-md border border-zinc-200 bg-white p-4 shadow-sm md:grid-cols-[minmax(18rem,1fr)_12rem_12rem_auto_auto] md:items-end dark:border-zinc-800 dark:bg-zinc-950"
+        >
+          <SearchInput defaultValue={search} />
+          <FilterSelect
+            name="tag"
+            defaultValue={tag}
+            options={tagOptions}
+            placeholder="all tags"
+          />
+          <SortSelect defaultValue={sort} options={defaultSortOptions} />
+          <button
+            type="submit"
+            className="h-11 rounded-md bg-zinc-950 px-4 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
+          >
+            Apply
+          </button>
+          <Link
+            href="/dashboard/notes"
+            className="inline-flex h-11 items-center justify-center rounded-md border border-zinc-300 px-4 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
+          >
+            Clear
+          </Link>
+        </form>
 
-      <p>
-        <Link href="/dashboard/notes/new">add note</Link>
-      </p>
+        {notes.length ? (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+            {notes.map((note) => {
+              const noteId = String(note._id);
+              const noteStyle = getNoteCardStyle(note.color);
+              const preview = note.content?.trim();
 
-      <form method="get">
-        <SearchInput defaultValue={search} />
-        <FilterSelect
-          name="tag"
-          defaultValue={tag}
-          options={tagOptions}
-          placeholder="all tags"
-        />
-        <SortSelect defaultValue={sort} options={defaultSortOptions} />
-        <button type="submit">apply</button>
-        <Link href="/dashboard/notes">clear</Link>
-      </form>
+              return (
+                <Link
+                  key={noteId}
+                  href={`/dashboard/notes/${noteId}`}
+                  className="group grid min-h-56 grid-rows-[auto_1fr_auto] overflow-hidden rounded-md border p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                  style={noteStyle}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <h2 className="line-clamp-2 text-lg font-semibold tracking-normal">
+                      {note.title}
+                    </h2>
+                    <StickyNote
+                      aria-hidden="true"
+                      className="h-5 w-5 shrink-0 opacity-60 transition group-hover:opacity-100"
+                    />
+                  </div>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
-        {notes.map((note) => {
-          const noteColor = note.color?.trim();
-          const hasColor = Boolean(noteColor);
-          const noteId = String(note._id);
+                  {preview ? (
+                    <p className="mt-3 line-clamp-5 text-sm leading-6 opacity-80">{preview}</p>
+                  ) : (
+                    <p className="mt-3 text-sm opacity-60">No content yet.</p>
+                  )}
 
-          return (
-            <Link
-              key={noteId}
-              href={`/dashboard/notes/${noteId}`}
-              style={{
-                display: "block",
-                width: "160px",
-                height: "160px",
-                overflow: "hidden",
-                backgroundColor: hasColor ? noteColor : "#ffffff",
-                border: hasColor ? "1px solid transparent" : "1px solid #000000",
-                color: "#000000",
-                textDecoration: "none"
-              }}
-            >
-              <h2>{note.title}</h2>
-              {note.content ? <p>{note.content}</p> : null}
-              {note.tags?.length ? <p>{note.tags.join(", ")}</p> : null}
-            </Link>
-          );
-        })}
-      </div>
+                  {note.tags?.length ? (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {note.tags.slice(0, 4).map((noteTag) => (
+                        <span
+                          key={noteTag}
+                          className="inline-flex items-center gap-1 rounded-full border border-current px-2 py-1 text-xs font-medium opacity-70"
+                        >
+                          <Tag aria-hidden="true" className="h-3 w-3" />
+                          {noteTag}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="grid min-h-72 place-items-center rounded-md border border-dashed border-zinc-300 bg-white px-6 py-12 text-center dark:border-zinc-700 dark:bg-zinc-950">
+            <div className="max-w-sm">
+              <FileText
+                aria-hidden="true"
+                className="mx-auto h-10 w-10 text-[var(--app-accent)]"
+              />
+              <h2 className="mt-4 text-lg font-semibold text-zinc-950 dark:text-zinc-50">
+                No notes found
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                Create a new note or adjust the current filters.
+              </p>
+            </div>
+          </div>
+        )}
+      </section>
     </AppShell>
   );
 }

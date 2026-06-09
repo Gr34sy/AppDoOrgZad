@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
 
 type DeleteEntityButtonProps = {
   endpoint: string;
@@ -39,11 +40,17 @@ export function DeleteEntityButton({
   }
 
   return (
-    <div>
-      <button type="button" onClick={handleDelete} disabled={isDeleting}>
-        {isDeleting ? "Usuwanie..." : label}
+    <div className="grid gap-2">
+      <button
+        type="button"
+        onClick={handleDelete}
+        disabled={isDeleting}
+        className="inline-flex h-10 items-center gap-2 rounded-md border border-red-200 px-3 text-sm font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-500/30 dark:text-red-300 dark:hover:border-red-500/60 dark:hover:bg-red-500/10"
+      >
+        <Trash2 aria-hidden="true" className="h-4 w-4" />
+        {isDeleting ? "Deleting..." : label}
       </button>
-      {error ? <p>{error}</p> : null}
+      {error ? <p className="text-sm text-red-600 dark:text-red-300">{error}</p> : null}
     </div>
   );
 }

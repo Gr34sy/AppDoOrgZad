@@ -2,8 +2,8 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 import { isValidObjectId } from "mongoose";
+import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
-import { DashboardTabs } from "@/components/dashboard/dashboard-tabs";
 import { NoteDetailsPanel } from "@/components/notes/note-details-panel";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
@@ -57,11 +57,13 @@ export default async function NotePage({ params }: NotePageProps) {
 
   return (
     <AppShell>
-      <DashboardTabs />
-
-      <p>
-        <Link href="/dashboard/notes">back to notes</Link>
-      </p>
+      <Link
+        href="/dashboard/notes"
+        className="mb-5 inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
+      >
+        <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+        Back to notes
+      </Link>
 
       <NoteDetailsPanel
         noteId={params.noteId}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Pin } from "lucide-react";
 
 type PinEntityButtonProps = {
   targetType: "note" | "checklist" | "task" | "project";
@@ -42,11 +43,21 @@ export function PinEntityButton({ targetType, targetId, initialPinId }: PinEntit
   }
 
   return (
-    <div>
-      <button type="button" onClick={handleToggle} disabled={isSubmitting}>
-        {isSubmitting ? "Zapisywanie..." : pinId ? "Odepnij" : "Przypnij"}
+    <div className="grid gap-2">
+      <button
+        type="button"
+        onClick={handleToggle}
+        disabled={isSubmitting}
+        className={`inline-flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${
+          pinId
+            ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-white hover:opacity-90"
+            : "border-zinc-300 text-zinc-700 hover:border-[var(--app-accent)] hover:text-zinc-950 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
+        }`}
+      >
+        <Pin aria-hidden="true" className="h-4 w-4" />
+        {isSubmitting ? "Saving..." : pinId ? "Pinned" : "Pin"}
       </button>
-      {error ? <p>{error}</p> : null}
+      {error ? <p className="text-sm text-red-600 dark:text-red-300">{error}</p> : null}
     </div>
   );
 }

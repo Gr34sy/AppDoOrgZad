@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Save } from "lucide-react";
 import { TagInputs } from "@/components/dashboard/tag-inputs";
 import { NoteColorInput } from "@/components/notes/note-color-input";
 
@@ -21,13 +22,13 @@ export function NoteCreateForm() {
     const formData = new FormData(event.currentTarget);
     const title = String(formData.get("title") ?? "").trim();
     const content = String(formData.get("content") ?? "");
-    const noteColor = colorMode === "hexadecimal" ? hexColor.trim() : colorMode;
+    const noteColor = colorMode === "hexadecimal" ? hexColor.trim() || "#fff7cc" : colorMode;
     const noteTags = tags
       .map((tag) => tag.trim())
       .filter(Boolean);
 
     if (!title) {
-      setError("Tytuł notatki jest wymagany.");
+      setError("Note title is required.");
       setIsSubmitting(false);
       return;
     }
@@ -46,7 +47,7 @@ export function NoteCreateForm() {
     });
 
     if (!response.ok) {
-      setError("Nie udało się dodać notatki.");
+      setError("Could not create the note.");
       setIsSubmitting(false);
       return;
     }
@@ -56,15 +57,35 @@ export function NoteCreateForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="title">Tytuł</label>
-        <input id="title" name="title" type="text" required />
+    <form
+      onSubmit={handleSubmit}
+      className="grid gap-6 rounded-md border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+    >
+      <div className="grid gap-2">
+        <label htmlFor="title" className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+          Title
+        </label>
+        <input
+          id="title"
+          name="title"
+          type="text"
+          required
+          placeholder="Give this note a clear name"
+          className="h-12 rounded-md border border-zinc-300 bg-white px-3 text-base text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+        />
       </div>
 
-      <div>
-        <label htmlFor="content">Treść</label>
-        <textarea id="content" name="content" />
+      <div className="grid gap-2">
+        <label htmlFor="content" className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+          Content
+        </label>
+        <textarea
+          id="content"
+          name="content"
+          rows={12}
+          placeholder="Write the note..."
+          className="min-h-72 resize-y rounded-md border border-zinc-300 bg-white px-3 py-3 text-sm leading-6 text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+        />
       </div>
 
       <NoteColorInput
@@ -76,10 +97,19 @@ export function NoteCreateForm() {
 
       <TagInputs tags={tags} onChange={setTags} />
 
-      {error ? <p>{error}</p> : null}
+      {error ? (
+        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
+          {error}
+        </p>
+      ) : null}
 
-      <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Dodawanie..." : "Dodaj notatkę"}
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="inline-flex h-11 w-fit items-center gap-2 rounded-md bg-[var(--app-accent)] px-4 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <Save aria-hidden="true" className="h-4 w-4" />
+        {isSubmitting ? "Creating..." : "Create note"}
       </button>
     </form>
   );
