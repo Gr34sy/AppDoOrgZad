@@ -2,8 +2,8 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 import { isValidObjectId } from "mongoose";
+import { ArrowLeft } from "lucide-react";
 import { ChecklistDetailsPanel } from "@/components/checklists/checklist-details-panel";
-import { DashboardTabs } from "@/components/dashboard/dashboard-tabs";
 import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
@@ -70,26 +70,30 @@ export default async function ChecklistPage({ params }: ChecklistPageProps) {
 
   return (
     <AppShell>
-      <DashboardTabs />
+      <section className="grid gap-5">
+        <Link
+          href="/dashboard/checklists"
+          className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
+        >
+          <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+          Back to checklists
+        </Link>
 
-      <p>
-        <Link href="/dashboard/checklists">back to checklists</Link>
-      </p>
-
-      <ChecklistDetailsPanel
-        checklistId={params.checklistId}
-        title={checklist.title}
-        description={checklist.description ?? ""}
-        tags={checklist.tags ?? []}
-        items={items.map((item) => ({
-          title: item.title,
-          isCompleted: Boolean(item.isCompleted)
-        }))}
-        parentType={checklist.parentType}
-        createdAtLabel={checklist.createdAt?.toLocaleString("pl-PL")}
-        updatedAtLabel={checklist.updatedAt?.toLocaleString("pl-PL")}
-        pinId={pin ? String(pin._id) : undefined}
-      />
+        <ChecklistDetailsPanel
+          checklistId={params.checklistId}
+          title={checklist.title}
+          description={checklist.description ?? ""}
+          tags={checklist.tags ?? []}
+          items={items.map((item) => ({
+            title: item.title,
+            isCompleted: Boolean(item.isCompleted)
+          }))}
+          parentType={checklist.parentType}
+          createdAtLabel={checklist.createdAt?.toLocaleString("pl-PL")}
+          updatedAtLabel={checklist.updatedAt?.toLocaleString("pl-PL")}
+          pinId={pin ? String(pin._id) : undefined}
+        />
+      </section>
     </AppShell>
   );
 }

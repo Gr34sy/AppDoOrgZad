@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 import { isValidObjectId } from "mongoose";
-import { DashboardTabs } from "@/components/dashboard/dashboard-tabs";
+import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { TaskDetailsPanel } from "@/components/tasks/task-details-panel";
 import { authOptions } from "@/lib/auth";
@@ -85,37 +85,41 @@ export default async function TaskPage({ params }: TaskPageProps) {
 
   return (
     <AppShell>
-      <DashboardTabs />
+      <section className="grid gap-5">
+        <Link
+          href="/dashboard/tasks"
+          className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
+        >
+          <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+          Back to tasks
+        </Link>
 
-      <p>
-        <Link href="/dashboard/tasks">back to tasks</Link>
-      </p>
-
-      <TaskDetailsPanel
-        taskId={params.taskId}
-        projectOptions={projects.map((project) => ({
-          id: String(project._id),
-          title: project.title
-        }))}
-        checklistOptions={checklists.map((checklist) => ({
-          id: String(checklist._id),
-          title: checklist.title
-        }))}
-        title={task.title}
-        description={task.description ?? ""}
-        priority={task.priority ?? "medium"}
-        statusId={task.statusId ?? "todo"}
-        projectId={task.projectId ? String(task.projectId) : ""}
-        dueDate={getDateInputValue(task.dueDate)}
-        dueDateLabel={task.dueDate?.toLocaleString("pl-PL")}
-        estimatedMinutes={task.estimatedMinutes}
-        tags={task.tags ?? []}
-        checklistIds={(task.checklistIds ?? []).map((checklistId) => String(checklistId))}
-        completedAtLabel={task.completedAt?.toLocaleString("pl-PL")}
-        createdAtLabel={task.createdAt?.toLocaleString("pl-PL")}
-        updatedAtLabel={task.updatedAt?.toLocaleString("pl-PL")}
-        pinId={pin ? String(pin._id) : undefined}
-      />
+        <TaskDetailsPanel
+          taskId={params.taskId}
+          projectOptions={projects.map((project) => ({
+            id: String(project._id),
+            title: project.title
+          }))}
+          checklistOptions={checklists.map((checklist) => ({
+            id: String(checklist._id),
+            title: checklist.title
+          }))}
+          title={task.title}
+          description={task.description ?? ""}
+          priority={task.priority ?? "medium"}
+          statusId={task.statusId ?? "todo"}
+          projectId={task.projectId ? String(task.projectId) : ""}
+          dueDate={getDateInputValue(task.dueDate)}
+          dueDateLabel={task.dueDate?.toLocaleString("pl-PL")}
+          estimatedMinutes={task.estimatedMinutes}
+          tags={task.tags ?? []}
+          checklistIds={(task.checklistIds ?? []).map((checklistId) => String(checklistId))}
+          completedAtLabel={task.completedAt?.toLocaleString("pl-PL")}
+          createdAtLabel={task.createdAt?.toLocaleString("pl-PL")}
+          updatedAtLabel={task.updatedAt?.toLocaleString("pl-PL")}
+          pinId={pin ? String(pin._id) : undefined}
+        />
+      </section>
     </AppShell>
   );
 }

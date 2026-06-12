@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { DashboardTabs } from "@/components/dashboard/dashboard-tabs";
+import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { TaskForm } from "@/components/tasks/task-form";
 import { authOptions } from "@/lib/auth";
@@ -32,19 +33,36 @@ export default async function NewTaskPage() {
 
   return (
     <AppShell>
-      <DashboardTabs />
-      <h1>new task</h1>
-      <TaskForm
-        mode="create"
-        projectOptions={projects.map((project) => ({
-          id: String(project._id),
-          title: project.title
-        }))}
-        checklistOptions={checklists.map((checklist) => ({
-          id: String(checklist._id),
-          title: checklist.title
-        }))}
-      />
+      <section className="grid max-w-4xl gap-6">
+        <div className="grid gap-3">
+          <Link
+            href="/dashboard/tasks"
+            className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
+          >
+            <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+            Back to tasks
+          </Link>
+          <div>
+            <h1 className="text-3xl font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
+              New task
+            </h1>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              Create a task with priority, status and optional project links.
+            </p>
+          </div>
+        </div>
+        <TaskForm
+          mode="create"
+          projectOptions={projects.map((project) => ({
+            id: String(project._id),
+            title: project.title
+          }))}
+          checklistOptions={checklists.map((checklist) => ({
+            id: String(checklist._id),
+            title: checklist.title
+          }))}
+        />
+      </section>
     </AppShell>
   );
 }

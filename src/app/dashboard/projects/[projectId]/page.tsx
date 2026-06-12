@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 import { isValidObjectId } from "mongoose";
-import { DashboardTabs } from "@/components/dashboard/dashboard-tabs";
+import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { ProjectDetailsPanel } from "@/components/projects/project-details-panel";
 import { authOptions } from "@/lib/auth";
@@ -99,38 +99,42 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <AppShell>
-      <DashboardTabs />
+      <section className="grid gap-5">
+        <Link
+          href="/dashboard/projects"
+          className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
+        >
+          <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+          Back to projects
+        </Link>
 
-      <p>
-        <Link href="/dashboard/projects">back to projects</Link>
-      </p>
-
-      <ProjectDetailsPanel
-        projectId={params.projectId}
-        checklistOptions={checklists.map((checklist) => ({
-          id: String(checklist._id),
-          title: checklist.title
-        }))}
-        title={project.title}
-        description={project.description ?? ""}
-        priority={project.priority ?? "medium"}
-        lifecycleStatus={project.lifecycleStatus ?? "active"}
-        dueDate={getDateInputValue(project.dueDate)}
-        dueDateLabel={project.dueDate?.toLocaleString("pl-PL")}
-        estimatedMinutes={project.estimatedMinutes}
-        tags={project.tags ?? []}
-        checklistIds={(project.checklistIds ?? []).map((checklistId) => String(checklistId))}
-        taskCount={taskCount}
-        kanbanColumns={kanbanColumns.map((column) => ({
-          id: column.id,
-          title: column.title,
-          isDone: Boolean(column.isDone)
-        }))}
-        completedAtLabel={project.completedAt?.toLocaleString("pl-PL")}
-        createdAtLabel={project.createdAt?.toLocaleString("pl-PL")}
-        updatedAtLabel={project.updatedAt?.toLocaleString("pl-PL")}
-        pinId={pin ? String(pin._id) : undefined}
-      />
+        <ProjectDetailsPanel
+          projectId={params.projectId}
+          checklistOptions={checklists.map((checklist) => ({
+            id: String(checklist._id),
+            title: checklist.title
+          }))}
+          title={project.title}
+          description={project.description ?? ""}
+          priority={project.priority ?? "medium"}
+          lifecycleStatus={project.lifecycleStatus ?? "active"}
+          dueDate={getDateInputValue(project.dueDate)}
+          dueDateLabel={project.dueDate?.toLocaleString("pl-PL")}
+          estimatedMinutes={project.estimatedMinutes}
+          tags={project.tags ?? []}
+          checklistIds={(project.checklistIds ?? []).map((checklistId) => String(checklistId))}
+          taskCount={taskCount}
+          kanbanColumns={kanbanColumns.map((column) => ({
+            id: column.id,
+            title: column.title,
+            isDone: Boolean(column.isDone)
+          }))}
+          completedAtLabel={project.completedAt?.toLocaleString("pl-PL")}
+          createdAtLabel={project.createdAt?.toLocaleString("pl-PL")}
+          updatedAtLabel={project.updatedAt?.toLocaleString("pl-PL")}
+          pinId={pin ? String(pin._id) : undefined}
+        />
+      </section>
     </AppShell>
   );
 }

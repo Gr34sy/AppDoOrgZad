@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { CalendarClock, CheckCircle2, ClipboardList, Plus, Tag } from "lucide-react";
 import { FilterSelect } from "@/components/dashboard/filter-select";
-import { DashboardTabs } from "@/components/dashboard/dashboard-tabs";
 import { SearchInput } from "@/components/dashboard/search-input";
 import { SortSelect } from "@/components/dashboard/sort-select";
 import { AppShell } from "@/components/layout/app-shell";
@@ -91,15 +91,30 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
 
   return (
     <AppShell>
-      <DashboardTabs />
+      <section className="grid gap-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
+              Tasks
+            </h1>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              Track work items, priorities, due dates and progress.
+            </p>
+          </div>
+          <Link
+            href="/dashboard/tasks/new"
+            className="inline-flex h-11 items-center gap-2 rounded-md bg-[var(--app-accent)] px-4 text-sm font-medium text-white shadow-sm transition hover:opacity-90"
+          >
+            <Plus aria-hidden="true" className="h-4 w-4" />
+            New task
+          </Link>
+        </div>
 
-      <h1>tasks</h1>
-      <p>
-        <Link href="/dashboard/tasks/new">add task</Link>
-      </p>
-
-      <form method="get">
-        <SearchInput defaultValue={search} />
+      <form
+        method="get"
+        className="grid gap-3 rounded-md border border-zinc-200 bg-white p-4 shadow-sm md:grid-cols-[minmax(18rem,1fr)_12rem_12rem_auto_auto] md:items-end dark:border-zinc-800 dark:bg-zinc-950"
+      >
+          <SearchInput defaultValue={search} />
         <FilterSelect
           name="priority"
           defaultValue={priority}
@@ -107,28 +122,91 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
           placeholder="all priorities"
         />
         <SortSelect defaultValue={sort} options={taskSortOptions} />
-        <button type="submit">apply</button>
-        <Link href="/dashboard/tasks">clear</Link>
+        <button
+          type="submit"
+          className="h-11 rounded-md bg-zinc-950 px-4 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
+        >
+          Apply
+        </button>
+        <Link
+          href="/dashboard/tasks"
+          className="inline-flex h-11 items-center justify-center rounded-md border border-zinc-300 px-4 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
+        >
+          Clear
+        </Link>
       </form>
 
-      <div>
-        {tasks.map((task) => {
-          const taskId = String(task._id);
+        {tasks.length ? (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {tasks.map((task) => {
+              const taskId = String(task._id);
 
-          return (
-            <article key={taskId}>
-              <Link href={`/dashboard/tasks/${taskId}`}>
-                <h2>{task.title}</h2>
-              </Link>
-              {task.description ? <p>{task.description}</p> : null}
-              <p>priority: {task.priority}</p>
-              <p>status: {task.statusId}</p>
-              {task.dueDate ? <p>due: {task.dueDate.toLocaleString("pl-PL")}</p> : null}
-              {task.tags?.length ? <p>{task.tags.join(", ")}</p> : null}
-            </article>
-          );
-        })}
-      </div>
+              return (
+                <Link
+                  key={taskId}
+                  href={`/dashboard/tasks/${taskId}`}
+                  className="group grid min-h-56 grid-rows-[auto_1fr_auto] rounded-md border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--app-accent)] hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h2 className="line-clamp-2 text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
+                        {task.title}
+                      </h2>
+                      <p className="mt-2 text-xs font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
+                        {task.statusId ?? "todo"} · {task.priority ?? "medium"}
+                      </p>
+                    </div>
+                    <ClipboardList
+                      aria-hidden="true"
+                      className="h-5 w-5 shrink-0 text-[var(--app-accent)] opacity-70 transition group-hover:opacity-100"
+                    />
+                  </div>
+
+                  {task.description ? (
+                    <p className="mt-4 line-clamp-4 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                      {task.description}
+                    </p>
+                  ) : (
+                    <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+                      No description yet.
+                    </p>
+                  )}
+
+                  <div className="mt-4 grid gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                    {task.dueDate ? (
+                      <span className="inline-flex items-center gap-2">
+                        <CalendarClock aria-hidden="true" className="h-3.5 w-3.5" />
+                        {task.dueDate.toLocaleString("pl-PL")}
+                      </span>
+                    ) : null}
+                    {task.tags?.length ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Tag aria-hidden="true" className="h-3.5 w-3.5" />
+                        {task.tags.slice(0, 3).join(", ")}
+                      </span>
+                    ) : null}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="grid min-h-72 place-items-center rounded-md border border-dashed border-zinc-300 bg-white px-6 py-12 text-center dark:border-zinc-700 dark:bg-zinc-950">
+            <div className="max-w-sm">
+              <CheckCircle2
+                aria-hidden="true"
+                className="mx-auto h-10 w-10 text-[var(--app-accent)]"
+              />
+              <h2 className="mt-4 text-lg font-semibold text-zinc-950 dark:text-zinc-50">
+                No tasks found
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                Add a task or adjust the current filters.
+              </p>
+            </div>
+          </div>
+        )}
+      </section>
     </AppShell>
   );
 }
