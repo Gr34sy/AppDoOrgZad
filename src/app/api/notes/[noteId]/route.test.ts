@@ -5,6 +5,7 @@ import { getCurrentUserId } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
 import { connectDatabase } from "@/lib/mongoose";
 import { Note } from "@/models/note";
+import { Pin } from "@/models/pin";
 import { DELETE, GET, PATCH } from "./route";
 
 vi.mock("@/lib/session", () => ({
@@ -24,7 +25,14 @@ vi.mock("@/lib/activity-events", () => ({
 vi.mock("@/models/note", () => ({
   Note: {
     findOne: vi.fn(),
-    findOneAndUpdate: vi.fn()
+    findOneAndUpdate: vi.fn(),
+    findOneAndDelete: vi.fn()
+  }
+}));
+
+vi.mock("@/models/pin", () => ({
+  Pin: {
+    deleteMany: vi.fn()
   }
 }));
 
@@ -109,18 +117,23 @@ describe("/api/notes/[noteId]", () => {
     });
   });
 
-  it("soft deletes an owned note", async () => {
+  it("deletes an owned note and removes related pins", async () => {
     vi.mocked(getCurrentUserId).mockResolvedValue("user-1");
-    vi.mocked(Note.findOneAndUpdate).mockResolvedValue({ id: noteId, title: "Deleted" });
+    vi.mocked(Note.findOneAndDelete).mockResolvedValue({ id: noteId, title: "Deleted" });
 
     const response = await DELETE({} as never, context);
 
     expect(response.status).toBe(200);
-    expect(Note.findOneAndUpdate).toHaveBeenCalledWith(
-      { _id: noteId, ownerId: "user-1", archivedAt: null },
-      { $set: { archivedAt: expect.any(Date) } },
-      { new: true }
-    );
+    expect(Note.findOneAndDelete).toHaveBeenCalledWith({
+      _id: noteId,
+      ownerId: "user-1",
+      archivedAt: null
+    });
+    expect(Pin.deleteMany).toHaveBeenCalledWith({
+      ownerId: "user-1",
+      targetType: "note",
+      targetId: noteId
+    });
     expect(recordActivityEvent).toHaveBeenCalledWith({
       ownerId: "user-1",
       entityType: "note",

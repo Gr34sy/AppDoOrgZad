@@ -43,3 +43,17 @@ export const savedThemeCreateSchema = z
     colors: colorSettingsSchema
   })
   .strict();
+
+export const pinCreateSchema = z
+  .object({
+    targetType: z.enum(["note", "checklist", "task", "project"]),
+    targetId: z.string().trim().min(1),
+    position: z.number().finite().optional()
+  })
+  .strict();
+
+export const pinUpdateSchema = z
+  .object({
+    position: z.number().finite()
+  })
+  .strict();

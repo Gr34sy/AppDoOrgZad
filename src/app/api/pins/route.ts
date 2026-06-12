@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { badRequestResponse } from "@/lib/api-responses";
+import { parseJsonBody } from "@/lib/api-request";
 import { connectDatabase } from "@/lib/mongoose";
 import { recordActivityEvent } from "@/lib/activity-events";
-import { getCurrentUserId, sanitizeMutation, unauthorizedResponse } from "@/lib/session";
+import { getCurrentUserId, unauthorizedResponse } from "@/lib/session";
+import { pinCreateSchema } from "@/lib/validation-schemas";
 import { Pin } from "@/models/pin";
 
 export async function GET() {
@@ -25,8 +28,13 @@ export async function POST(request: NextRequest) {
   }
 
   await connectDatabase();
-  const payload = sanitizeMutation(await request.json());
-  const pin = await Pin.create({ ...payload, ownerId });
+  const { data, error } = await parseJsonBody(request, pinCreateSchema);
+
+  if (!data) {
+    return badRequestResponse(error);
+  }
+
+  const pin = await Pin.create({ ...data, ownerId });
 
   await recordActivityEvent({
     ownerId,
