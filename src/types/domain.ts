@@ -6,7 +6,14 @@ export type PinTargetType = "note" | "checklist" | "task" | "project";
 
 export type ColorMode = "system" | "light" | "dark";
 
-export type ThemeName = ColorMode;
+export type ColorSettings = {
+  accent: string;
+  upcoming: string;
+  todo: string;
+  inProgress: string;
+  completed: string;
+  calendar: string;
+};
 
 export type EntityType = "note" | "checklist" | "task" | "project";
 

@@ -26,3 +26,11 @@ export function sanitizeNoteMutation(payload: Record<string, unknown>) {
 
   return noteMutation;
 }
+
+export function hasNoteMutationFields(payload: NoteMutationPayload) {
+  return Object.keys(payload).length > 0;
+}
+
+export function isValidNoteTitle(title: unknown) {
+  return typeof title === "string" && title.trim().length > 0;
+}

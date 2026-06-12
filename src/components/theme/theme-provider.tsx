@@ -1,16 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { ColorMode } from "@/types/domain";
-
-export type ColorSettings = {
-  accent: string;
-  upcoming: string;
-  todo: string;
-  inProgress: string;
-  completed: string;
-  calendar: string;
-};
+import type { ColorMode, ColorSettings } from "@/types/domain";
 
 export const defaultLightColors: ColorSettings = {
   accent: "#2563eb",
@@ -128,9 +119,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        const databaseMode = (payload.preference.colorMode ??
-          payload.preference.theme ??
-          initialMode) as ColorMode;
+        const databaseMode = (payload.preference.colorMode ?? initialMode) as ColorMode;
         const databaseColors = {
           ...getDefaultColorsForMode(databaseMode),
           ...(payload.preference.colors ?? {})

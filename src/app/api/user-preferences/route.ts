@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { ColorSettings } from "@/components/theme/theme-provider";
+import { badRequestResponse, tooManyRequestsResponse } from "@/lib/api-responses";
+import { parseJsonBody } from "@/lib/api-request";
 import { connectDatabase } from "@/lib/mongoose";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { getCurrentUserId, unauthorizedResponse } from "@/lib/session";
+import { savedThemeCreateSchema, userPreferenceUpdateSchema } from "@/lib/validation-schemas";
 import { UserPreference } from "@/models/user-preference";
-import type { ColorMode } from "@/types/domain";
+import type { ColorMode, ColorSettings } from "@/types/domain";
 
-const colorKeys = ["accent", "upcoming", "todo", "inProgress", "completed", "calendar"] as const;
 const colorModes: ColorMode[] = ["system", "light", "dark"];
 
 type PreferencePayload = {
@@ -20,35 +22,8 @@ type PreferencePayload = {
   }>;
 };
 
-function isHexColor(value: unknown): value is string {
-  return typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value);
-}
-
-function sanitizeColors(value: unknown): Partial<ColorSettings> | null {
-  if (!value || typeof value !== "object") {
-    return null;
-  }
-
-  const colors: Partial<ColorSettings> = {};
-  const payload = value as Record<string, unknown>;
-
-  for (const key of colorKeys) {
-    if (isHexColor(payload[key])) {
-      colors[key] = payload[key];
-    }
-  }
-
-  return Object.keys(colors).length ? colors : null;
-}
-
-function sanitizeCompleteColors(value: unknown): ColorSettings | null {
-  const colors = sanitizeColors(value);
-
-  if (!colors || colorKeys.some((key) => !colors[key])) {
-    return null;
-  }
-
-  return colors as ColorSettings;
+function isColorMode(value: unknown): value is ColorMode {
+  return typeof value === "string" && colorModes.includes(value as ColorMode);
 }
 
 function serializePreference(preference: PreferencePayload | null) {
@@ -58,11 +33,10 @@ function serializePreference(preference: PreferencePayload | null) {
     savedThemes: []
   };
 
-  const colorMode = safePreference.colorMode ?? safePreference.theme ?? "system";
+  const colorMode = safePreference.colorMode ?? "system";
 
   return {
     colorMode,
-    theme: colorMode,
     colors: safePreference.colors,
     savedThemes: (safePreference.savedThemes ?? []).map(
       (savedTheme: {
@@ -86,8 +60,25 @@ async function getPreference(ownerId: string) {
     { $setOnInsert: { userId: ownerId } },
     { new: true, upsert: true }
   ).lean();
+  const legacyPreference = preference as PreferencePayload | null;
 
-  return preference as PreferencePayload | null;
+  if (legacyPreference && !legacyPreference.colorMode && isColorMode(legacyPreference.theme)) {
+    await UserPreference.updateOne(
+      { userId: ownerId },
+      {
+        $set: { colorMode: legacyPreference.theme },
+        $unset: { theme: "" }
+      }
+    );
+
+    return {
+      ...legacyPreference,
+      colorMode: legacyPreference.theme,
+      theme: undefined
+    } as PreferencePayload;
+  }
+
+  return legacyPreference;
 }
 
 export async function GET() {
@@ -110,26 +101,36 @@ export async function PUT(request: NextRequest) {
     return unauthorizedResponse();
   }
 
-  const body = await request.json();
-  const updates: Record<string, unknown> = {};
+  const rateLimit = checkRateLimit({
+    key: `preferences:update:${ownerId}`,
+    limit: 30,
+    windowMs: 60_000
+  });
 
-  const nextColorMode = body.colorMode ?? body.theme;
-
-  if (colorModes.includes(nextColorMode)) {
-    updates.colorMode = nextColorMode;
-    updates.theme = nextColorMode;
+  if (!rateLimit.allowed) {
+    return tooManyRequestsResponse(rateLimit.retryAfterSeconds);
   }
 
-  const colors = sanitizeColors(body.colors);
+  const { data, error } = await parseJsonBody(request, userPreferenceUpdateSchema);
 
-  if (colors) {
-    updates.colors = colors;
+  if (!data) {
+    return badRequestResponse(error);
+  }
+
+  const updates: Record<string, unknown> = {};
+
+  if (data.colorMode) {
+    updates.colorMode = data.colorMode;
+  }
+
+  if (data.colors) {
+    updates.colors = data.colors;
   }
 
   await connectDatabase();
   const preference = (await UserPreference.findOneAndUpdate(
     { userId: ownerId },
-    { $set: updates, $setOnInsert: { userId: ownerId } },
+    { $set: updates, $unset: { theme: "" }, $setOnInsert: { userId: ownerId } },
     { new: true, upsert: true }
   ).lean()) as PreferencePayload | null;
 
@@ -143,12 +144,20 @@ export async function POST(request: NextRequest) {
     return unauthorizedResponse();
   }
 
-  const body = await request.json();
-  const name = typeof body.name === "string" ? body.name.trim().slice(0, 80) : "";
-  const colors = sanitizeCompleteColors(body.colors);
+  const rateLimit = checkRateLimit({
+    key: `preferences:saved-themes:${ownerId}`,
+    limit: 20,
+    windowMs: 60_000
+  });
 
-  if (!name || !colors) {
-    return NextResponse.json({ message: "Invalid saved theme" }, { status: 400 });
+  if (!rateLimit.allowed) {
+    return tooManyRequestsResponse(rateLimit.retryAfterSeconds);
+  }
+
+  const { data, error } = await parseJsonBody(request, savedThemeCreateSchema);
+
+  if (!data) {
+    return badRequestResponse(error);
   }
 
   await connectDatabase();
@@ -157,10 +166,11 @@ export async function POST(request: NextRequest) {
     {
       $push: {
         savedThemes: {
-          name,
-          colors
+          name: data.name,
+          colors: data.colors
         }
       },
+      $unset: { theme: "" },
       $setOnInsert: { userId: ownerId }
     },
     { new: true, upsert: true }

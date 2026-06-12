@@ -2,11 +2,10 @@
 
 import {
   defaultDarkColors,
-  defaultLightColors,
-  type ColorSettings
+  defaultLightColors
 } from "@/components/theme/theme-provider";
 import { useTheme } from "@/components/theme/theme-provider";
-import type { ColorMode } from "@/types/domain";
+import type { ColorMode, ColorSettings } from "@/types/domain";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -145,9 +144,7 @@ export function ColorThemeSettings() {
 
       if (response.ok) {
         const payload = await response.json();
-        const databaseMode = (payload.preference?.colorMode ??
-          payload.preference?.theme ??
-          colorMode) as ColorMode;
+        const databaseMode = (payload.preference?.colorMode ?? colorMode) as ColorMode;
         const databaseColors = {
           ...getDefaultColors(databaseMode),
           ...(payload.preference?.colors ?? {})

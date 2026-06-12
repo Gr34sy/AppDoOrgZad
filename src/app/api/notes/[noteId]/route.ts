@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose";
+import { badRequestResponse, tooManyRequestsResponse } from "@/lib/api-responses";
+import { parseJsonBody } from "@/lib/api-request";
 import { connectDatabase } from "@/lib/mongoose";
 import {
   getCurrentUserId,
@@ -8,6 +10,8 @@ import {
 } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
 import { sanitizeNoteMutation } from "@/lib/note-mutations";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { noteUpdateSchema } from "@/lib/validation-schemas";
 import { Note } from "@/models/note";
 
 type RouteContext = {
@@ -48,8 +52,25 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     return notFoundResponse();
   }
 
+  const rateLimit = checkRateLimit({
+    key: `notes:update:${ownerId}`,
+    limit: 60,
+    windowMs: 60_000
+  });
+
+  if (!rateLimit.allowed) {
+    return tooManyRequestsResponse(rateLimit.retryAfterSeconds);
+  }
+
+  const { data, error } = await parseJsonBody(request, noteUpdateSchema);
+
+  if (!data) {
+    return badRequestResponse(error);
+  }
+
   await connectDatabase();
-  const payload = sanitizeNoteMutation(await request.json());
+  const payload = sanitizeNoteMutation(data);
+
   const note = await Note.findOneAndUpdate(
     { _id: params.noteId, ownerId, archivedAt: null },
     { $set: payload },
@@ -74,6 +95,16 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
 
   if (!isValidObjectId(params.noteId)) {
     return notFoundResponse();
+  }
+
+  const rateLimit = checkRateLimit({
+    key: `notes:delete:${ownerId}`,
+    limit: 30,
+    windowMs: 60_000
+  });
+
+  if (!rateLimit.allowed) {
+    return tooManyRequestsResponse(rateLimit.retryAfterSeconds);
   }
 
   await connectDatabase();

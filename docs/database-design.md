@@ -17,13 +17,36 @@ W aplikacji używana jest strategia `jwt`, ale kolekcje `users` i `accounts` nad
 
 Preferencje użytkownika.
 
-| Pole              | Typ        | Opis                                               |
-| ----------------- | ---------- | -------------------------------------------------- |
-| `userId`          | `ObjectId` | Referencja do `users._id`, unikalna                |
-| `theme`           | `string`   | `system`, `light`, `dark`, `forest`, `sky`, `rose` |
-| `dashboardLayout` | `string`   | `compact` albo `comfortable`                       |
-| `createdAt`       | `Date`     | Data utworzenia                                    |
-| `updatedAt`       | `Date`     | Data aktualizacji                                  |
+| Pole              | Typ        | Opis                                                            |
+| ----------------- | ---------- | --------------------------------------------------------------- |
+| `userId`          | `ObjectId` | Referencja do `users._id`, unikalna                             |
+| `colorMode`       | `string`   | Ogólny tryb UI: `system`, `light`, `dark`                       |
+| `dashboardLayout` | `string`   | `compact` albo `comfortable`                                    |
+| `colors`          | `object`   | Aktualne kolory akcentu, kalendarza i kafelków dashboardu       |
+| `savedThemes`     | `object[]` | Zapisane przez użytkownika zestawy kolorów w ramach color theme |
+| `createdAt`       | `Date`     | Data utworzenia                                                 |
+| `updatedAt`       | `Date`     | Data aktualizacji                                               |
+
+`colors`:
+
+| Pole         | Typ      | Opis                              |
+| ------------ | -------- | --------------------------------- |
+| `accent`     | `string` | Kolor akcentu aplikacji           |
+| `upcoming`   | `string` | Kolor kafelka upcoming            |
+| `todo`       | `string` | Kolor kafelka todo                |
+| `inProgress` | `string` | Kolor kafelka in progress         |
+| `completed`  | `string` | Kolor kafelka completed           |
+| `calendar`   | `string` | Kolor akcentów kalendarza         |
+
+`savedThemes` przechowuje nazwę motywu, pełny obiekt `colors` oraz datę
+utworzenia. `colorMode` i `colors` są rozdzielone: pierwszy odpowiada za ogólny
+jasny/ciemny/systemowy wygląd tła i elementów bazowych, a drugi za akcenty oraz
+kolory wybranych części dashboardu.
+
+Starsze dokumenty mogły zawierać pole `theme`. Aktualny endpoint preferencji
+wykonuje lekką migrację przy odczycie: jeśli dokument ma `theme`, a nie ma
+`colorMode`, wartość zostaje przeniesiona do `colorMode`, a pole `theme` jest
+usuwane przez `$unset`.
 
 Indeksy:
 
@@ -221,3 +244,11 @@ Priorytety:
 - Soft delete przez `archivedAt` pozwala szybko ukrywać elementy bez kosztownych operacji kaskadowych.
 - `activityevents` daje podstawę do natychmiastowego odświeżania klienta bez skanowania wszystkich kolekcji.
 - Endpoint `GET /api/realtime` udostępnia strumień SSE z nowymi zdarzeniami użytkownika.
+- Klient po zalogowaniu uruchamia `RealtimeRefresh`, który używa `EventSource` i odświeża widoki po zdarzeniach domenowych.
+
+## Walidacja i ochrona API
+
+- Requesty mutujące są walidowane przez schematy Zod przed zapisem w bazie.
+- Payloady notatek przechodzą przez sanitizację, która usuwa pola techniczne i właścicielskie.
+- Endpointy mutujące notatek oraz preferencji mają prosty rate limiting per użytkownik i typ operacji.
+- Błędny JSON zwraca `400 Bad Request`, brak sesji zwraca `401 Unauthorized`, a brak zasobu zwraca `404 Not found`.

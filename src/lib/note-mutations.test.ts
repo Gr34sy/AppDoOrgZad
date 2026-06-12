@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { sanitizeNoteMutation } from "@/lib/note-mutations";
+import {
+  hasNoteMutationFields,
+  isValidNoteTitle,
+  sanitizeNoteMutation
+} from "@/lib/note-mutations";
 
 describe("sanitizeNoteMutation", () => {
   it("keeps only editable note fields", () => {
@@ -36,5 +40,16 @@ describe("sanitizeNoteMutation", () => {
       title: "Color note",
       color: "#5eead4"
     });
+  });
+
+  it("detects empty mutation payloads", () => {
+    expect(hasNoteMutationFields({})).toBe(false);
+    expect(hasNoteMutationFields({ title: "Note" })).toBe(true);
+  });
+
+  it("validates note titles", () => {
+    expect(isValidNoteTitle("Meeting notes")).toBe(true);
+    expect(isValidNoteTitle("   ")).toBe(false);
+    expect(isValidNoteTitle(null)).toBe(false);
   });
 });

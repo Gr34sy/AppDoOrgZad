@@ -10,11 +10,6 @@ const userPreferenceSchema = new Schema(
       unique: true,
       index: true
     },
-    theme: {
-      type: String,
-      enum: ["system", "light", "dark"] satisfies ColorMode[],
-      default: "system"
-    },
     colorMode: {
       type: String,
       enum: ["system", "light", "dark"] satisfies ColorMode[],

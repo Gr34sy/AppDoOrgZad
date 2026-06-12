@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getServerSession } from "next-auth";
+import { RealtimeRefresh } from "@/components/layout/realtime-refresh";
 import { SignOutButton } from "@/components/layout/sign-out-button";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import { authOptions } from "@/lib/auth";
@@ -16,6 +17,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[var(--app-background)] text-zinc-950 dark:text-zinc-50">
+      <RealtimeRefresh />
       <input id="app-sidebar-toggle" type="checkbox" className="peer sr-only" aria-hidden="true" />
       <label
         htmlFor="app-sidebar-toggle"

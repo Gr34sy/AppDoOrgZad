@@ -1,5 +1,68 @@
 # Dziennik aktualizacji projektu
 
+## Bieżąca zmiana - walidacja API, testy integracyjne i dokumentacja prezentacji
+
+Data: 2026-06-09
+
+Zmiana domyka zakres przygotowany do prezentacji projektu. Obejmuje mechanizmy,
+które wcześniej były wskazane jako potencjalne usprawnienia: walidację requestów
+przez Zod, rate limiting mutacji, testy integracyjne endpointów notatek oraz
+migrację starego pola `theme` do `colorMode`.
+
+Najważniejsze zmiany funkcjonalne:
+
+- dodano zależność `zod` i schematy walidacyjne w `src/lib/validation-schemas.ts`;
+- endpointy notatek walidują requesty tworzenia i aktualizacji przed połączeniem
+  z bazą danych;
+- endpoint preferencji użytkownika waliduje zapis `colorMode`, kolorów oraz
+  zapisanych motywów;
+- dodano wspólny parser JSON `src/lib/api-request.ts`, który pozwala zwracać
+  kontrolowane `400 Bad Request` dla błędnego body;
+- dodano wspólne odpowiedzi API w `src/lib/api-responses.ts`;
+- dodano prosty, pamięciowy rate limiting w `src/lib/rate-limit.ts` dla mutacji
+  notatek i preferencji użytkownika;
+- endpoint preferencji migruje legacy `theme` do `colorMode` i usuwa stare pole
+  przez `$unset`;
+- usunięto aktywne pole `theme` ze schematu `UserPreference`;
+- dodano testy integracyjne route handlerów:
+  - `src/app/api/notes/route.test.ts`;
+  - `src/app/api/notes/[noteId]/route.test.ts`;
+- dodano klienta realtime `src/components/layout/realtime-refresh.tsx`, który
+  używa `EventSource` do nasłuchiwania `/api/realtime` i odświeża widoki przez
+  `router.refresh()`;
+- utworzono konspekt prezentacji w `docs/prezentacja.md`;
+- zaktualizowano `docs/database-design.md`, żeby odpowiadał aktualnemu modelowi
+  preferencji i ochrony API.
+
+Znaczenie architektoniczne:
+
+- walidacja Zod oddziela kontrakt requestów od logiki zapisu w bazie;
+- rate limiting daje podstawową ochronę przed nadużyciem endpointów mutujących;
+- migracja `theme` -> `colorMode` porządkuje rozdział między ogólnym trybem UI
+  a motywem kolorów aplikacji;
+- testy integracyjne API notatek sprawdzają zachowanie endpointów na poziomie
+  HTTP handlerów, bez wymagania prawdziwej bazy danych;
+- aktywne odświeżanie przez SSE wykorzystuje istniejący model `ActivityEvent`,
+  więc CRUD może informować klienta o zmianach bez pełnego ręcznego odświeżania
+  strony;
+- dokumentacja prezentacyjna opisuje faktycznie wdrożone elementy: OAuth, JWT,
+  customizację, Mongoose oraz CRUD notatek.
+
+Uwagi bezpieczeństwa zależności:
+
+- `npm audit --omit=dev` wskazał podatności w aktualnym drzewie `next`,
+  zagnieżdżonym `postcss` oraz `next-auth`/`uuid`;
+- automatyczna komenda `npm audit fix --force` proponuje breaking changes, więc
+  nie została uruchomiona automatycznie;
+- rekomendowany kolejny krok to kontrolowany upgrade Next.js i NextAuth po
+  sprawdzeniu zmian migracyjnych.
+
+Walidacja:
+
+- `npm run typecheck` zakończyło się powodzeniem;
+- `npm run test` zakończyło się powodzeniem;
+- `npm run lint` zakończyło się powodzeniem.
+
 ## Bieżąca zmiana - redesign dashboardu i nawigacji
 
 Data: 2026-06-07
@@ -167,8 +230,11 @@ Aktualny model zdarzeń obejmuje akcje:
 ### UI i motywy
 
 UI jest oparte o Tailwind CSS. Istnieje globalny plik `src/app/globals.css`,
-provider motywu oraz selector motywu. Typy domenowe uwzględniają motywy:
-`system`, `light`, `dark`, `forest`, `sky`, `rose`.
+provider motywu oraz ustawienia wyglądu. Aktualny model rozdziela:
+
+- `colorMode` - ogólny tryb aplikacji: `system`, `light`, `dark`;
+- `colors` - kolory akcentów, kalendarza i kafelków dashboardu;
+- `savedThemes` - zapisane przez użytkownika zestawy kolorów.
 
 Layout aplikacji po zalogowaniu jest skupiony w `AppShell`, co daje naturalne
 miejsce na nawigację, akcje konta użytkownika i przełączniki globalne.
