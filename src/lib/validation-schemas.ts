@@ -29,6 +29,80 @@ export const noteUpdateSchema = noteCreateSchema.partial().refine(
   "At least one note field is required"
 );
 
+const tagListSchema = z.array(z.string().trim().min(1).max(60)).max(20);
+const objectIdStringSchema = z.string().trim().min(1).max(80);
+const optionalDateStringSchema = z.string().datetime().nullable();
+const prioritySchema = z.enum(["low", "medium", "high", "urgent"]);
+const lifecycleStatusSchema = z.enum(["active", "paused", "completed", "archived"]);
+
+export const checklistItemSchema = z
+  .object({
+    title: z.string().trim().min(1).max(180),
+    isCompleted: z.boolean().optional(),
+    completedAt: optionalDateStringSchema.optional(),
+    position: z.number().finite().optional()
+  })
+  .strict();
+
+export const checklistCreateSchema = z
+  .object({
+    title: z.string().trim().min(1).max(160),
+    description: z.string().max(2000).optional(),
+    items: z.array(checklistItemSchema).max(200).optional(),
+    tags: tagListSchema.optional(),
+    parentType: z.enum(["task", "project"]).nullable().optional(),
+    parentId: objectIdStringSchema.nullable().optional(),
+    position: z.number().finite().optional()
+  })
+  .strict();
+
+export const checklistUpdateSchema = checklistCreateSchema.partial().refine(
+  (payload) => Object.keys(payload).length > 0,
+  "At least one checklist field is required"
+);
+
+export const taskCreateSchema = z
+  .object({
+    title: z.string().trim().min(1).max(180),
+    description: z.string().max(10000).optional(),
+    priority: prioritySchema.optional(),
+    statusId: z.string().trim().min(1).max(80).optional(),
+    projectId: objectIdStringSchema.nullable().optional(),
+    dueDate: optionalDateStringSchema.optional(),
+    estimatedMinutes: z.number().finite().min(0).nullable().optional(),
+    tags: tagListSchema.optional(),
+    checklistIds: z.array(objectIdStringSchema).max(100).optional(),
+    position: z.number().finite().optional(),
+    completedAt: optionalDateStringSchema.optional()
+  })
+  .strict();
+
+export const taskUpdateSchema = taskCreateSchema.partial().refine(
+  (payload) => Object.keys(payload).length > 0,
+  "At least one task field is required"
+);
+
+export const projectCreateSchema = z
+  .object({
+    title: z.string().trim().min(1).max(180),
+    description: z.string().max(12000).optional(),
+    priority: prioritySchema.optional(),
+    lifecycleStatus: lifecycleStatusSchema.optional(),
+    dueDate: optionalDateStringSchema.optional(),
+    estimatedMinutes: z.number().finite().min(0).nullable().optional(),
+    tags: tagListSchema.optional(),
+    checklistIds: z.array(objectIdStringSchema).max(100).optional(),
+    taskIds: z.array(objectIdStringSchema).max(200).optional(),
+    position: z.number().finite().optional(),
+    completedAt: optionalDateStringSchema.optional()
+  })
+  .strict();
+
+export const projectUpdateSchema = projectCreateSchema.partial().refine(
+  (payload) => Object.keys(payload).length > 0,
+  "At least one project field is required"
+);
+
 export const userPreferenceUpdateSchema = z
   .object({
     colorMode: colorModeSchema.optional(),

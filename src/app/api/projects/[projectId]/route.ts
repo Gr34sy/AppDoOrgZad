@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose";
+import { badRequestResponse } from "@/lib/api-responses";
+import { parseJsonBody } from "@/lib/api-request";
 import { connectDatabase } from "@/lib/mongoose";
 import {
   getCurrentUserId,
@@ -8,6 +10,7 @@ import {
   unauthorizedResponse
 } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { projectUpdateSchema } from "@/lib/validation-schemas";
 import { Project } from "@/models/project";
 
 type RouteContext = {
@@ -48,8 +51,14 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     return notFoundResponse();
   }
 
+  const { data, error } = await parseJsonBody(request, projectUpdateSchema);
+
+  if (!data) {
+    return badRequestResponse(error);
+  }
+
   await connectDatabase();
-  const payload = sanitizeMutation(await request.json());
+  const payload = sanitizeMutation(data);
   const project = await Project.findOneAndUpdate(
     { _id: params.projectId, ownerId, archivedAt: null },
     { $set: payload },

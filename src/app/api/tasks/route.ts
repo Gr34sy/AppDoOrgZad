@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { badRequestResponse } from "@/lib/api-responses";
+import { parseJsonBody } from "@/lib/api-request";
 import { connectDatabase } from "@/lib/mongoose";
 import { getCurrentUserId, sanitizeMutation, unauthorizedResponse } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { taskCreateSchema } from "@/lib/validation-schemas";
 import { Project } from "@/models/project";
 import { Task } from "@/models/task";
 
@@ -30,8 +33,14 @@ export async function POST(request: NextRequest) {
     return unauthorizedResponse();
   }
 
+  const { data, error } = await parseJsonBody(request, taskCreateSchema);
+
+  if (!data) {
+    return badRequestResponse(error);
+  }
+
   await connectDatabase();
-  const payload = sanitizeMutation(await request.json());
+  const payload = sanitizeMutation(data);
   const task = await Task.create({ ...payload, ownerId });
   if (task.projectId) {
     await Project.updateOne(

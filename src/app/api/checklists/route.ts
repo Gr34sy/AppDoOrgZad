@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { badRequestResponse } from "@/lib/api-responses";
+import { parseJsonBody } from "@/lib/api-request";
 import { connectDatabase } from "@/lib/mongoose";
 import { getCurrentUserId, sanitizeMutation, unauthorizedResponse } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { checklistCreateSchema } from "@/lib/validation-schemas";
 import { Checklist } from "@/models/checklist";
 
 export async function GET() {
@@ -27,8 +30,14 @@ export async function POST(request: NextRequest) {
     return unauthorizedResponse();
   }
 
+  const { data, error } = await parseJsonBody(request, checklistCreateSchema);
+
+  if (!data) {
+    return badRequestResponse(error);
+  }
+
   await connectDatabase();
-  const payload = sanitizeMutation(await request.json());
+  const payload = sanitizeMutation(data);
   const checklist = await Checklist.create({ ...payload, ownerId });
   await recordActivityEvent({
     ownerId,
