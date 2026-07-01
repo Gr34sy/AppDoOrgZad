@@ -13,10 +13,10 @@ export default async function SettingsPage() {
 
   return (
     <AppShell>
-      <section className="grid max-w-2xl gap-6">
+      <section className="app-page max-w-2xl">
         <div>
-          <h1 className="text-2xl font-semibold tracking-normal">Settings</h1>
-          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+          <h1 className="app-page-title">Settings</h1>
+          <p className="app-page-description">
             Adjust the application appearance.
           </p>
         </div>

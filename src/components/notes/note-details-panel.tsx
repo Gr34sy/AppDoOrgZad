@@ -52,7 +52,7 @@ export function NoteDetailsPanel({
           <StickyNote aria-hidden="true" className="h-5 w-5 text-[var(--app-accent)]" />
           Note details
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="app-action-row">
           <button
             type="button"
             onClick={() => setIsEditing(true)}
@@ -72,11 +72,11 @@ export function NoteDetailsPanel({
       </div>
 
       <div
-        className="min-h-[28rem] rounded-md border p-6 shadow-sm"
+        className="min-h-[20rem] rounded-md border p-4 shadow-sm sm:min-h-[28rem] sm:p-6"
         style={noteStyle}
       >
         <div className="flex items-start justify-between gap-4">
-          <h1 className="max-w-3xl text-3xl font-semibold tracking-normal">{title}</h1>
+          <h1 className="max-w-3xl break-words text-2xl font-semibold tracking-normal sm:text-3xl">{title}</h1>
           <StickyNote aria-hidden="true" className="h-7 w-7 shrink-0 opacity-60" />
         </div>
 

@@ -82,7 +82,7 @@ export function TaskDetailsPanel({
           <CheckCircle2 aria-hidden="true" className="h-5 w-5 text-[var(--app-accent)]" />
           Task details
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="app-action-row">
           <button
             type="button"
             onClick={() => setIsEditing(true)}
@@ -104,11 +104,11 @@ export function TaskDetailsPanel({
       <div className="rounded-md border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
+            <h1 className="break-words text-2xl font-semibold tracking-normal text-zinc-950 sm:text-3xl dark:text-zinc-50">
               {title}
             </h1>
             <p className="mt-2 text-sm font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
-              {statusId} · {priority}
+              {statusId} / {priority}
             </p>
           </div>
           <CheckCircle2 aria-hidden="true" className="h-7 w-7 text-[var(--app-accent)]" />

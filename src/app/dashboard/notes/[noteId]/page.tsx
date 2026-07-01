@@ -57,9 +57,10 @@ export default async function NotePage({ params }: NotePageProps) {
 
   return (
     <AppShell>
+      <section className="app-page">
       <Link
         href="/dashboard/notes"
-        className="mb-5 inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
+        className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
       >
         <ArrowLeft aria-hidden="true" className="h-4 w-4" />
         Back to notes
@@ -75,6 +76,7 @@ export default async function NotePage({ params }: NotePageProps) {
         updatedAtLabel={note.updatedAt?.toLocaleString("pl-PL")}
         pinId={pin ? String(pin._id) : undefined}
       />
+      </section>
     </AppShell>
   );
 }

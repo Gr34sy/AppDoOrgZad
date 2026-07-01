@@ -124,7 +124,7 @@ function MetricOverlay({
   }>;
 }) {
   return (
-    <div className="absolute left-0 top-full z-30 hidden w-80 pt-2 group-hover:block">
+    <div className="absolute left-0 top-full z-30 hidden w-[min(20rem,calc(100vw-2rem))] pt-2 group-hover:block">
       <div className="rounded-lg border border-zinc-200 bg-white p-3 text-zinc-950 shadow-xl shadow-zinc-950/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50">
         {items.length ? (
           <div className="grid gap-2">
@@ -173,8 +173,8 @@ export function PinnedBoard({ pinnedItems, workflowColumns, calendarEvents }: Pi
   return (
     <div className="grid gap-6">
       <section className="grid gap-3">
-        <div className="grid items-stretch gap-4 xl:grid-cols-[auto_340px] xl:justify-start">
-          <div className="grid h-full max-w-[412px] grid-cols-[minmax(0,200px)] gap-3 sm:grid-cols-[repeat(2,minmax(0,200px))] sm:grid-rows-2">
+        <div className="grid min-w-0 items-stretch gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,340px)] xl:justify-start">
+          <div className="grid h-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:grid-rows-2 xl:max-w-[412px]">
             <div className="group relative z-0 rounded-lg bg-[var(--dashboard-upcoming-color)] p-3 text-white shadow-lg shadow-black/15 transition hover:z-20 hover:-translate-y-0.5 hover:shadow-xl focus-within:z-20">
               <div className="flex h-full flex-col items-center justify-center text-center">
                 <p className="text-[11px] font-medium uppercase text-white/80">Upcoming</p>

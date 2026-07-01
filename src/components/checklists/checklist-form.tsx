@@ -111,12 +111,12 @@ export function ChecklistForm({
   }
 
   const inputClass =
-    "h-12 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50";
+    "h-12 w-full min-w-0 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50";
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="grid gap-6 rounded-md border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+      className="grid w-full min-w-0 gap-6 rounded-md border border-zinc-200 bg-white p-4 shadow-sm sm:p-5 dark:border-zinc-800 dark:bg-zinc-950"
     >
       <h2 className="text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
         {mode === "create" ? "Create checklist" : "Edit checklist"}
@@ -138,7 +138,7 @@ export function ChecklistForm({
           name="description"
           rows={5}
           defaultValue={initialDescription}
-          className="min-h-36 resize-y rounded-md border border-zinc-300 bg-white px-3 py-3 text-sm leading-6 text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className="min-h-36 w-full min-w-0 resize-y rounded-md border border-zinc-300 bg-white px-3 py-3 text-sm leading-6 text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
         />
       </div>
 
@@ -150,7 +150,7 @@ export function ChecklistForm({
           {items.map((item, index) => (
             <div
               key={index}
-              className="grid gap-2 rounded-md border border-zinc-200 bg-zinc-50 p-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center dark:border-zinc-800 dark:bg-zinc-900"
+              className="grid min-w-0 gap-2 rounded-md border border-zinc-200 bg-zinc-50 p-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center dark:border-zinc-800 dark:bg-zinc-900"
             >
               <label htmlFor={`item-${index}`} className="sr-only">
                 Item {index + 1}
@@ -189,7 +189,7 @@ export function ChecklistForm({
         <button
           type="button"
           onClick={() => setItems([...items, { title: "", isCompleted: false }])}
-          className="inline-flex h-10 w-fit items-center gap-2 rounded-md border border-zinc-300 px-3 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
+          className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md border border-zinc-300 px-3 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 sm:w-fit dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
         >
           <Plus aria-hidden="true" className="h-4 w-4" />
           Add item
@@ -207,7 +207,7 @@ export function ChecklistForm({
         </p>
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
+      <div className="app-action-row">
         <button
           type="submit"
           disabled={isSubmitting}

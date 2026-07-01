@@ -87,19 +87,17 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
 
   return (
     <AppShell>
-      <section className="grid gap-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
-              Projects
-            </h1>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <section className="app-page">
+        <div className="app-page-header">
+          <div className="app-page-heading">
+            <h1 className="app-page-title">Projects</h1>
+            <p className="app-page-description">
               Organize larger work streams with status, priority and linked tasks.
             </p>
           </div>
           <Link
             href="/dashboard/projects/new"
-            className="inline-flex h-11 items-center gap-2 rounded-md bg-[var(--app-accent)] px-4 text-sm font-medium text-white shadow-sm transition hover:opacity-90"
+            className="app-primary-action"
           >
             <Plus aria-hidden="true" className="h-4 w-4" />
             New project
@@ -108,7 +106,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
 
         <form
           method="get"
-          className="grid gap-3 rounded-md border border-zinc-200 bg-white p-4 shadow-sm md:grid-cols-[minmax(18rem,1fr)_12rem_12rem_auto_auto] md:items-end dark:border-zinc-800 dark:bg-zinc-950"
+          className="app-filter-form"
         >
           <SearchInput defaultValue={search} />
           <FilterSelect
@@ -133,7 +131,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
         </form>
 
         {projects.length ? (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="app-card-grid">
             {projects.map((project) => {
               const projectId = String(project._id);
               const taskCount = project.taskIds?.length ?? 0;
@@ -150,7 +148,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                         {project.title}
                       </h2>
                       <p className="mt-2 text-xs font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
-                        {project.lifecycleStatus ?? "active"} · {project.priority ?? "medium"}
+                        {project.lifecycleStatus ?? "active"} / {project.priority ?? "medium"}
                       </p>
                     </div>
                     <FolderKanban

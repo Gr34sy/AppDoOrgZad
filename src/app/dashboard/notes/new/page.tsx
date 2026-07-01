@@ -15,7 +15,7 @@ export default async function NewNotePage() {
 
   return (
     <AppShell>
-      <section className="grid gap-6">
+      <section className="app-page">
         <Link
           href="/dashboard/notes"
           className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
@@ -24,13 +24,13 @@ export default async function NewNotePage() {
           Back to notes
         </Link>
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
+        <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
           <div className="grid gap-4">
             <div>
               <p className="text-sm font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
                 New note
               </p>
-              <h1 className="mt-1 text-3xl font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
+              <h1 className="mt-1 break-words text-2xl font-semibold tracking-normal text-zinc-950 sm:text-3xl dark:text-zinc-50">
                 Capture an idea
               </h1>
             </div>

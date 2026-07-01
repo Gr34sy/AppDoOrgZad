@@ -89,7 +89,7 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{countLabel}</p>
         </div>
         <div className="grid gap-3">
-          <div className="w-full max-w-[472px]">
+          <div className="w-full min-w-0">
             <label htmlFor="pinned-search" className="sr-only">
               Search pinned items
             </label>
@@ -147,13 +147,13 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
         </div>
       </section>
 
-      <section className="grid content-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="app-card-grid content-start">
         {filteredItems.length ? (
           filteredItems.map((item) => (
             <Link
               key={item.id}
               href={item.href}
-              className="group min-h-44 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-950/10 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
+              className="group min-h-44 min-w-0 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-950/10 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
             >
               <div className="flex items-center justify-between gap-3">
                 <span
@@ -163,7 +163,7 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
                 >
                   {item.type}
                 </span>
-                <span className="max-w-[9rem] truncate rounded-md bg-zinc-100 px-2 py-1 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+                <span className="min-w-0 max-w-[9rem] truncate rounded-md bg-zinc-100 px-2 py-1 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
                   {formatLabel(item.status)}
                 </span>
               </div>

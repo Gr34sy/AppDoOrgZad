@@ -63,16 +63,14 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
 
   return (
     <AppShell>
-      <section className="grid gap-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
-              Notes
-            </h1>
+      <section className="app-page">
+        <div className="app-page-header">
+          <div className="app-page-heading">
+            <h1 className="app-page-title">Notes</h1>
           </div>
           <Link
             href="/dashboard/notes/new"
-            className="inline-flex h-11 items-center gap-2 rounded-md bg-[var(--app-accent)] px-4 text-sm font-medium text-white shadow-sm transition hover:opacity-90"
+            className="app-primary-action"
           >
             <Plus aria-hidden="true" className="h-4 w-4" />
             New note
@@ -81,7 +79,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
 
         <form
           method="get"
-          className="grid gap-3 rounded-md border border-zinc-200 bg-white p-4 shadow-sm md:grid-cols-[minmax(18rem,1fr)_12rem_12rem_auto_auto] md:items-end dark:border-zinc-800 dark:bg-zinc-950"
+          className="app-filter-form"
         >
           <SearchInput defaultValue={search} />
           <FilterSelect
@@ -106,7 +104,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
         </form>
 
         {notes.length ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          <div className="app-card-grid">
             {notes.map((note) => {
               const noteId = String(note._id);
               const noteStyle = getNoteCardStyle(note.color);

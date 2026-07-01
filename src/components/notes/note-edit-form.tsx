@@ -81,7 +81,7 @@ export function NoteEditForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="grid gap-6 rounded-md border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+      className="grid w-full min-w-0 gap-6 rounded-md border border-zinc-200 bg-white p-4 shadow-sm sm:p-5 dark:border-zinc-800 dark:bg-zinc-950"
     >
       <h2 className="text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
         Edit note
@@ -97,7 +97,7 @@ export function NoteEditForm({
           type="text"
           defaultValue={initialTitle}
           required
-          className="h-12 rounded-md border border-zinc-300 bg-white px-3 text-base text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className="h-12 w-full min-w-0 rounded-md border border-zinc-300 bg-white px-3 text-base text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
         />
       </div>
 
@@ -110,7 +110,7 @@ export function NoteEditForm({
           name="content"
           defaultValue={initialContent}
           rows={12}
-          className="min-h-72 resize-y rounded-md border border-zinc-300 bg-white px-3 py-3 text-sm leading-6 text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className="min-h-72 w-full min-w-0 resize-y rounded-md border border-zinc-300 bg-white px-3 py-3 text-sm leading-6 text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
         />
       </div>
 
@@ -134,7 +134,7 @@ export function NoteEditForm({
         </p>
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
+      <div className="app-action-row">
         <button
           type="submit"
           disabled={isSubmitting}

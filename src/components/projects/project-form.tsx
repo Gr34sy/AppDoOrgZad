@@ -107,13 +107,13 @@ export function ProjectForm({
   }
 
   const inputClass =
-    "h-12 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50";
+    "h-12 w-full min-w-0 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50";
   const labelClass = "text-sm font-medium text-zinc-700 dark:text-zinc-200";
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="grid gap-6 rounded-md border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+      className="grid w-full min-w-0 gap-6 rounded-md border border-zinc-200 bg-white p-4 shadow-sm sm:p-5 dark:border-zinc-800 dark:bg-zinc-950"
     >
       <h2 className="text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
         {mode === "create" ? "Create project" : "Edit project"}
@@ -135,7 +135,7 @@ export function ProjectForm({
           name="description"
           rows={6}
           defaultValue={initialDescription}
-          className="min-h-40 resize-y rounded-md border border-zinc-300 bg-white px-3 py-3 text-sm leading-6 text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className="min-h-40 w-full min-w-0 resize-y rounded-md border border-zinc-300 bg-white px-3 py-3 text-sm leading-6 text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
         />
       </div>
 
@@ -218,7 +218,7 @@ export function ProjectForm({
                   }}
                   className="h-4 w-4 accent-[var(--app-accent)]"
                 />
-                {checklist.title}
+                <span className="min-w-0 break-words">{checklist.title}</span>
               </label>
             ))}
           </div>
@@ -238,7 +238,7 @@ export function ProjectForm({
         </p>
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
+      <div className="app-action-row">
         <button
           type="submit"
           disabled={isSubmitting}

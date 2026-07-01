@@ -59,7 +59,7 @@ export function NoteCreateForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="grid gap-6 rounded-md border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+      className="grid w-full min-w-0 gap-6 rounded-md border border-zinc-200 bg-white p-4 shadow-sm sm:p-5 dark:border-zinc-800 dark:bg-zinc-950"
     >
       <div className="grid gap-2">
         <label htmlFor="title" className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
@@ -71,7 +71,7 @@ export function NoteCreateForm() {
           type="text"
           required
           placeholder="Give this note a clear name"
-          className="h-12 rounded-md border border-zinc-300 bg-white px-3 text-base text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+          className="h-12 w-full min-w-0 rounded-md border border-zinc-300 bg-white px-3 text-base text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500"
         />
       </div>
 
@@ -84,7 +84,7 @@ export function NoteCreateForm() {
           name="content"
           rows={12}
           placeholder="Write the note..."
-          className="min-h-72 resize-y rounded-md border border-zinc-300 bg-white px-3 py-3 text-sm leading-6 text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+          className="min-h-72 w-full min-w-0 resize-y rounded-md border border-zinc-300 bg-white px-3 py-3 text-sm leading-6 text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500"
         />
       </div>
 
@@ -106,7 +106,7 @@ export function NoteCreateForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="inline-flex h-11 w-fit items-center gap-2 rounded-md bg-[var(--app-accent)] px-4 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-[var(--app-accent)] px-4 text-sm font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-fit"
       >
         <Save aria-hidden="true" className="h-4 w-4" />
         {isSubmitting ? "Creating..." : "Create note"}

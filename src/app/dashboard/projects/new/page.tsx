@@ -27,7 +27,7 @@ export default async function NewProjectPage() {
 
   return (
     <AppShell>
-      <section className="grid max-w-4xl gap-6">
+      <section className="app-page max-w-4xl">
         <div className="grid gap-3">
           <Link
             href="/dashboard/projects"
@@ -37,10 +37,10 @@ export default async function NewProjectPage() {
             Back to projects
           </Link>
           <div>
-            <h1 className="text-3xl font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
+            <h1 className="app-page-title">
               New project
             </h1>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="app-page-description">
               Create a project with priority, lifecycle status and linked checklists.
             </p>
           </div>
