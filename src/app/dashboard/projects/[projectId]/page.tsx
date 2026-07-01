@@ -5,6 +5,7 @@ import { isValidObjectId } from "mongoose";
 import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { ProjectDetailsPanel } from "@/components/projects/project-details-panel";
+import { ProjectKanbanBoard } from "@/components/projects/project-kanban-board";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
 import { Checklist } from "@/models/checklist";
@@ -47,6 +48,17 @@ type EntityOptionDocument = {
   title: string;
 };
 
+type ProjectTask = {
+  _id: unknown;
+  title: string;
+  description?: string;
+  priority?: string;
+  statusId?: string;
+  dueDate?: Date | null;
+  tags?: string[];
+  position?: number;
+};
+
 function getDateInputValue(date?: Date | null) {
   if (!date) {
     return "";
@@ -68,7 +80,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   await connectDatabase();
 
-  const [project, checklists, taskCount, pin] = await Promise.all([
+  const [project, checklists, projectTasks, pin] = await Promise.all([
     Project.findOne({
       _id: params.projectId,
       ownerId: session.user.id,
@@ -77,11 +89,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     Checklist.find({ ownerId: session.user.id, archivedAt: null })
       .sort({ title: 1 })
       .lean<EntityOptionDocument[]>(),
-    Task.countDocuments({
+    Task.find({
       ownerId: session.user.id,
       projectId: params.projectId,
       archivedAt: null
-    }),
+    })
+      .sort({ statusId: 1, position: 1, updatedAt: -1 })
+      .lean<ProjectTask[]>(),
     Pin.findOne({
       ownerId: session.user.id,
       targetType: "project",
@@ -123,16 +137,35 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           estimatedMinutes={project.estimatedMinutes}
           tags={project.tags ?? []}
           checklistIds={(project.checklistIds ?? []).map((checklistId) => String(checklistId))}
-          taskCount={taskCount}
+          taskCount={projectTasks.length}
           kanbanColumns={kanbanColumns.map((column) => ({
             id: column.id,
             title: column.title,
+            color: column.color,
             isDone: Boolean(column.isDone)
           }))}
           completedAtLabel={project.completedAt?.toLocaleString("pl-PL")}
           createdAtLabel={project.createdAt?.toLocaleString("pl-PL")}
           updatedAtLabel={project.updatedAt?.toLocaleString("pl-PL")}
           pinId={pin ? String(pin._id) : undefined}
+        />
+        <ProjectKanbanBoard
+          projectId={params.projectId}
+          columns={kanbanColumns.map((column) => ({
+            id: column.id,
+            title: column.title,
+            color: column.color,
+            isDone: Boolean(column.isDone)
+          }))}
+          tasks={projectTasks.map((task) => ({
+            id: String(task._id),
+            title: task.title,
+            description: task.description ?? "",
+            priority: task.priority ?? "medium",
+            statusId: task.statusId ?? "todo",
+            dueDateLabel: task.dueDate?.toLocaleDateString("pl-PL"),
+            tags: task.tags ?? []
+          }))}
         />
       </section>
     </AppShell>

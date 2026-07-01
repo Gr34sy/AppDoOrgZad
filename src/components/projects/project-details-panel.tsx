@@ -14,6 +14,7 @@ type EntityOption = {
 type KanbanColumn = {
   id: string;
   title: string;
+  color?: string;
   isDone: boolean;
 };
 
@@ -168,7 +169,13 @@ export function ProjectDetailsPanel({
                 key={column.id}
                 className="flex items-center justify-between gap-3 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-3 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
               >
-                <span>{column.title}</span>
+                <span className="inline-flex min-w-0 items-center gap-2">
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: column.color ?? "var(--app-accent)" }}
+                  />
+                  <span className="truncate">{column.title}</span>
+                </span>
                 {column.isDone ? (
                   <CheckCircle2 aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
                 ) : null}
