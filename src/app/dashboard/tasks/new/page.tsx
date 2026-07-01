@@ -12,9 +12,23 @@ import { Project } from "@/models/project";
 type EntityOptionDocument = {
   _id: unknown;
   title: string;
+  kanbanColumns?: Array<{
+    id: string;
+    title: string;
+  }>;
 };
 
-export default async function NewTaskPage() {
+type NewTaskPageProps = {
+  searchParams?: {
+    projectId?: string | string[];
+  };
+};
+
+function getSearchParam(value?: string | string[]) {
+  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
+}
+
+export default async function NewTaskPage({ searchParams }: NewTaskPageProps) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -30,6 +44,7 @@ export default async function NewTaskPage() {
       .sort({ title: 1 })
       .lean<EntityOptionDocument[]>()
   ]);
+  const initialProjectId = getSearchParam(searchParams?.projectId);
 
   return (
     <AppShell>
@@ -55,12 +70,17 @@ export default async function NewTaskPage() {
           mode="create"
           projectOptions={projects.map((project) => ({
             id: String(project._id),
-            title: project.title
+            title: project.title,
+            kanbanColumns: (project.kanbanColumns ?? []).map((column) => ({
+              id: column.id,
+              title: column.title
+            }))
           }))}
           checklistOptions={checklists.map((checklist) => ({
             id: String(checklist._id),
             title: checklist.title
           }))}
+          initialProjectId={initialProjectId}
         />
       </section>
     </AppShell>

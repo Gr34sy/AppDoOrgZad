@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save, X } from "lucide-react";
 import { TagInputs } from "@/components/dashboard/tag-inputs";
@@ -8,6 +8,10 @@ import { TagInputs } from "@/components/dashboard/tag-inputs";
 type EntityOption = {
   id: string;
   title: string;
+  kanbanColumns?: Array<{
+    id: string;
+    title: string;
+  }>;
 };
 
 type TaskFormProps = {
@@ -29,7 +33,13 @@ type TaskFormProps = {
 };
 
 const priorityOptions = ["low", "medium", "high", "urgent"];
-const statusOptions = ["backlog", "todo", "in_progress", "testing", "done"];
+const defaultStatusOptions = [
+  { id: "backlog", title: "Backlog" },
+  { id: "todo", title: "To do" },
+  { id: "in_progress", title: "In progress" },
+  { id: "testing", title: "Testing" },
+  { id: "done", title: "Done" }
+];
 
 export function TaskForm({
   mode,
@@ -54,6 +64,18 @@ export function TaskForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tags, setTags] = useState(initialTags.length ? initialTags : [""]);
   const [checklistIds, setChecklistIds] = useState(initialChecklistIds);
+  const [selectedProjectId, setSelectedProjectId] = useState(initialProjectId);
+  const [selectedStatusId, setSelectedStatusId] = useState(initialStatusId);
+  const selectedProject = projectOptions.find((project) => project.id === selectedProjectId);
+  const statusOptions = selectedProject?.kanbanColumns?.length
+    ? selectedProject.kanbanColumns
+    : defaultStatusOptions;
+
+  useEffect(() => {
+    if (!statusOptions.some((status) => status.id === selectedStatusId)) {
+      setSelectedStatusId(statusOptions[0]?.id ?? "todo");
+    }
+  }, [selectedStatusId, statusOptions]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -162,10 +184,16 @@ export function TaskForm({
           <label htmlFor="statusId" className={labelClass}>
             Status
           </label>
-          <select id="statusId" name="statusId" defaultValue={initialStatusId} className={inputClass}>
+          <select
+            id="statusId"
+            name="statusId"
+            value={selectedStatusId}
+            onChange={(event) => setSelectedStatusId(event.target.value)}
+            className={inputClass}
+          >
             {statusOptions.map((status) => (
-              <option key={status} value={status}>
-                {status}
+              <option key={status.id} value={status.id}>
+                {status.title}
               </option>
             ))}
           </select>
@@ -175,7 +203,13 @@ export function TaskForm({
           <label htmlFor="projectId" className={labelClass}>
             Project
           </label>
-          <select id="projectId" name="projectId" defaultValue={initialProjectId} className={inputClass}>
+          <select
+            id="projectId"
+            name="projectId"
+            value={selectedProjectId}
+            onChange={(event) => setSelectedProjectId(event.target.value)}
+            className={inputClass}
+          >
             <option value="">No project</option>
             {projectOptions.map((project) => (
               <option key={project.id} value={project.id}>

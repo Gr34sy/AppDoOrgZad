@@ -82,6 +82,16 @@ export const taskUpdateSchema = taskCreateSchema.partial().refine(
   "At least one task field is required"
 );
 
+export const kanbanColumnSchema = z
+  .object({
+    id: z.string().trim().min(1).max(80),
+    title: z.string().trim().min(1).max(80),
+    position: z.number().finite(),
+    color: hexColorSchema.optional(),
+    isDone: z.boolean().optional()
+  })
+  .strict();
+
 export const projectCreateSchema = z
   .object({
     title: z.string().trim().min(1).max(180),
@@ -93,6 +103,7 @@ export const projectCreateSchema = z
     tags: tagListSchema.optional(),
     checklistIds: z.array(objectIdStringSchema).max(100).optional(),
     taskIds: z.array(objectIdStringSchema).max(200).optional(),
+    kanbanColumns: z.array(kanbanColumnSchema).min(1).max(12).optional(),
     position: z.number().finite().optional(),
     completedAt: optionalDateStringSchema.optional()
   })

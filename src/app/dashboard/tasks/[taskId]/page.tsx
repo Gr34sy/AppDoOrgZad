@@ -37,6 +37,10 @@ type TaskDetails = {
 type EntityOptionDocument = {
   _id: unknown;
   title: string;
+  kanbanColumns?: Array<{
+    id: string;
+    title: string;
+  }>;
 };
 
 function getDateInputValue(date?: Date | null) {
@@ -98,7 +102,11 @@ export default async function TaskPage({ params }: TaskPageProps) {
           taskId={params.taskId}
           projectOptions={projects.map((project) => ({
             id: String(project._id),
-            title: project.title
+            title: project.title,
+            kanbanColumns: (project.kanbanColumns ?? []).map((column) => ({
+              id: column.id,
+              title: column.title
+            }))
           }))}
           checklistOptions={checklists.map((checklist) => ({
             id: String(checklist._id),

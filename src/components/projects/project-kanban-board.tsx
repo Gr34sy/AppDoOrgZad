@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, CalendarClock, GripVertical, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
+import { DragEvent, useEffect, useMemo, useState } from "react";
 
 type KanbanColumn = {
   id: string;
@@ -46,16 +46,37 @@ function getColumnProgress(tasks: KanbanTask[], taskCount: number) {
 export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanBoardProps) {
   const router = useRouter();
   const [movingTaskId, setMovingTaskId] = useState("");
+  const [draggedTaskId, setDraggedTaskId] = useState("");
+  const [activeDropColumnId, setActiveDropColumnId] = useState("");
+  const [boardTasks, setBoardTasks] = useState(tasks);
   const [error, setError] = useState<string | null>(null);
-  const orderedColumns = useMemo(
-    () =>
-      columns.length
-        ? columns
-        : [{ id: "todo", title: "To do", color: "#2563eb", isDone: false }],
-    [columns]
-  );
+
+  useEffect(() => {
+    setBoardTasks(tasks);
+  }, [tasks]);
+
+  const orderedColumns = useMemo(() => {
+    const baseColumns = columns.length
+      ? columns
+      : [{ id: "todo", title: "To do", color: "#2563eb", isDone: false }];
+    const knownColumnIds = new Set(baseColumns.map((column) => column.id));
+    const extraColumns = Array.from(
+      new Set(
+        boardTasks
+          .map((task) => task.statusId)
+          .filter((statusId) => statusId && !knownColumnIds.has(statusId))
+      )
+    ).map((statusId) => ({
+      id: statusId,
+      title: statusId.replace(/_/g, " "),
+      color: "#71717a",
+      isDone: false
+    }));
+
+    return [...baseColumns, ...extraColumns];
+  }, [boardTasks, columns]);
   const columnIds = useMemo(() => orderedColumns.map((column) => column.id), [orderedColumns]);
-  const taskCount = tasks.length;
+  const taskCount = boardTasks.length;
 
   async function moveTask(task: KanbanTask, nextStatusId: string) {
     if (task.statusId === nextStatusId) {
@@ -64,6 +85,11 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
 
     setError(null);
     setMovingTaskId(task.id);
+    setBoardTasks((currentTasks) =>
+      currentTasks.map((currentTask) =>
+        currentTask.id === task.id ? { ...currentTask, statusId: nextStatusId } : currentTask
+      )
+    );
 
     const response = await fetch(`/api/tasks/${task.id}`, {
       method: "PATCH",
@@ -78,12 +104,40 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
 
     if (!response.ok) {
       setError("Could not move the task.");
+      setBoardTasks(tasks);
       setMovingTaskId("");
       return;
     }
 
     setMovingTaskId("");
     router.refresh();
+  }
+
+  function handleDragStart(event: DragEvent<HTMLElement>, taskId: string) {
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", taskId);
+    setDraggedTaskId(taskId);
+  }
+
+  function handleDragOver(event: DragEvent<HTMLElement>, columnId: string) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    setActiveDropColumnId(columnId);
+  }
+
+  async function handleDrop(event: DragEvent<HTMLElement>, columnId: string) {
+    event.preventDefault();
+    const taskId = event.dataTransfer.getData("text/plain") || draggedTaskId;
+    const task = boardTasks.find((currentTask) => currentTask.id === taskId);
+
+    setDraggedTaskId("");
+    setActiveDropColumnId("");
+
+    if (!task) {
+      return;
+    }
+
+    await moveTask(task, columnId);
   }
 
   return (
@@ -98,7 +152,7 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
           </p>
         </div>
         <Link
-          href="/dashboard/tasks/new"
+          href={`/dashboard/tasks/new?projectId=${projectId}`}
           className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-[var(--app-accent)] px-3 text-sm font-medium text-white transition hover:opacity-90 sm:w-auto"
         >
           <Plus aria-hidden="true" className="h-4 w-4" />
@@ -114,7 +168,7 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
 
       <div className="grid min-w-0 gap-3 overflow-x-auto pb-2 lg:grid-flow-col lg:auto-cols-[minmax(17rem,1fr)]">
         {orderedColumns.map((column, columnIndex) => {
-          const columnTasks = tasks.filter((task) => task.statusId === column.id);
+          const columnTasks = boardTasks.filter((task) => task.statusId === column.id);
           const previousColumnId = columnIds[columnIndex - 1];
           const nextColumnId = columnIds[columnIndex + 1];
           const progress = getColumnProgress(columnTasks, taskCount);
@@ -122,7 +176,14 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
           return (
             <section
               key={column.id}
-              className="grid min-h-72 min-w-0 content-start gap-3 rounded-md border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-900/70"
+              onDragOver={(event) => handleDragOver(event, column.id)}
+              onDragLeave={() => setActiveDropColumnId("")}
+              onDrop={(event) => handleDrop(event, column.id)}
+              className={`grid min-h-72 min-w-0 content-start gap-3 rounded-md border bg-zinc-50 p-3 transition dark:bg-zinc-900/70 ${
+                activeDropColumnId === column.id
+                  ? "border-[var(--app-accent)] ring-2 ring-[var(--app-accent)]/15"
+                  : "border-zinc-200 dark:border-zinc-800"
+              }`}
             >
               <div className="grid gap-3">
                 <div className="flex items-start justify-between gap-3">
@@ -162,7 +223,15 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
                   {columnTasks.map((task) => (
                     <article
                       key={task.id}
-                      className="group grid gap-3 rounded-md border border-zinc-200 bg-white p-3 shadow-sm transition hover:border-[var(--app-accent)] dark:border-zinc-800 dark:bg-zinc-950"
+                      draggable
+                      onDragStart={(event) => handleDragStart(event, task.id)}
+                      onDragEnd={() => {
+                        setDraggedTaskId("");
+                        setActiveDropColumnId("");
+                      }}
+                      className={`group grid cursor-grab gap-3 rounded-md border border-zinc-200 bg-white p-3 shadow-sm transition hover:border-[var(--app-accent)] active:cursor-grabbing dark:border-zinc-800 dark:bg-zinc-950 ${
+                        draggedTaskId === task.id ? "opacity-60" : ""
+                      }`}
                     >
                       <div className="flex items-start gap-2">
                         <GripVertical

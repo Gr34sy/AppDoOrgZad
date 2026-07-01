@@ -73,6 +73,12 @@ export function ProjectDetailsPanel({
         initialEstimatedMinutes={estimatedMinutes}
         initialTags={tags}
         initialChecklistIds={checklistIds}
+        initialKanbanColumns={kanbanColumns.map((column) => ({
+          id: column.id,
+          title: column.title,
+          color: column.color ?? "#71717a",
+          isDone: column.isDone
+        }))}
         onCancel={() => setIsEditing(false)}
         onSaved={() => setIsEditing(false)}
       />
