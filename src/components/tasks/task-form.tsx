@@ -25,7 +25,6 @@ type TaskFormProps = {
   initialStatusId?: string;
   initialProjectId?: string;
   initialDueDate?: string;
-  initialEstimatedMinutes?: number | null;
   initialTags?: string[];
   initialChecklistIds?: string[];
   onCancel?: () => void;
@@ -52,7 +51,6 @@ export function TaskForm({
   initialStatusId = "todo",
   initialProjectId = "",
   initialDueDate = "",
-  initialEstimatedMinutes = null,
   initialTags = [],
   initialChecklistIds = [],
   onCancel,
@@ -87,7 +85,6 @@ export function TaskForm({
     const title = String(formData.get("title") ?? "").trim();
     const description = String(formData.get("description") ?? "");
     const projectId = String(formData.get("projectId") ?? "");
-    const estimatedValue = String(formData.get("estimatedMinutes") ?? "").trim();
     const dueDate = String(formData.get("dueDate") ?? "").trim();
 
     if (!title) {
@@ -109,7 +106,6 @@ export function TaskForm({
         statusId: String(formData.get("statusId") ?? "todo"),
         projectId: projectId || null,
         dueDate: dueDate ? new Date(`${dueDate}T00:00:00`).toISOString() : null,
-        estimatedMinutes: estimatedValue ? Number(estimatedValue) : null,
         tags: tags.map((tag) => tag.trim()).filter(Boolean),
         checklistIds
       })
@@ -224,20 +220,6 @@ export function TaskForm({
             Due date
           </label>
           <input id="dueDate" name="dueDate" type="date" defaultValue={initialDueDate} className={inputClass} />
-        </div>
-
-        <div className="grid gap-2">
-          <label htmlFor="estimatedMinutes" className={labelClass}>
-            Estimated minutes
-          </label>
-          <input
-            id="estimatedMinutes"
-            name="estimatedMinutes"
-            type="number"
-            min="0"
-            defaultValue={initialEstimatedMinutes ?? ""}
-            className={inputClass}
-          />
         </div>
       </div>
 

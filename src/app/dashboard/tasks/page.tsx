@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { CalendarClock, CheckCircle2, ClipboardList, Plus, Tag } from "lucide-react";
+import { CalendarClock, CheckCircle2, ClipboardList, Plus } from "lucide-react";
 import { FilterSelect } from "@/components/dashboard/filter-select";
 import { SearchInput } from "@/components/dashboard/search-input";
 import { SortSelect } from "@/components/dashboard/sort-select";
+import { TagList } from "@/components/dashboard/tag-list";
 import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { defaultSortOptions, escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
@@ -177,12 +178,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
                         {task.dueDate.toLocaleString("pl-PL")}
                       </span>
                     ) : null}
-                    {task.tags?.length ? (
-                      <span className="inline-flex items-center gap-2">
-                        <Tag aria-hidden="true" className="h-3.5 w-3.5" />
-                        {task.tags.slice(0, 3).join(", ")}
-                      </span>
-                    ) : null}
+                    <TagList tags={task.tags ?? []} limit={3} />
                   </div>
                 </Link>
               );

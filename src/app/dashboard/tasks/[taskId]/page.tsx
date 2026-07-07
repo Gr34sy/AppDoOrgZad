@@ -25,7 +25,6 @@ type TaskDetails = {
   statusId?: string;
   projectId?: unknown;
   dueDate?: Date | null;
-  estimatedMinutes?: number | null;
   tags?: string[];
   checklistIds?: unknown[];
   position?: number;
@@ -119,7 +118,6 @@ export default async function TaskPage({ params }: TaskPageProps) {
           projectId={task.projectId ? String(task.projectId) : ""}
           dueDate={getDateInputValue(task.dueDate)}
           dueDateLabel={task.dueDate?.toLocaleString("pl-PL")}
-          estimatedMinutes={task.estimatedMinutes}
           tags={task.tags ?? []}
           checklistIds={(task.checklistIds ?? []).map((checklistId) => String(checklistId))}
           completedAtLabel={task.completedAt?.toLocaleString("pl-PL")}

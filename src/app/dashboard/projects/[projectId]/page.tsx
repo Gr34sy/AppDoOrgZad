@@ -33,7 +33,6 @@ type ProjectDetails = {
   priority?: string;
   lifecycleStatus?: string;
   dueDate?: Date | null;
-  estimatedMinutes?: number | null;
   tags?: string[];
   checklistIds?: unknown[];
   taskIds?: unknown[];
@@ -134,7 +133,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           lifecycleStatus={project.lifecycleStatus ?? "active"}
           dueDate={getDateInputValue(project.dueDate)}
           dueDateLabel={project.dueDate?.toLocaleString("pl-PL")}
-          estimatedMinutes={project.estimatedMinutes}
           tags={project.tags ?? []}
           checklistIds={(project.checklistIds ?? []).map((checklistId) => String(checklistId))}
           taskCount={projectTasks.length}

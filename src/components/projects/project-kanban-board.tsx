@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, CalendarClock, GripVertical, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarClock, Check, GripVertical, Plus, X } from "lucide-react";
 import { DragEvent, useEffect, useMemo, useState } from "react";
+import { TagList } from "@/components/dashboard/tag-list";
 
 type KanbanColumn = {
   id: string;
@@ -49,15 +50,22 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
   const [draggedTaskId, setDraggedTaskId] = useState("");
   const [activeDropColumnId, setActiveDropColumnId] = useState("");
   const [boardTasks, setBoardTasks] = useState(tasks);
+  const [boardColumns, setBoardColumns] = useState(columns);
+  const [editingColumnId, setEditingColumnId] = useState("");
+  const [columnDraft, setColumnDraft] = useState<KanbanColumn | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setBoardTasks(tasks);
   }, [tasks]);
 
+  useEffect(() => {
+    setBoardColumns(columns);
+  }, [columns]);
+
   const orderedColumns = useMemo(() => {
-    const baseColumns = columns.length
-      ? columns
+    const baseColumns = boardColumns.length
+      ? boardColumns
       : [{ id: "todo", title: "To do", color: "#2563eb", isDone: false }];
     const knownColumnIds = new Set(baseColumns.map((column) => column.id));
     const extraColumns = Array.from(
@@ -74,7 +82,7 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
     }));
 
     return [...baseColumns, ...extraColumns];
-  }, [boardTasks, columns]);
+  }, [boardColumns, boardTasks]);
   const columnIds = useMemo(() => orderedColumns.map((column) => column.id), [orderedColumns]);
   const taskCount = boardTasks.length;
 
@@ -111,6 +119,65 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
 
     setMovingTaskId("");
     router.refresh();
+  }
+
+  function startColumnEdit(column: KanbanColumn) {
+    setEditingColumnId(column.id);
+    setColumnDraft({
+      ...column,
+      color: column.color ?? "#71717a"
+    });
+  }
+
+  async function saveColumnEdit() {
+    if (!columnDraft) {
+      return;
+    }
+
+    const nextColumns = orderedColumns.map((column) =>
+      column.id === editingColumnId
+        ? {
+            ...column,
+            title: columnDraft.title.trim() || column.title,
+            color: columnDraft.color || column.color || "#71717a",
+            isDone: columnDraft.isDone
+          }
+        : column
+    );
+
+    setError(null);
+    setBoardColumns(nextColumns);
+    setEditingColumnId("");
+    setColumnDraft(null);
+
+    const response = await fetch(`/api/projects/${projectId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        kanbanColumns: nextColumns.map((column, index) => ({
+          id: column.id,
+          title: column.title,
+          color: column.color ?? "#71717a",
+          isDone: column.isDone,
+          position: index
+        }))
+      })
+    });
+
+    if (!response.ok) {
+      setError("Could not save the column.");
+      setBoardColumns(columns);
+      return;
+    }
+
+    router.refresh();
+  }
+
+  function cancelColumnEdit() {
+    setEditingColumnId("");
+    setColumnDraft(null);
   }
 
   function handleDragStart(event: DragEvent<HTMLElement>, taskId: string) {
@@ -188,18 +255,86 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
               <div className="grid gap-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="flex min-w-0 items-center gap-2">
-                      <span
-                        className="h-2.5 w-2.5 shrink-0 rounded-full"
-                        style={{ backgroundColor: column.color ?? "var(--app-accent)" }}
-                      />
-                      <h3 className="truncate text-sm font-semibold text-zinc-950 dark:text-zinc-50">
-                        {column.title}
-                      </h3>
-                    </div>
-                    <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                      {columnTasks.length} {columnTasks.length === 1 ? "task" : "tasks"}
-                    </p>
+                    {editingColumnId === column.id && columnDraft ? (
+                      <div className="grid gap-2">
+                        <input
+                          value={columnDraft.title}
+                          onChange={(event) =>
+                            setColumnDraft({ ...columnDraft, title: event.target.value })
+                          }
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              void saveColumnEdit();
+                            }
+                            if (event.key === "Escape") {
+                              cancelColumnEdit();
+                            }
+                          }}
+                          className="h-10 w-full rounded-md border border-[var(--app-accent)] bg-white px-3 text-sm font-semibold text-zinc-950 outline-none ring-2 ring-[var(--app-accent)]/15 dark:bg-zinc-950 dark:text-zinc-50"
+                        />
+                        <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] gap-2">
+                          <input
+                            type="color"
+                            value={columnDraft.color ?? "#71717a"}
+                            onChange={(event) =>
+                              setColumnDraft({ ...columnDraft, color: event.target.value })
+                            }
+                            className="h-10 w-full rounded-md border border-zinc-300 bg-white p-1 dark:border-zinc-700 dark:bg-zinc-950"
+                            aria-label={`${column.title} color`}
+                          />
+                          <label className="inline-flex h-10 items-center gap-2 rounded-md border border-zinc-300 px-2 text-xs text-zinc-700 dark:border-zinc-700 dark:text-zinc-200">
+                            <input
+                              type="checkbox"
+                              checked={columnDraft.isDone}
+                              onChange={(event) =>
+                                setColumnDraft({ ...columnDraft, isDone: event.target.checked })
+                              }
+                              className="h-3.5 w-3.5 accent-[var(--app-accent)]"
+                            />
+                            Done
+                          </label>
+                          <div className="grid grid-cols-2 gap-1">
+                            <button
+                              type="button"
+                              onClick={() => void saveColumnEdit()}
+                              className="grid h-10 w-10 place-items-center rounded-md bg-[var(--app-accent)] text-white"
+                              aria-label={`Save ${column.title}`}
+                              title="Save"
+                            >
+                              <Check aria-hidden="true" className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={cancelColumnEdit}
+                              className="grid h-10 w-10 place-items-center rounded-md border border-zinc-300 text-zinc-500 transition hover:border-zinc-500 hover:text-zinc-950 dark:border-zinc-700 dark:text-zinc-400 dark:hover:text-white"
+                              aria-label={`Cancel ${column.title}`}
+                              title="Cancel"
+                            >
+                              <X aria-hidden="true" className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => startColumnEdit(column)}
+                        className="block w-full rounded-md p-1 text-left transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/25 dark:hover:bg-zinc-950"
+                      >
+                        <span className="flex min-w-0 items-center gap-2">
+                          <span
+                            className="h-2.5 w-2.5 shrink-0 rounded-full"
+                            style={{ backgroundColor: column.color ?? "var(--app-accent)" }}
+                          />
+                          <span className="truncate text-sm font-semibold text-zinc-950 dark:text-zinc-50">
+                            {column.title}
+                          </span>
+                        </span>
+                        <span className="mt-1 block text-xs text-zinc-500 dark:text-zinc-400">
+                          {columnTasks.length} {columnTasks.length === 1 ? "task" : "tasks"}
+                        </span>
+                      </button>
+                    )}
                   </div>
                   {column.isDone ? (
                     <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200">
@@ -270,18 +405,7 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
                         ) : null}
                       </div>
 
-                      {task.tags.length ? (
-                        <div className="flex flex-wrap gap-1.5">
-                          {task.tags.slice(0, 3).map((tag) => (
-                            <span
-                              key={tag}
-                              className="rounded-full border border-zinc-200 px-2 py-0.5 text-[11px] text-zinc-500 dark:border-zinc-800 dark:text-zinc-400"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      ) : null}
+                      <TagList tags={task.tags} limit={3} />
 
                       <div className="grid grid-cols-2 gap-2">
                         <button

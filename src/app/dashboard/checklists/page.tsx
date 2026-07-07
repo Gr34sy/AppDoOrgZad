@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { CheckSquare, ListChecks, Plus, Tag } from "lucide-react";
+import { CheckSquare, ListChecks, Plus } from "lucide-react";
 import { FilterSelect } from "@/components/dashboard/filter-select";
 import { SearchInput } from "@/components/dashboard/search-input";
 import { SortSelect } from "@/components/dashboard/sort-select";
+import { TagList } from "@/components/dashboard/tag-list";
 import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { defaultSortOptions, escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
@@ -142,12 +143,7 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
                     </p>
                   )}
 
-                  {checklist.tags?.length ? (
-                    <span className="mt-4 inline-flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                      <Tag aria-hidden="true" className="h-3.5 w-3.5" />
-                      {checklist.tags.slice(0, 3).join(", ")}
-                    </span>
-                  ) : null}
+                  <TagList tags={checklist.tags ?? []} limit={3} className="mt-4" />
                 </Link>
               );
             })}

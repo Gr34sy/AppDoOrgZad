@@ -60,6 +60,18 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
   await connectDatabase();
   const payload = sanitizeMutation(data);
+  if (payload.projectId) {
+    const projectExists = await Project.exists({
+      _id: payload.projectId,
+      ownerId,
+      archivedAt: null
+    });
+
+    if (!projectExists) {
+      return badRequestResponse("Selected project does not exist.");
+    }
+  }
+
   const previousTask = await Task.findOne({
     _id: params.taskId,
     ownerId,

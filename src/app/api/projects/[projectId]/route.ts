@@ -12,6 +12,7 @@ import {
 import { recordActivityEvent } from "@/lib/activity-events";
 import { projectUpdateSchema } from "@/lib/validation-schemas";
 import { Project } from "@/models/project";
+import { Task } from "@/models/task";
 
 type RouteContext = {
   params: {
@@ -58,15 +59,36 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
   }
 
   await connectDatabase();
-  const payload = sanitizeMutation(data);
-  const project = await Project.findOneAndUpdate(
-    { _id: params.projectId, ownerId, archivedAt: null },
-    { $set: payload },
-    { new: true, runValidators: true }
-  );
+  const { newTasks, ...projectData } = data;
+  const payload = sanitizeMutation(projectData);
+  const hasProjectUpdates = Object.keys(payload).length > 0;
+  const project = hasProjectUpdates
+    ? await Project.findOneAndUpdate(
+        { _id: params.projectId, ownerId, archivedAt: null },
+        { $set: payload },
+        { new: true, runValidators: true }
+      )
+    : await Project.findOne({ _id: params.projectId, ownerId, archivedAt: null });
 
   if (!project) {
     return notFoundResponse();
+  }
+
+  const createdTasks = await Promise.all(
+    (newTasks ?? []).map((task) =>
+      Task.create({
+        ...sanitizeMutation(task),
+        ownerId,
+        projectId: project._id
+      })
+    )
+  );
+
+  if (createdTasks.length) {
+    await Project.updateOne(
+      { _id: project._id, ownerId, archivedAt: null },
+      { $addToSet: { taskIds: { $each: createdTasks.map((task) => task._id) } } }
+    );
   }
 
   await recordActivityEvent({

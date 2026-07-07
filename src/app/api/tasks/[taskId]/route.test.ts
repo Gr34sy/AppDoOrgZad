@@ -24,6 +24,7 @@ vi.mock("@/lib/activity-events", () => ({
 
 vi.mock("@/models/project", () => ({
   Project: {
+    exists: vi.fn(),
     updateOne: vi.fn()
   }
 }));
@@ -80,6 +81,7 @@ describe("/api/tasks/[taskId]", () => {
 
   it("updates an owned task and moves project links", async () => {
     vi.mocked(getCurrentUserId).mockResolvedValue("user-1");
+    vi.mocked(Project.exists).mockResolvedValue({ _id: "new-project" } as never);
     vi.mocked(Task.findOne).mockResolvedValue({ id: taskId, projectId: "old-project" });
     vi.mocked(Task.findOneAndUpdate).mockResolvedValue({
       id: taskId,

@@ -4,6 +4,7 @@ import { getCurrentUserId } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
 import { connectDatabase } from "@/lib/mongoose";
 import { Project } from "@/models/project";
+import { Task } from "@/models/task";
 import { GET, POST } from "./route";
 
 vi.mock("@/lib/session", () => ({
@@ -23,6 +24,13 @@ vi.mock("@/lib/activity-events", () => ({
 vi.mock("@/models/project", () => ({
   Project: {
     find: vi.fn(),
+    create: vi.fn(),
+    updateOne: vi.fn()
+  }
+}));
+
+vi.mock("@/models/task", () => ({
+  Task: {
     create: vi.fn()
   }
 }));
@@ -109,5 +117,46 @@ describe("/api/projects", () => {
       action: "created"
     });
     expect(payload.project).toEqual({ id: "project-1", title: "Website" });
+  });
+
+  it("creates project tasks as regular tasks linked to the project", async () => {
+    vi.mocked(getCurrentUserId).mockResolvedValue("user-1");
+    vi.mocked(Project.create).mockResolvedValue({
+      id: "project-1",
+      _id: "project-1",
+      title: "Website"
+    } as never);
+    vi.mocked(Task.create).mockResolvedValueOnce({
+      id: "task-1",
+      _id: "task-1",
+      title: "Draft content"
+    } as never);
+    vi.mocked(Project.updateOne).mockResolvedValue({} as never);
+
+    const response = await POST(
+      createJsonRequest({
+        title: "Website",
+        newTasks: [
+          {
+            title: "Draft content",
+            priority: "high",
+            statusId: "todo"
+          }
+        ]
+      }) as never
+    );
+
+    expect(response.status).toBe(201);
+    expect(Task.create).toHaveBeenCalledWith({
+      title: "Draft content",
+      priority: "high",
+      statusId: "todo",
+      ownerId: "user-1",
+      projectId: "project-1"
+    });
+    expect(Project.updateOne).toHaveBeenCalledWith(
+      { _id: "project-1", ownerId: "user-1", archivedAt: null },
+      { $addToSet: { taskIds: { $each: ["task-1"] } } }
+    );
   });
 });

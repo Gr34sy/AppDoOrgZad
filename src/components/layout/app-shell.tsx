@@ -60,7 +60,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
           <SignOutButton />
         </div>
       </aside>
-      <main className="mx-auto w-full min-w-0 max-w-7xl px-4 py-20 transition-[margin] duration-300 sm:px-6 lg:ml-72 lg:px-8 lg:py-8 peer-checked:lg:ml-20">
+      <main className="w-full min-w-0 max-w-none px-4 py-20 transition-[margin,width] duration-300 sm:px-6 lg:ml-72 lg:w-[calc(100%-18rem)] lg:px-8 lg:py-8 peer-checked:lg:ml-20 peer-checked:lg:w-[calc(100%-5rem)]">
         {children}
       </main>
     </div>

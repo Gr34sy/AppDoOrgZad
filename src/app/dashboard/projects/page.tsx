@@ -1,15 +1,18 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { CalendarClock, FolderKanban, Plus, Tag } from "lucide-react";
+import { Types } from "mongoose";
+import { CalendarClock, FolderKanban, Plus } from "lucide-react";
 import { FilterSelect } from "@/components/dashboard/filter-select";
 import { SearchInput } from "@/components/dashboard/search-input";
 import { SortSelect } from "@/components/dashboard/sort-select";
+import { TagList } from "@/components/dashboard/tag-list";
 import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { defaultSortOptions, escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
 import { connectDatabase } from "@/lib/mongoose";
 import { Project } from "@/models/project";
+import { Task } from "@/models/task";
 
 type ProjectsPageProps = {
   searchParams?: {
@@ -27,7 +30,6 @@ type ListedProject = {
   lifecycleStatus?: string;
   dueDate?: Date | null;
   tags?: string[];
-  taskIds?: unknown[];
 };
 
 const lifecycleStatusOptions = [
@@ -84,6 +86,22 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
 
   await connectDatabase();
   const projects = await Project.find(query).sort(getProjectSort(sort)).lean<ListedProject[]>();
+  const projectTaskCounts = await Task.aggregate<{ _id: unknown; count: number }>([
+    {
+      $match: {
+        ownerId: new Types.ObjectId(ownerId),
+        archivedAt: null,
+        projectId: { $ne: null }
+      }
+    },
+    { $group: { _id: "$projectId", count: { $sum: 1 } } }
+  ]);
+  const taskCountByProjectId = new Map(
+    projectTaskCounts.map((projectTaskCount) => [
+      String(projectTaskCount._id),
+      projectTaskCount.count
+    ])
+  );
 
   return (
     <AppShell>
@@ -134,7 +152,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
           <div className="app-card-grid">
             {projects.map((project) => {
               const projectId = String(project._id);
-              const taskCount = project.taskIds?.length ?? 0;
+              const taskCount = taskCountByProjectId.get(projectId) ?? 0;
 
               return (
                 <Link
@@ -175,12 +193,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                         {project.dueDate.toLocaleString("pl-PL")}
                       </span>
                     ) : null}
-                    {project.tags?.length ? (
-                      <span className="inline-flex items-center gap-2">
-                        <Tag aria-hidden="true" className="h-3.5 w-3.5" />
-                        {project.tags.slice(0, 3).join(", ")}
-                      </span>
-                    ) : null}
+                    <TagList tags={project.tags ?? []} limit={3} />
                   </div>
                 </Link>
               );

@@ -45,12 +45,6 @@ const taskSchema = new Schema(
       default: null,
       index: true
     },
-    estimatedMinutes: {
-      type: Number,
-      min: 0,
-      default: null,
-      index: true
-    },
     tags: {
       type: [String],
       default: [],

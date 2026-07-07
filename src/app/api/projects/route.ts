@@ -6,6 +6,7 @@ import { getCurrentUserId, sanitizeMutation, unauthorizedResponse } from "@/lib/
 import { recordActivityEvent } from "@/lib/activity-events";
 import { projectCreateSchema } from "@/lib/validation-schemas";
 import { Project } from "@/models/project";
+import { Task } from "@/models/task";
 
 export async function GET() {
   const ownerId = await getCurrentUserId();
@@ -38,8 +39,26 @@ export async function POST(request: NextRequest) {
   }
 
   await connectDatabase();
-  const payload = sanitizeMutation(data);
+  const { newTasks, ...projectData } = data;
+  const payload = sanitizeMutation(projectData);
   const project = await Project.create({ ...payload, ownerId });
+  const createdTasks = await Promise.all(
+    (newTasks ?? []).map((task) =>
+      Task.create({
+        ...sanitizeMutation(task),
+        ownerId,
+        projectId: project._id
+      })
+    )
+  );
+
+  if (createdTasks.length) {
+    await Project.updateOne(
+      { _id: project._id, ownerId, archivedAt: null },
+      { $addToSet: { taskIds: { $each: createdTasks.map((task) => task._id) } } }
+    );
+  }
+
   await recordActivityEvent({
     ownerId,
     entityType: "project",

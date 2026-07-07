@@ -23,6 +23,7 @@ vi.mock("@/lib/activity-events", () => ({
 
 vi.mock("@/models/project", () => ({
   Project: {
+    exists: vi.fn(),
     updateOne: vi.fn()
   }
 }));
@@ -88,6 +89,7 @@ describe("/api/tasks", () => {
 
   it("creates a task, links it to a project and records activity", async () => {
     vi.mocked(getCurrentUserId).mockResolvedValue("user-1");
+    vi.mocked(Project.exists).mockResolvedValue({ _id: "project-1" } as never);
     vi.mocked(Task.create).mockResolvedValue({
       id: "task-1",
       _id: "task-1",
@@ -127,5 +129,25 @@ describe("/api/tasks", () => {
       entityId: "task-1",
       action: "created"
     });
+  });
+
+  it("rejects tasks linked to unavailable projects", async () => {
+    vi.mocked(getCurrentUserId).mockResolvedValue("user-1");
+    vi.mocked(Project.exists).mockResolvedValue(null);
+
+    const response = await POST(
+      createJsonRequest({
+        title: "Write docs",
+        projectId: "project-1"
+      }) as never
+    );
+
+    expect(response.status).toBe(400);
+    expect(Project.exists).toHaveBeenCalledWith({
+      _id: "project-1",
+      ownerId: "user-1",
+      archivedAt: null
+    });
+    expect(Task.create).not.toHaveBeenCalled();
   });
 });

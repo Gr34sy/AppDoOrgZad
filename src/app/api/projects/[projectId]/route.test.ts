@@ -4,6 +4,7 @@ import { getCurrentUserId } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
 import { connectDatabase } from "@/lib/mongoose";
 import { Project } from "@/models/project";
+import { Task } from "@/models/task";
 import { DELETE, GET, PATCH } from "./route";
 
 vi.mock("@/lib/session", () => ({
@@ -24,7 +25,14 @@ vi.mock("@/lib/activity-events", () => ({
 vi.mock("@/models/project", () => ({
   Project: {
     findOne: vi.fn(),
-    findOneAndUpdate: vi.fn()
+    findOneAndUpdate: vi.fn(),
+    updateOne: vi.fn()
+  }
+}));
+
+vi.mock("@/models/task", () => ({
+  Task: {
+    create: vi.fn()
   }
 }));
 

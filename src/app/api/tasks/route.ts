@@ -41,6 +41,18 @@ export async function POST(request: NextRequest) {
 
   await connectDatabase();
   const payload = sanitizeMutation(data);
+  if (payload.projectId) {
+    const projectExists = await Project.exists({
+      _id: payload.projectId,
+      ownerId,
+      archivedAt: null
+    });
+
+    if (!projectExists) {
+      return badRequestResponse("Selected project does not exist.");
+    }
+  }
+
   const task = await Task.create({ ...payload, ownerId });
   if (task.projectId) {
     await Project.updateOne(

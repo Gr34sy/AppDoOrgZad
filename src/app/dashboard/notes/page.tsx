@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { FileText, Plus, StickyNote, Tag } from "lucide-react";
+import { FileText, Plus, StickyNote } from "lucide-react";
 import { FilterSelect } from "@/components/dashboard/filter-select";
 import { AppShell } from "@/components/layout/app-shell";
 import { SearchInput } from "@/components/dashboard/search-input";
 import { SortSelect } from "@/components/dashboard/sort-select";
+import { TagList } from "@/components/dashboard/tag-list";
 import { authOptions } from "@/lib/auth";
 import { defaultSortOptions, escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
 import { connectDatabase } from "@/lib/mongoose";
@@ -133,19 +134,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
                     <p className="mt-3 text-sm opacity-60">No content yet.</p>
                   )}
 
-                  {note.tags?.length ? (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {note.tags.slice(0, 4).map((noteTag) => (
-                        <span
-                          key={noteTag}
-                          className="inline-flex items-center gap-1 rounded-full border border-current px-2 py-1 text-xs font-medium opacity-70"
-                        >
-                          <Tag aria-hidden="true" className="h-3 w-3" />
-                          {noteTag}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
+                  <TagList tags={note.tags ?? []} limit={4} className="mt-4" />
                 </Link>
               );
             })}

@@ -17,6 +17,14 @@ export type KanbanColumnInput = {
   isDone: boolean;
 };
 
+type ProjectTaskInput = {
+  clientId: string;
+  title: string;
+  priority: string;
+  statusId: string;
+  dueDate: string;
+};
+
 type ProjectFormProps = {
   mode: "create" | "edit";
   projectId?: string;
@@ -26,7 +34,6 @@ type ProjectFormProps = {
   initialPriority?: string;
   initialLifecycleStatus?: string;
   initialDueDate?: string;
-  initialEstimatedMinutes?: number | null;
   initialTags?: string[];
   initialChecklistIds?: string[];
   initialKanbanColumns?: KanbanColumnInput[];
@@ -92,7 +99,6 @@ export function ProjectForm({
   initialPriority = "medium",
   initialLifecycleStatus = "active",
   initialDueDate = "",
-  initialEstimatedMinutes = null,
   initialTags = [],
   initialChecklistIds = [],
   initialKanbanColumns = defaultKanbanColumns,
@@ -108,13 +114,24 @@ export function ProjectForm({
   const [kanbanColumns, setKanbanColumns] = useState<KanbanColumnInput[]>(
     initialKanbanColumns.length ? initialKanbanColumns : defaultKanbanColumns
   );
+  const [newTasks, setNewTasks] = useState<ProjectTaskInput[]>([]);
 
   function updateKanbanColumn(index: number, column: KanbanColumnInput) {
+    const previousColumnId = kanbanColumns[index]?.id;
+
     setKanbanColumns((currentColumns) =>
       currentColumns.map((currentColumn, columnIndex) =>
         columnIndex === index ? column : currentColumn
       )
     );
+
+    if (previousColumnId && previousColumnId !== column.id) {
+      setNewTasks((currentTasks) =>
+        currentTasks.map((task) =>
+          task.statusId === previousColumnId ? { ...task, statusId: column.id } : task
+        )
+      );
+    }
   }
 
   function moveKanbanColumn(index: number, direction: -1 | 1) {
@@ -141,6 +158,31 @@ export function ProjectForm({
     );
   }
 
+  function addProjectTask() {
+    const defaultStatusId = kanbanColumns[0]?.id || "todo";
+
+    setNewTasks((currentTasks) => [
+      ...currentTasks,
+      {
+        clientId: crypto.randomUUID(),
+        title: "",
+        priority: "medium",
+        statusId: defaultStatusId,
+        dueDate: ""
+      }
+    ]);
+  }
+
+  function updateProjectTask(clientId: string, task: ProjectTaskInput) {
+    setNewTasks((currentTasks) =>
+      currentTasks.map((currentTask) => (currentTask.clientId === clientId ? task : currentTask))
+    );
+  }
+
+  function removeProjectTask(clientId: string) {
+    setNewTasks((currentTasks) => currentTasks.filter((task) => task.clientId !== clientId));
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
@@ -150,7 +192,6 @@ export function ProjectForm({
     const formData = new FormData(event.currentTarget);
     const title = String(formData.get("title") ?? "").trim();
     const dueDate = String(formData.get("dueDate") ?? "").trim();
-    const estimatedValue = String(formData.get("estimatedMinutes") ?? "").trim();
 
     if (!title) {
       setError("Project title is required.");
@@ -166,6 +207,15 @@ export function ProjectForm({
       return;
     }
 
+    const projectTasks = newTasks
+      .map((task) => ({
+        title: task.title.trim(),
+        priority: task.priority,
+        statusId: task.statusId,
+        dueDate: task.dueDate ? new Date(`${task.dueDate}T00:00:00`).toISOString() : null
+      }))
+      .filter((task) => task.title);
+
     const endpoint = mode === "create" ? "/api/projects" : `/api/projects/${projectId}`;
     const response = await fetch(endpoint, {
       method: mode === "create" ? "POST" : "PATCH",
@@ -178,9 +228,9 @@ export function ProjectForm({
         priority: String(formData.get("priority") ?? "medium"),
         lifecycleStatus: String(formData.get("lifecycleStatus") ?? "active"),
         dueDate: dueDate ? new Date(`${dueDate}T00:00:00`).toISOString() : null,
-        estimatedMinutes: estimatedValue ? Number(estimatedValue) : null,
         tags: tags.map((tag) => tag.trim()).filter(Boolean),
         checklistIds,
+        newTasks: projectTasks,
         kanbanColumns: normalizedKanbanColumns
       })
     });
@@ -281,20 +331,6 @@ export function ProjectForm({
           </label>
           <input id="dueDate" name="dueDate" type="date" defaultValue={initialDueDate} className={inputClass} />
         </div>
-
-        <div className="grid gap-2">
-          <label htmlFor="estimatedMinutes" className={labelClass}>
-            Estimated minutes
-          </label>
-          <input
-            id="estimatedMinutes"
-            name="estimatedMinutes"
-            type="number"
-            min="0"
-            defaultValue={initialEstimatedMinutes ?? ""}
-            className={inputClass}
-          />
-        </div>
       </div>
 
       <TagInputs tags={tags} onChange={setTags} />
@@ -328,6 +364,113 @@ export function ProjectForm({
           </div>
         ) : (
           <p className="text-sm text-zinc-500 dark:text-zinc-400">No checklists available.</p>
+        )}
+      </fieldset>
+
+      <fieldset className="grid gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <legend className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
+            Project tasks
+          </legend>
+          <button
+            type="button"
+            onClick={addProjectTask}
+            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md border border-zinc-300 px-3 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 sm:w-auto dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
+          >
+            <Plus aria-hidden="true" className="h-4 w-4" />
+            Add task
+          </button>
+        </div>
+
+        {newTasks.length ? (
+          <div className="grid gap-2">
+            {newTasks.map((task) => (
+              <div
+                key={task.clientId}
+                className="grid gap-3 rounded-md border border-zinc-200 bg-zinc-50 p-3 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end dark:border-zinc-800 dark:bg-zinc-900"
+              >
+                <div className="grid gap-2">
+                  <label htmlFor={`project-task-title-${task.clientId}`} className={labelClass}>
+                    Task title
+                  </label>
+                  <input
+                    id={`project-task-title-${task.clientId}`}
+                    type="text"
+                    value={task.title}
+                    onChange={(event) =>
+                      updateProjectTask(task.clientId, { ...task, title: event.target.value })
+                    }
+                    className={inputClass}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label htmlFor={`project-task-priority-${task.clientId}`} className={labelClass}>
+                    Priority
+                  </label>
+                  <select
+                    id={`project-task-priority-${task.clientId}`}
+                    value={task.priority}
+                    onChange={(event) =>
+                      updateProjectTask(task.clientId, { ...task, priority: event.target.value })
+                    }
+                    className={inputClass}
+                  >
+                    {priorityOptions.map((priority) => (
+                      <option key={priority} value={priority}>
+                        {priority}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="grid gap-2">
+                  <label htmlFor={`project-task-status-${task.clientId}`} className={labelClass}>
+                    Status
+                  </label>
+                  <select
+                    id={`project-task-status-${task.clientId}`}
+                    value={task.statusId}
+                    onChange={(event) =>
+                      updateProjectTask(task.clientId, { ...task, statusId: event.target.value })
+                    }
+                    className={inputClass}
+                  >
+                    {kanbanColumns.map((column) => (
+                      <option key={column.id} value={column.id}>
+                        {column.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="grid gap-2">
+                  <label htmlFor={`project-task-date-${task.clientId}`} className={labelClass}>
+                    Due date
+                  </label>
+                  <input
+                    id={`project-task-date-${task.clientId}`}
+                    type="date"
+                    value={task.dueDate}
+                    onChange={(event) =>
+                      updateProjectTask(task.clientId, { ...task, dueDate: event.target.value })
+                    }
+                    className={inputClass}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeProjectTask(task.clientId)}
+                  className="grid h-12 w-full place-items-center rounded-md border border-zinc-300 text-zinc-500 transition hover:border-red-300 hover:text-red-600 md:w-12 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-red-500/60 dark:hover:text-red-300"
+                  aria-label={`Remove ${task.title || "project task"}`}
+                  title="Remove task"
+                >
+                  <Trash2 aria-hidden="true" className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Add tasks here to create them together with this project.
+          </p>
         )}
       </fieldset>
 
