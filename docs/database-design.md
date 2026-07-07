@@ -41,19 +41,20 @@ Zadania użytkownika.
 | Pole | Typ | Opis |
 | --- | --- | --- |
 | `ownerId` | `ObjectId` | Właściciel zadania |
-| `projectId` | `ObjectId \| null` | Projekt, do którego należy zadanie |
+| `projectId` | `ObjectId \| null` | Projekt, do którego należy zadanie; główne powiązanie taska z projektem |
 | `title` | `string` | Tytuł |
 | `description` | `string` | Opis |
 | `priority` | `string` | `low`, `medium`, `high`, `urgent` |
 | `statusId` | `string` | Status albo kolumna Kanban |
 | `dueDate` | `Date \| null` | Termin |
-| `estimatedMinutes` | `number \| null` | Szacowany czas realizacji |
 | `tags` | `string[]` | Tagi |
 | `checklistIds` | `ObjectId[]` | Powiązane checklisty |
 | `position` | `number` | Kolejność |
 | `completedAt` | `Date \| null` | Data ukończenia |
 | `archivedAt` | `Date \| null` | Archiwizacja |
 | `createdAt`, `updatedAt` | `Date` | Daty utworzenia i aktualizacji |
+
+Zadania mogą być tworzone samodzielnie z widoku tasków albo jako element projektu. W obu przypadkach są zapisywane w tej samej kolekcji `tasks`, dzięki czemu task dodany podczas tworzenia lub edycji projektu jest widoczny także w głównej zakładce zadań użytkownika. Backend sprawdza, czy wskazany `projectId` należy do aktualnego użytkownika.
 
 ## `checklists`
 
@@ -93,10 +94,9 @@ Projekty użytkownika.
 | `priority` | `string` | `low`, `medium`, `high`, `urgent` |
 | `lifecycleStatus` | `string` | `active`, `paused`, `completed`, `archived` |
 | `dueDate` | `Date \| null` | Termin |
-| `estimatedMinutes` | `number \| null` | Szacowany czas realizacji |
 | `tags` | `string[]` | Tagi |
 | `checklistIds` | `ObjectId[]` | Checklisty projektu |
-| `taskIds` | `ObjectId[]` | Zadania projektu |
+| `taskIds` | `ObjectId[]` | Pomocnicza lista zadań projektu |
 | `kanbanColumns` | `object[]` | Kolumny Kanban |
 | `position` | `number` | Kolejność |
 | `completedAt` | `Date \| null` | Data ukończenia |
@@ -113,6 +113,8 @@ Struktura kolumny Kanban:
 | `color` | `string` | Kolor kolumny |
 | `isDone` | `boolean` | Czy kolumna oznacza zakończenie |
 
+Relacja projektu z zadaniami jest utrzymywana przede wszystkim przez `tasks.projectId`. Pole `projects.taskIds` pełni rolę pomocniczą dla zgodności i szybkiego odczytu wybranych danych, natomiast listy i liczniki projektów mogą być wyliczane bezpośrednio z kolekcji `tasks`.
+
 ## `pins`
 
 Przypięte elementy na dashboardzie.
@@ -126,6 +128,8 @@ Przypięte elementy na dashboardzie.
 | `createdAt`, `updatedAt` | `Date` | Daty utworzenia i aktualizacji |
 
 Dashboard najpierw pobiera dokumenty z `pins`, a potem na podstawie `targetType` i `targetId` doczytuje właściwe notatki, zadania, checklisty albo projekty.
+
+W interfejsie przypięcie jest obsługiwane wspólnym ikonowym przyciskiem. Stan przypięcia wynika z obecności dokumentu w kolekcji `pins`; przypięty element ma wypełniony przycisk, a nieprzypięty pusty przycisk z ikoną w kolorze akcentu.
 
 ## `userpreferences`
 
@@ -174,7 +178,7 @@ Najważniejsze powiązania:
 | --- | --- |
 | `users._id` -> `ownerId` | Użytkownik jest właścicielem notatek, zadań, checklist, projektów, pinów i zdarzeń |
 | `users._id` -> `userpreferences.userId` | Użytkownik ma jeden dokument preferencji |
-| `projects._id` -> `tasks.projectId` | Zadanie może należeć do projektu |
+| `projects._id` -> `tasks.projectId` | Zadanie może należeć do projektu; taski projektowe są pełnoprawnymi taskami użytkownika |
 | `checklists._id` -> `tasks.checklistIds` | Zadanie może mieć powiązane checklisty |
 | `checklists._id` -> `projects.checklistIds` | Projekt może mieć powiązane checklisty |
 | `pins.targetId` + `pins.targetType` | Pin wskazuje na notatkę, zadanie, checklistę albo projekt |

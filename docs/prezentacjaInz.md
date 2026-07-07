@@ -33,13 +33,14 @@ Tresci na slajdzie:
 - Tworzenie i zarzadzanie notatkami.
 - Tworzenie i zarzadzanie zadaniami.
 - Tworzenie checklist.
-- Organizowanie projektow.
+- Organizowanie projektow wraz z powiazanymi taskami i tablica Kanban.
 - Przypinanie waznych elementow do dashboardu.
 - Zapisywanie preferencji wygladu uzytkownika.
 
 Notatki do omowienia:
 
 - Uzytkownik po zalogowaniu moze pracowac na kilku typach danych: notatkach, taskach, checklistach i projektach.
+- Task moze zostac utworzony samodzielnie albo jako czesc projektu, ale zawsze jest normalnym zadaniem widocznym w zakladce taskow.
 - Dashboard pelni role centrum aplikacji. Nie jest osobna encja, tylko widok agregujacy najwazniejsze dane.
 - Preferencje wygladu sa zapisywane per uzytkownik, wiec aplikacja pamieta wybrany tryb i kolory.
 
@@ -233,8 +234,9 @@ Notatki do omowienia:
 
 - CRUD jest realizowany przez endpointy w `src/app/api`.
 - Interfejs uzytkownika znajduje sie w podstronach `src/app/dashboard`.
-- Formularze tworzenia i edycji komunikuja sie z API przez `fetch`.
+- Formularze tworzenia oraz edycja inline w widokach szczegolow komunikuja sie z API przez `fetch`.
 - Kazda operacja domenowa jest ograniczona do danych aktualnego uzytkownika.
+- Widoki szczegolow pozwalaja zmieniac tytul i opis bez otwierania osobnego formularza. Zmiany sa zapisywane dopiero po kliknieciu `Save changes`.
 - Notatki sa obecnie usuwane fizycznie z bazy przez `findOneAndDelete`.
 - Inne encje uzywaja pola `archivedAt`, zeby ukryc usuniete elementy bez natychmiastowego kasowania dokumentu.
 
@@ -250,6 +252,7 @@ Tresci na slajdzie:
 - Przypiete elementy: notatki, zadania, checklisty, projekty.
 - Kolekcja `pins`.
 - Wspolny mechanizm dla wielu typow danych.
+- Ikonowy przycisk przypinania w widokach szczegolow.
 
 Notatki do omowienia:
 
@@ -257,6 +260,7 @@ Notatki do omowienia:
 - Kolekcja `pins` zapisuje tylko `targetType`, `targetId`, `ownerId` i `position`.
 - Na podstawie typu i identyfikatora aplikacja doczytuje wlasciwy dokument.
 - To pozwala jednym mechanizmem przypinac rozne typy elementow.
+- Przycisk pin pokazuje stan wizualnie: przypiety element ma wypelniony przycisk, a nieprzypiety pusty przycisk z ikona w kolorze akcentu.
 
 ## Slajd 12 - Interfejs uzytkownika
 
@@ -269,16 +273,42 @@ Tresci na slajdzie:
 - Sidebar i wspolny layout `AppShell`.
 - Listy z wyszukiwaniem, filtrowaniem i sortowaniem.
 - Karty elementow.
-- Formularze tworzenia i edycji.
-- Panele szczegolow z akcjami `Edit`, `Pin`, `Delete`.
+- Formularze tworzenia.
+- Edycja inline w widokach szczegolow.
+- Przycisk `Save changes` widoczny dopiero po zmianach.
+- Ikonowe przypinanie i usuwanie elementow.
 
 Notatki do omowienia:
 
 - `AppShell` zapewnia wspolny uklad po zalogowaniu.
-- Listy notatek, zadan, checklist i projektow maja spojny wyglad.
+- `AppShell` jest responsywny takze przy rozwinietym sidebarze, a glowna kolumna nie wychodzi poza ekran.
+- Listy notatek, zadan, checklist i projektow maja spojny wyglad, wspolny pasek wyszukiwania/filtrowania bez dodatkowej ramki oraz wyrownane kontrolki.
 - Elementy mozna otworzyc w widoku szczegolow.
-- Widok szczegolow pozwala edytowac, przypinac i usuwac element.
+- Widok szczegolow pozwala kliknac tytul lub opis, zmienic tekst i zapisac zmiany jednym przyciskiem.
+- Sekcje szczegolow notatek, taskow, checklist i projektow maja wspolny uklad metadanych `Created | Updated`.
+- Tagi sa wyswietlane jako osobne ramki w kolorze akcentu, bez przecinkow.
 - UI jest stylowany przez Tailwind CSS i korzysta z ikon Lucide React.
+
+## Slajd 12a - Projekty i Kanban
+
+Cel slajdu:
+
+- Pokazac integracje projektow z taskami oraz tablica Kanban.
+
+Tresci na slajdzie:
+
+- Taski projektu sa zwyklymi taskami uzytkownika.
+- Task mozna przypisac do projektu z formularza zadania.
+- Taski mozna utworzyc podczas tworzenia lub edycji projektu.
+- Tablica Kanban w projekcie korzysta ze statusow taskow.
+- Kolumny Kanban mozna edytowac po kliknieciu w naglowek kolumny.
+
+Notatki do omowienia:
+
+- Projekt nie przechowuje oddzielnego typu podtaskow. Zamiast tego kazde zadanie projektowe jest dokumentem w kolekcji `tasks` z ustawionym `projectId`.
+- Dzieki temu task utworzony z poziomu projektu pojawia sie takze na globalnej liscie taskow.
+- API pilnuje, zeby task nie mogl zostac przypisany do projektu innego uzytkownika.
+- Kolumny Kanban sa zapisane w projekcie jako konfiguracja `kanbanColumns`, a konkretne zadania trafiaja do kolumn przez pole `statusId`.
 
 ## Slajd 13 - Personalizacja wygladu
 
@@ -313,6 +343,7 @@ Tresci na slajdzie:
 - Filtrowanie po `ownerId`.
 - Walidacja Zod.
 - Sanitizacja payloadow.
+- Walidacja powiazania taska z projektem.
 - Rate limiting.
 - Statusy bledow: `400`, `401`, `404`, `429`.
 
@@ -322,6 +353,7 @@ Notatki do omowienia:
 - Dokumenty sa pobierane i modyfikowane z warunkiem `ownerId`.
 - Zod pilnuje ksztaltu requestu, np. wymaganych pol i typow danych.
 - Sanitizacja usuwa pola techniczne, ktorych klient nie powinien ustawic samodzielnie.
+- Przy tworzeniu i edycji taska backend sprawdza, czy wskazany projekt istnieje, nie jest zarchiwizowany i nalezy do aktualnego uzytkownika.
 - Rate limiting ogranicza liczbe wybranych mutacji w krotkim czasie.
 - `400` oznacza bledny request, `401` brak sesji, `404` brak zasobu, `429` zbyt wiele requestow.
 
@@ -356,14 +388,14 @@ Tresci na slajdzie:
 - `npm run typecheck`.
 - `npm run build`.
 - `npm run test`.
-- Vitest: testy helperow i endpointow notatek.
+- Vitest: testy helperow i endpointow API.
 
 Notatki do omowienia:
 
 - `typecheck` sprawdza zgodnosc typow TypeScript.
 - `build` sprawdza, czy aplikacja kompiluje sie jako projekt Next.js.
 - `test` uruchamia testy Vitest.
-- Testy obejmuja m.in. sanitizacje mutacji, walidacje danych notatek oraz zachowanie endpointow notatek.
+- Testy obejmuja m.in. sanitizacje mutacji, walidacje danych oraz zachowanie endpointow notatek, checklist, taskow i projektow.
 - Konfiguracja Vitest obsluguje alias `@`, zeby testy importowaly pliki tak samo jak aplikacja.
 
 ## Slajd 17 - Scenariusz demonstracji
@@ -377,7 +409,9 @@ Tresci na slajdzie:
 - Logowanie przez OAuth.
 - Dashboard.
 - Utworzenie notatki.
-- Edycja zadania/checklisty/projektu.
+- Edycja inline zadania/checklisty/projektu i zapis przez `Save changes`.
+- Przypisanie taska do projektu albo utworzenie taskow z formularza projektu.
+- Edycja kolumny Kanban w projekcie.
 - Przypiecie elementu do dashboardu.
 - Zmiana ustawien wygladu.
 
@@ -385,7 +419,7 @@ Notatki do omowienia:
 
 - Najlepsza kolejnosc demo: `/login`, `/dashboard`, `/dashboard/notes`, `/dashboard/tasks`, `/dashboard/checklists`, `/dashboard/projects`, `/dashboard/settings`.
 - W trakcie demo warto podkreslac, ze kazda operacja dziala w kontekscie zalogowanego uzytkownika.
-- Dobrym przykladem pelnego przeplywu jest: stworzenie notatki, otwarcie szczegolow, edycja, przypiecie do dashboardu i usuniecie.
+- Dobrym przykladem pelnego przeplywu jest: stworzenie notatki, otwarcie szczegolow, edycja inline, zapis przez `Save changes`, przypiecie do dashboardu i usuniecie.
 
 ## Slajd 18 - Wnioski i mozliwosci rozwoju
 
@@ -399,13 +433,15 @@ Tresci na slajdzie:
 - Wdrozone logowanie, sesja, API, baza danych i UI.
 - Glowne encje maja CRUD.
 - Dane sa izolowane per uzytkownik.
-- Projekt mozna rozwijac o testy E2E, rozbudowany Kanban i monitoring.
+- Projekty sa zintegrowane z taskami i Kanbanem.
+- Projekt mozna rozwijac o testy E2E, monitoring i dalsza automatyzacje pracy.
 
 Notatki do omowienia:
 
 - Najwazniejszym efektem pracy jest dzialajacy przeplyw od logowania do zapisu danych w bazie.
 - Aplikacja ma modularna strukture, co ulatwia dalszy rozwoj.
 - Mozliwe kierunki rozwoju to testy end-to-end, lepszy monitoring, rozbudowa Kanbana, kontrolowany upgrade zaleznosci i bardziej zaawansowane realtime.
+- Obecny Kanban ma juz edytowalne kolumny i powiazanie z taskami, wiec dalszy rozwoj moze obejmowac np. limity WIP, automatyzacje statusow i bardziej rozbudowane widoki raportowe.
 
 ## Krotka lista technologii do zapamietania
 
