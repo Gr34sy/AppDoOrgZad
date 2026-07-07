@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { FileText, Plus, StickyNote } from "lucide-react";
+import { CardDeleteButton } from "@/components/dashboard/card-delete-button";
 import { FilterSelect } from "@/components/dashboard/filter-select";
 import { AppShell } from "@/components/layout/app-shell";
 import { SearchInput } from "@/components/dashboard/search-input";
@@ -112,30 +113,35 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
               const preview = note.content?.trim();
 
               return (
-                <Link
+                <article
                   key={noteId}
-                  href={`/dashboard/notes/${noteId}`}
-                  className="group grid min-h-56 grid-rows-[auto_1fr_auto] overflow-hidden rounded-md border p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                  className="group relative overflow-hidden rounded-md transition hover:-translate-y-0.5"
                   style={noteStyle}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <h2 className="line-clamp-2 text-lg font-semibold tracking-normal">
-                      {note.title}
-                    </h2>
-                    <StickyNote
-                      aria-hidden="true"
-                      className="h-5 w-5 shrink-0 opacity-60 transition group-hover:opacity-100"
-                    />
-                  </div>
+                  <CardDeleteButton endpoint={`/api/notes/${noteId}`} />
+                  <Link
+                    href={`/dashboard/notes/${noteId}`}
+                    className="grid min-h-56 grid-rows-[auto_1fr_auto] rounded-md border p-4 shadow-sm transition hover:shadow-md"
+                  >
+                    <div className="flex items-start justify-between gap-3 pr-9">
+                      <h2 className="line-clamp-2 text-lg font-semibold tracking-normal">
+                        {note.title}
+                      </h2>
+                      <StickyNote
+                        aria-hidden="true"
+                        className="h-5 w-5 shrink-0 opacity-60 transition group-hover:opacity-100"
+                      />
+                    </div>
 
-                  {preview ? (
-                    <p className="mt-3 line-clamp-5 text-sm leading-6 opacity-80">{preview}</p>
-                  ) : (
-                    <p className="mt-3 text-sm opacity-60">No content yet.</p>
-                  )}
+                    {preview ? (
+                      <p className="mt-3 line-clamp-5 text-sm leading-6 opacity-80">{preview}</p>
+                    ) : (
+                      <p className="mt-3 text-sm opacity-60">No content yet.</p>
+                    )}
 
-                  <TagList tags={note.tags ?? []} limit={4} className="mt-4" />
-                </Link>
+                    <TagList tags={note.tags ?? []} limit={4} className="mt-4" />
+                  </Link>
+                </article>
               );
             })}
           </div>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { CalendarClock, CheckCircle2, ClipboardList, Plus } from "lucide-react";
+import { CardDeleteButton } from "@/components/dashboard/card-delete-button";
 import { FilterSelect } from "@/components/dashboard/filter-select";
 import { SearchInput } from "@/components/dashboard/search-input";
 import { SortSelect } from "@/components/dashboard/sort-select";
@@ -141,46 +142,51 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
               const taskId = String(task._id);
 
               return (
-                <Link
+                <article
                   key={taskId}
-                  href={`/dashboard/tasks/${taskId}`}
-                  className="group grid min-h-56 grid-rows-[auto_1fr_auto] rounded-md border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--app-accent)] hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+                  className="group relative transition hover:-translate-y-0.5"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h2 className="line-clamp-2 text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
-                        {task.title}
-                      </h2>
-                      <p className="mt-2 text-xs font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
-                        {task.statusId ?? "todo"} / {task.priority ?? "medium"}
-                      </p>
+                  <CardDeleteButton endpoint={`/api/tasks/${taskId}`} />
+                  <Link
+                    href={`/dashboard/tasks/${taskId}`}
+                    className="grid min-h-56 grid-rows-[auto_1fr_auto] rounded-md border border-zinc-200 bg-white p-4 shadow-sm transition hover:border-[var(--app-accent)] hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+                  >
+                    <div className="flex items-start justify-between gap-3 pr-9">
+                      <div>
+                        <h2 className="line-clamp-2 text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
+                          {task.title}
+                        </h2>
+                        <p className="mt-2 text-xs font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
+                          {task.statusId ?? "todo"} / {task.priority ?? "medium"}
+                        </p>
+                      </div>
+                      <ClipboardList
+                        aria-hidden="true"
+                        className="h-5 w-5 shrink-0 text-[var(--app-accent)] opacity-70 transition group-hover:opacity-100"
+                      />
                     </div>
-                    <ClipboardList
-                      aria-hidden="true"
-                      className="h-5 w-5 shrink-0 text-[var(--app-accent)] opacity-70 transition group-hover:opacity-100"
-                    />
-                  </div>
 
-                  {task.description ? (
-                    <p className="mt-4 line-clamp-4 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-                      {task.description}
-                    </p>
-                  ) : (
-                    <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
-                      No description yet.
-                    </p>
-                  )}
+                    {task.description ? (
+                      <p className="mt-4 line-clamp-4 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                        {task.description}
+                      </p>
+                    ) : (
+                      <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+                        No description yet.
+                      </p>
+                    )}
 
-                  <div className="mt-4 grid gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                    {task.dueDate ? (
-                      <span className="inline-flex items-center gap-2">
-                        <CalendarClock aria-hidden="true" className="h-3.5 w-3.5" />
-                        {task.dueDate.toLocaleString("pl-PL")}
-                      </span>
-                    ) : null}
-                    <TagList tags={task.tags ?? []} limit={3} />
-                  </div>
-                </Link>
+                    <div className="mt-4 grid gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                      {task.dueDate ? (
+                        <span className="inline-flex items-center gap-2">
+                          <CalendarClock aria-hidden="true" className="h-3.5 w-3.5" />
+                          {task.dueDate.toLocaleString("pl-PL")}
+                        </span>
+                      ) : null}
+                      <TagList tags={task.tags ?? []} limit={3} />
+                    </div>
+                  </Link>
+                </article>
               );
             })}
           </div>

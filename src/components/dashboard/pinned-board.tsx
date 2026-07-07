@@ -127,12 +127,12 @@ function MetricOverlay({
     <div className="absolute left-0 top-full z-30 hidden w-[min(20rem,calc(100vw-2rem))] pt-2 group-hover:block">
       <div className="rounded-lg border border-zinc-200 bg-white p-3 text-zinc-950 shadow-xl shadow-zinc-950/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50">
         {items.length ? (
-          <div className="grid gap-2">
+          <div className="grid">
             {items.map((item) => (
               <Link
                 key={item.id}
                 href={item.href}
-                className="grid grid-cols-[auto_1fr] gap-3 rounded-md border border-zinc-100 p-2 transition hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700"
+                className="grid grid-cols-[auto_1fr] gap-3 rounded-lg border-b border-zinc-200 p-2 transition last:border-b-0 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-950/60"
               >
                 <span
                   className={`mt-1 h-2.5 w-2.5 rounded-full ${

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { CheckSquare, ListChecks, Plus } from "lucide-react";
+import { CardDeleteButton } from "@/components/dashboard/card-delete-button";
 import { FilterSelect } from "@/components/dashboard/filter-select";
 import { SearchInput } from "@/components/dashboard/search-input";
 import { SortSelect } from "@/components/dashboard/sort-select";
@@ -113,38 +114,43 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
               const itemCount = checklist.items?.length ?? 0;
 
               return (
-                <Link
+                <article
                   key={checklistId}
-                  href={`/dashboard/checklists/${checklistId}`}
-                  className="group grid min-h-52 grid-rows-[auto_1fr_auto] rounded-md border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--app-accent)] hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+                  className="group relative transition hover:-translate-y-0.5"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h2 className="line-clamp-2 text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
-                        {checklist.title}
-                      </h2>
-                      <p className="mt-2 text-xs font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
-                        {itemCount} {itemCount === 1 ? "item" : "items"}
-                      </p>
+                  <CardDeleteButton endpoint={`/api/checklists/${checklistId}`} />
+                  <Link
+                    href={`/dashboard/checklists/${checklistId}`}
+                    className="grid min-h-52 grid-rows-[auto_1fr_auto] rounded-md border border-zinc-200 bg-white p-4 shadow-sm transition hover:border-[var(--app-accent)] hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+                  >
+                    <div className="flex items-start justify-between gap-3 pr-9">
+                      <div>
+                        <h2 className="line-clamp-2 text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
+                          {checklist.title}
+                        </h2>
+                        <p className="mt-2 text-xs font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
+                          {itemCount} {itemCount === 1 ? "item" : "items"}
+                        </p>
+                      </div>
+                      <ListChecks
+                        aria-hidden="true"
+                        className="h-5 w-5 shrink-0 text-[var(--app-accent)] opacity-70 transition group-hover:opacity-100"
+                      />
                     </div>
-                    <ListChecks
-                      aria-hidden="true"
-                      className="h-5 w-5 shrink-0 text-[var(--app-accent)] opacity-70 transition group-hover:opacity-100"
-                    />
-                  </div>
 
-                  {checklist.description ? (
-                    <p className="mt-4 line-clamp-4 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-                      {checklist.description}
-                    </p>
-                  ) : (
-                    <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
-                      No description yet.
-                    </p>
-                  )}
+                    {checklist.description ? (
+                      <p className="mt-4 line-clamp-4 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                        {checklist.description}
+                      </p>
+                    ) : (
+                      <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+                        No description yet.
+                      </p>
+                    )}
 
-                  <TagList tags={checklist.tags ?? []} limit={3} className="mt-4" />
-                </Link>
+                    <TagList tags={checklist.tags ?? []} limit={3} className="mt-4" />
+                  </Link>
+                </article>
               );
             })}
           </div>

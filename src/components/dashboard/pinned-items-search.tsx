@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { LayoutGrid, Search } from "lucide-react";
 import { useMemo, useState } from "react";
+import { CardDeleteButton } from "@/components/dashboard/card-delete-button";
 
 type PinnedItem = {
   id: string;
@@ -43,6 +44,20 @@ function getProgressColor(type: string) {
   }
 
   return "bg-sky-400";
+}
+
+function getPinnedItemDeleteEndpoint(item: PinnedItem) {
+  const hrefParts = item.href.split("/").filter(Boolean);
+  const targetId = hrefParts[hrefParts.length - 1];
+  const endpointByType: Record<string, string> = {
+    Note: "notes",
+    Checklist: "checklists",
+    Task: "tasks",
+    Project: "projects"
+  };
+  const endpointType = endpointByType[item.type];
+
+  return targetId && endpointType ? `/api/${endpointType}/${targetId}` : "";
 }
 
 export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearchProps) {
@@ -118,8 +133,8 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
               onClick={showAllTypes}
               className={`grid h-9 w-9 place-items-center rounded-md border transition ${
                 showsAllTypes
-                  ? "border-zinc-950 bg-zinc-950 text-white hover:bg-zinc-800 dark:border-white dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
-                  : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 hover:text-zinc-950 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:text-white"
+                  ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-white shadow-sm hover:opacity-90"
+                  : "border-zinc-200 bg-white text-zinc-700 hover:border-[var(--app-accent)] hover:text-[var(--app-accent)] focus-visible:border-[var(--app-accent)] focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
               }`}
             >
               <LayoutGrid aria-hidden="true" className="h-4 w-4" strokeWidth={2.25} />
@@ -135,8 +150,8 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
                   onClick={() => toggleType(filter.value)}
                   className={`rounded-md border px-4 py-2 font-medium transition ${
                     isSelected
-                      ? "border-zinc-950 bg-zinc-950 text-white hover:bg-zinc-800 dark:border-white dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
-                      : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 hover:text-zinc-950 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:text-white"
+                      ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-white shadow-sm hover:opacity-90"
+                      : "border-zinc-200 bg-white text-zinc-700 hover:border-[var(--app-accent)] hover:text-[var(--app-accent)] focus-visible:border-[var(--app-accent)] focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
                   }`}
                 >
                   {filter.label}
@@ -150,36 +165,43 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
       <section className="app-card-grid content-start">
         {filteredItems.length ? (
           filteredItems.map((item) => (
-            <Link
+            <article
               key={item.id}
-              href={item.href}
-              className="group min-h-44 min-w-0 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-xl hover:shadow-zinc-950/10 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
+              className="group relative min-w-0 transition hover:-translate-y-0.5"
             >
-              <div className="flex items-center justify-between gap-3">
-                <span
-                  className={`rounded-md border px-2.5 py-1 text-xs font-semibold ${
-                    typeStyles[item.type] ?? "border-zinc-300 bg-zinc-100 text-zinc-900"
-                  }`}
-                >
-                  {item.type}
-                </span>
-                <span className="min-w-0 max-w-[9rem] truncate rounded-md bg-zinc-100 px-2 py-1 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-                  {formatLabel(item.status)}
-                </span>
-              </div>
-              <h3 className="mt-5 line-clamp-2 text-lg font-semibold tracking-normal">
-                {item.title}
-              </h3>
-              <p className="mt-3 line-clamp-3 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-                {item.meta}
-              </p>
-              <div className="mt-5 h-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800">
-                <div
-                  className={`h-1.5 rounded-full ${getProgressColor(item.type)}`}
-                  style={{ width: "42%" }}
-                />
-              </div>
-            </Link>
+              {getPinnedItemDeleteEndpoint(item) ? (
+                <CardDeleteButton endpoint={getPinnedItemDeleteEndpoint(item)} />
+              ) : null}
+              <Link
+                href={item.href}
+                className="block min-h-44 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition hover:border-[var(--app-accent)] hover:shadow-xl hover:shadow-[var(--app-accent)]/10 focus-visible:border-[var(--app-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/20 dark:border-zinc-800 dark:bg-zinc-900"
+              >
+                <div className="flex items-center justify-between gap-3 pr-9">
+                  <span
+                    className={`rounded-md border px-2.5 py-1 text-xs font-semibold ${
+                      typeStyles[item.type] ?? "border-zinc-300 bg-zinc-100 text-zinc-900"
+                    }`}
+                  >
+                    {item.type}
+                  </span>
+                  <span className="min-w-0 max-w-[9rem] truncate rounded-md bg-zinc-100 px-2 py-1 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+                    {formatLabel(item.status)}
+                  </span>
+                </div>
+                <h3 className="mt-5 line-clamp-2 text-lg font-semibold tracking-normal">
+                  {item.title}
+                </h3>
+                <p className="mt-3 line-clamp-3 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                  {item.meta}
+                </p>
+                <div className="mt-5 h-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800">
+                  <div
+                    className={`h-1.5 rounded-full ${getProgressColor(item.type)}`}
+                    style={{ width: "42%" }}
+                  />
+                </div>
+              </Link>
+            </article>
           ))
         ) : (
           <article className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">

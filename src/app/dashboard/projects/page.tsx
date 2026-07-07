@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { Types } from "mongoose";
 import { CalendarClock, FolderKanban, Plus } from "lucide-react";
+import { CardDeleteButton } from "@/components/dashboard/card-delete-button";
 import { FilterSelect } from "@/components/dashboard/filter-select";
 import { SearchInput } from "@/components/dashboard/search-input";
 import { SortSelect } from "@/components/dashboard/sort-select";
@@ -155,47 +156,52 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
               const taskCount = taskCountByProjectId.get(projectId) ?? 0;
 
               return (
-                <Link
+                <article
                   key={projectId}
-                  href={`/dashboard/projects/${projectId}`}
-                  className="group grid min-h-56 grid-rows-[auto_1fr_auto] rounded-md border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--app-accent)] hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+                  className="group relative transition hover:-translate-y-0.5"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h2 className="line-clamp-2 text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
-                        {project.title}
-                      </h2>
-                      <p className="mt-2 text-xs font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
-                        {project.lifecycleStatus ?? "active"} / {project.priority ?? "medium"}
-                      </p>
+                  <CardDeleteButton endpoint={`/api/projects/${projectId}`} />
+                  <Link
+                    href={`/dashboard/projects/${projectId}`}
+                    className="grid min-h-56 grid-rows-[auto_1fr_auto] rounded-md border border-zinc-200 bg-white p-4 shadow-sm transition hover:border-[var(--app-accent)] hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
+                  >
+                    <div className="flex items-start justify-between gap-3 pr-9">
+                      <div>
+                        <h2 className="line-clamp-2 text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
+                          {project.title}
+                        </h2>
+                        <p className="mt-2 text-xs font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
+                          {project.lifecycleStatus ?? "active"} / {project.priority ?? "medium"}
+                        </p>
+                      </div>
+                      <FolderKanban
+                        aria-hidden="true"
+                        className="h-5 w-5 shrink-0 text-[var(--app-accent)] opacity-70 transition group-hover:opacity-100"
+                      />
                     </div>
-                    <FolderKanban
-                      aria-hidden="true"
-                      className="h-5 w-5 shrink-0 text-[var(--app-accent)] opacity-70 transition group-hover:opacity-100"
-                    />
-                  </div>
 
-                  {project.description ? (
-                    <p className="mt-4 line-clamp-4 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-                      {project.description}
-                    </p>
-                  ) : (
-                    <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
-                      No description yet.
-                    </p>
-                  )}
+                    {project.description ? (
+                      <p className="mt-4 line-clamp-4 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                        {project.description}
+                      </p>
+                    ) : (
+                      <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+                        No description yet.
+                      </p>
+                    )}
 
-                  <div className="mt-4 grid gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                    <span>{taskCount} {taskCount === 1 ? "task" : "tasks"}</span>
-                    {project.dueDate ? (
-                      <span className="inline-flex items-center gap-2">
-                        <CalendarClock aria-hidden="true" className="h-3.5 w-3.5" />
-                        {project.dueDate.toLocaleString("pl-PL")}
-                      </span>
-                    ) : null}
-                    <TagList tags={project.tags ?? []} limit={3} />
-                  </div>
-                </Link>
+                    <div className="mt-4 grid gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                      <span>{taskCount} {taskCount === 1 ? "task" : "tasks"}</span>
+                      {project.dueDate ? (
+                        <span className="inline-flex items-center gap-2">
+                          <CalendarClock aria-hidden="true" className="h-3.5 w-3.5" />
+                          {project.dueDate.toLocaleString("pl-PL")}
+                        </span>
+                      ) : null}
+                      <TagList tags={project.tags ?? []} limit={3} />
+                    </div>
+                  </Link>
+                </article>
               );
             })}
           </div>
