@@ -1,5 +1,4 @@
 import { getServerSession } from "next-auth";
-import { Types } from "mongoose";
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { PinnedBoard } from "@/components/dashboard/pinned-board";
@@ -29,12 +28,14 @@ type PinnedTarget = {
   items?: unknown[];
 };
 
-type WorkflowTask = {
+type DashboardMetricDocument = {
   _id: unknown;
   title: string;
+  updatedAt?: Date | string;
   priority?: string;
+  lifecycleStatus?: string;
   statusId?: string;
-  dueDate?: Date | string | null;
+  items?: unknown[];
 };
 
 const targetConfig: Record<PinTargetType, { hrefBase: string; label: string }> = {
@@ -69,27 +70,50 @@ export default async function DashboardPage() {
   }
 
   const ownerId = session.user.id;
-  const ownerObjectId = new Types.ObjectId(ownerId);
 
   await connectDatabase();
   const now = new Date();
   const calendarStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const calendarEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
-  const [pins, taskStatusCounts, workflowTasks, calendarTasks, calendarProjects] = await Promise.all([
+  const [
+    pins,
+    noteCount,
+    checklistCount,
+    taskCount,
+    projectCount,
+    recentNotes,
+    recentChecklists,
+    recentTasks,
+    recentProjects,
+    calendarTasks,
+    calendarProjects
+  ] = await Promise.all([
     Pin.find({ ownerId }).sort({ position: 1, updatedAt: -1 }).lean<PinDocument[]>(),
-    Task.aggregate<{ _id: string; count: number }>([
-      { $match: { ownerId: ownerObjectId, archivedAt: null } },
-      { $group: { _id: "$statusId", count: { $sum: 1 } } }
-    ]),
-    Task.find({
-      ownerId,
-      archivedAt: null,
-      statusId: { $in: ["todo", "in_progress", "done"] }
-    })
+    Note.countDocuments({ ownerId, archivedAt: null }),
+    Checklist.countDocuments({ ownerId, archivedAt: null }),
+    Task.countDocuments({ ownerId, archivedAt: null }),
+    Project.countDocuments({ ownerId, archivedAt: null }),
+    Note.find({ ownerId, archivedAt: null })
       .sort({ updatedAt: -1 })
-      .select({ title: 1, priority: 1, dueDate: 1, statusId: 1 })
-      .lean<WorkflowTask[]>(),
+      .limit(5)
+      .select({ title: 1, updatedAt: 1 })
+      .lean<DashboardMetricDocument[]>(),
+    Checklist.find({ ownerId, archivedAt: null })
+      .sort({ updatedAt: -1 })
+      .limit(5)
+      .select({ title: 1, updatedAt: 1, items: 1 })
+      .lean<DashboardMetricDocument[]>(),
+    Task.find({ ownerId, archivedAt: null })
+      .sort({ updatedAt: -1 })
+      .limit(5)
+      .select({ title: 1, updatedAt: 1, priority: 1, statusId: 1 })
+      .lean<DashboardMetricDocument[]>(),
+    Project.find({ ownerId, archivedAt: null })
+      .sort({ updatedAt: -1 })
+      .limit(5)
+      .select({ title: 1, updatedAt: 1, priority: 1, lifecycleStatus: 1 })
+      .lean<DashboardMetricDocument[]>(),
     Task.find({
       ownerId,
       archivedAt: null,
@@ -144,20 +168,58 @@ export default async function DashboardPage() {
     )
   ).filter((item) => item !== null);
 
-  const workflowColumns = ["todo", "in_progress", "done"].map((status) => ({
-    title: status,
-    count: taskStatusCounts.find((taskStatus) => taskStatus._id === status)?.count ?? 0,
-    items: workflowTasks
-      .filter((task) => task.statusId === status)
-      .slice(0, 5)
-      .map((task) => ({
+  const dashboardMetrics = [
+    {
+      title: "Notes",
+      count: noteCount,
+      colorKey: "notes" as const,
+      items: recentNotes.map((note) => ({
+        id: String(note._id),
+        title: note.title,
+        href: `/dashboard/notes/${String(note._id)}`,
+        updatedAt: note.updatedAt ? new Date(note.updatedAt).toISOString() : "",
+        meta: "Note"
+      }))
+    },
+    {
+      title: "Checklists",
+      count: checklistCount,
+      colorKey: "checklists" as const,
+      items: recentChecklists.map((checklist) => ({
+        id: String(checklist._id),
+        title: checklist.title,
+        href: `/dashboard/checklists/${String(checklist._id)}`,
+        updatedAt: checklist.updatedAt ? new Date(checklist.updatedAt).toISOString() : "",
+        meta: `${checklist.items?.length ?? 0} ${(checklist.items?.length ?? 0) === 1 ? "item" : "items"}`
+      }))
+    },
+    {
+      title: "Tasks",
+      count: taskCount,
+      colorKey: "tasks" as const,
+      items: recentTasks.map((task) => ({
         id: String(task._id),
         title: task.title,
-        priority: task.priority ?? "medium",
-        dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : "",
-        href: `/dashboard/tasks/${String(task._id)}`
+        href: `/dashboard/tasks/${String(task._id)}`,
+        updatedAt: task.updatedAt ? new Date(task.updatedAt).toISOString() : "",
+        meta: task.statusId ?? task.priority ?? "Task",
+        priority: task.priority
       }))
-  }));
+    },
+    {
+      title: "Projects",
+      count: projectCount,
+      colorKey: "projects" as const,
+      items: recentProjects.map((project) => ({
+        id: String(project._id),
+        title: project.title,
+        href: `/dashboard/projects/${String(project._id)}`,
+        updatedAt: project.updatedAt ? new Date(project.updatedAt).toISOString() : "",
+        meta: project.lifecycleStatus ?? project.priority ?? "Project",
+        priority: project.priority
+      }))
+    }
+  ];
 
   const calendarEvents = [
     ...calendarTasks.map((task) => ({
@@ -184,7 +246,7 @@ export default async function DashboardPage() {
     <AppShell>
       <PinnedBoard
         pinnedItems={pinnedItems}
-        workflowColumns={workflowColumns}
+        dashboardMetrics={dashboardMetrics}
         calendarEvents={calendarEvents}
       />
     </AppShell>

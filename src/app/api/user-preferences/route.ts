@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { badRequestResponse, tooManyRequestsResponse } from "@/lib/api-responses";
+import {
+  badRequestResponse,
+  serviceUnavailableResponse,
+  tooManyRequestsResponse
+} from "@/lib/api-responses";
 import { parseJsonBody } from "@/lib/api-request";
 import { connectDatabase } from "@/lib/mongoose";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -54,6 +58,10 @@ function serializePreference(preference: PreferencePayload | null) {
   };
 }
 
+function databaseUnavailableResponse() {
+  return serviceUnavailableResponse("Database connection is currently unavailable.");
+}
+
 async function getPreference(ownerId: string) {
   const preference = await UserPreference.findOneAndUpdate(
     { userId: ownerId },
@@ -88,10 +96,19 @@ export async function GET() {
     return unauthorizedResponse();
   }
 
-  await connectDatabase();
-  const preference = await getPreference(ownerId);
+  try {
+    await connectDatabase();
+    const preference = await getPreference(ownerId);
 
-  return NextResponse.json({ preference: serializePreference(preference) });
+    return NextResponse.json({ preference: serializePreference(preference) });
+  } catch (error) {
+    console.error("Unable to load user preferences", error);
+
+    return NextResponse.json({
+      preference: serializePreference(null),
+      unavailable: true
+    });
+  }
 }
 
 export async function PUT(request: NextRequest) {
@@ -127,12 +144,20 @@ export async function PUT(request: NextRequest) {
     updates.colors = data.colors;
   }
 
-  await connectDatabase();
-  const preference = (await UserPreference.findOneAndUpdate(
-    { userId: ownerId },
-    { $set: updates, $unset: { theme: "" }, $setOnInsert: { userId: ownerId } },
-    { new: true, upsert: true }
-  ).lean()) as PreferencePayload | null;
+  let preference: PreferencePayload | null;
+
+  try {
+    await connectDatabase();
+    preference = (await UserPreference.findOneAndUpdate(
+      { userId: ownerId },
+      { $set: updates, $unset: { theme: "" }, $setOnInsert: { userId: ownerId } },
+      { new: true, upsert: true }
+    ).lean()) as PreferencePayload | null;
+  } catch (error) {
+    console.error("Unable to update user preferences", error);
+
+    return databaseUnavailableResponse();
+  }
 
   return NextResponse.json({ preference: serializePreference(preference) });
 }
@@ -160,21 +185,29 @@ export async function POST(request: NextRequest) {
     return badRequestResponse(error);
   }
 
-  await connectDatabase();
-  const preference = (await UserPreference.findOneAndUpdate(
-    { userId: ownerId },
-    {
-      $push: {
-        savedThemes: {
-          name: data.name,
-          colors: data.colors
-        }
+  let preference: PreferencePayload | null;
+
+  try {
+    await connectDatabase();
+    preference = (await UserPreference.findOneAndUpdate(
+      { userId: ownerId },
+      {
+        $push: {
+          savedThemes: {
+            name: data.name,
+            colors: data.colors
+          }
+        },
+        $unset: { theme: "" },
+        $setOnInsert: { userId: ownerId }
       },
-      $unset: { theme: "" },
-      $setOnInsert: { userId: ownerId }
-    },
-    { new: true, upsert: true }
-  ).lean()) as PreferencePayload | null;
+      { new: true, upsert: true }
+    ).lean()) as PreferencePayload | null;
+  } catch (error) {
+    console.error("Unable to save user theme", error);
+
+    return databaseUnavailableResponse();
+  }
 
   return NextResponse.json({ preference: serializePreference(preference) }, { status: 201 });
 }

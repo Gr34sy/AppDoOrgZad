@@ -158,7 +158,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
               return (
                 <article
                   key={projectId}
-                  className="group relative transition hover:-translate-y-0.5"
+                  className="group relative overflow-hidden rounded-md transition hover:-translate-y-0.5"
                 >
                   <CardDeleteButton endpoint={`/api/projects/${projectId}`} />
                   <Link

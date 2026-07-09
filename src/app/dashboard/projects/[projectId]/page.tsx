@@ -161,6 +161,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             description: task.description ?? "",
             priority: task.priority ?? "medium",
             statusId: task.statusId ?? "todo",
+            position: task.position ?? 0,
             dueDateLabel: task.dueDate?.toLocaleDateString("pl-PL"),
             tags: task.tags ?? []
           }))}

@@ -86,7 +86,9 @@ export default async function ChecklistPage({ params }: ChecklistPageProps) {
           tags={checklist.tags ?? []}
           items={items.map((item) => ({
             title: item.title,
-            isCompleted: Boolean(item.isCompleted)
+            isCompleted: Boolean(item.isCompleted),
+            completedAt: item.completedAt?.toISOString() ?? null,
+            position: item.position ?? 0
           }))}
           parentType={checklist.parentType}
           createdAtLabel={checklist.createdAt?.toLocaleString("pl-PL")}

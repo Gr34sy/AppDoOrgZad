@@ -19,17 +19,17 @@ export function NoteColorInput({
 
   return (
     <fieldset className="grid gap-3">
-      <legend className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">Color</legend>
+      <legend className="app-form-legend">Color</legend>
 
-      <div className="grid gap-2">
-        <label htmlFor="colorMode" className="text-sm font-medium text-zinc-600 dark:text-zinc-300">
+      <div className="app-form-field">
+        <label htmlFor="colorMode" className="app-form-label">
           Note color
         </label>
         <select
           id="colorMode"
           value={colorMode}
           onChange={(event) => onColorModeChange(event.target.value)}
-          className="h-11 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className="app-form-control"
         >
           <option value="">No color</option>
           {noteColorOptions.map((colorOption) => (
@@ -60,8 +60,8 @@ export function NoteColorInput({
       </div>
 
       {isHexadecimalColor ? (
-        <div className="grid gap-2">
-          <label htmlFor="hexColor" className="text-sm font-medium text-zinc-600 dark:text-zinc-300">
+        <div className="app-form-field">
+          <label htmlFor="hexColor" className="app-form-label">
             HEX value
           </label>
           <input
@@ -69,7 +69,7 @@ export function NoteColorInput({
             type="color"
             value={hexColor || "#fff7cc"}
             onChange={(event) => onHexColorChange(event.target.value)}
-            className="h-11 w-full cursor-pointer rounded-md border border-zinc-300 bg-white px-2 py-1 shadow-sm outline-none transition focus:border-[var(--app-accent)] dark:border-zinc-700 dark:bg-zinc-900"
+            className="app-form-color"
           />
         </div>
       ) : null}

@@ -116,7 +116,7 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
               return (
                 <article
                   key={checklistId}
-                  className="group relative transition hover:-translate-y-0.5"
+                  className="group relative overflow-hidden rounded-md transition hover:-translate-y-0.5"
                 >
                   <CardDeleteButton endpoint={`/api/checklists/${checklistId}`} />
                   <Link

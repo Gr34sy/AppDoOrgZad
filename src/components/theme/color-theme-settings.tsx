@@ -10,10 +10,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const colorControls: Array<{ label: string; name: keyof ColorSettings }> = [
-  { label: "Upcoming tile", name: "upcoming" },
-  { label: "To do tile", name: "todo" },
-  { label: "In progress tile", name: "inProgress" },
-  { label: "Completed tile", name: "completed" }
+  { label: "Notes tile", name: "upcoming" },
+  { label: "Checklists tile", name: "todo" },
+  { label: "Tasks tile", name: "inProgress" },
+  { label: "Projects tile", name: "completed" }
 ];
 
 const modeOptions: Array<{ label: string; value: ColorMode }> = [

@@ -253,20 +253,19 @@ export function ProjectForm({
     router.refresh();
   }
 
-  const inputClass =
-    "h-12 w-full min-w-0 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50";
-  const labelClass = "text-sm font-medium text-zinc-700 dark:text-zinc-200";
+  const inputClass = "app-form-control";
+  const labelClass = "app-form-label";
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="grid w-full min-w-0 gap-6 rounded-md border border-zinc-200 bg-white p-4 shadow-sm sm:p-5 dark:border-zinc-800 dark:bg-zinc-950"
+      className="app-form-panel"
     >
-      <h2 className="text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
+      <h2 className="app-form-heading">
         {mode === "create" ? "Create project" : "Edit project"}
       </h2>
 
-      <div className="grid gap-2">
+      <div className="app-form-field">
         <label htmlFor="title" className={labelClass}>
           Title
         </label>
@@ -280,7 +279,7 @@ export function ProjectForm({
         />
       </div>
 
-      <div className="grid gap-2">
+      <div className="app-form-field">
         <label htmlFor="description" className={labelClass}>
           Description
         </label>
@@ -289,12 +288,13 @@ export function ProjectForm({
           name="description"
           rows={6}
           defaultValue={initialDescription}
-          className="min-h-40 w-full min-w-0 resize-y rounded-md border border-zinc-300 bg-white px-3 py-3 text-sm leading-6 text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className="app-form-textarea min-h-40"
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="grid gap-2">
+      <div className="app-form-section">
+        <div className="app-form-grid">
+        <div className="app-form-field">
           <label htmlFor="priority" className={labelClass}>
             Priority
           </label>
@@ -307,7 +307,7 @@ export function ProjectForm({
           </select>
         </div>
 
-        <div className="grid gap-2">
+        <div className="app-form-field">
           <label htmlFor="lifecycleStatus" className={labelClass}>
             Status
           </label>
@@ -325,18 +325,19 @@ export function ProjectForm({
           </select>
         </div>
 
-        <div className="grid gap-2">
+        <div className="app-form-field">
           <label htmlFor="dueDate" className={labelClass}>
             Due date
           </label>
           <input id="dueDate" name="dueDate" type="date" defaultValue={initialDueDate} className={inputClass} />
+        </div>
         </div>
       </div>
 
       <TagInputs tags={tags} onChange={setTags} />
 
       <fieldset className="grid gap-3">
-        <legend className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
+        <legend className="app-form-legend">
           Project checklists
         </legend>
         {checklistOptions.length ? (
@@ -344,7 +345,7 @@ export function ProjectForm({
             {checklistOptions.map((checklist) => (
               <label
                 key={checklist.id}
-                className="flex items-center gap-3 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-3 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
+                className="app-form-checkbox-card"
               >
                 <input
                   type="checkbox"
@@ -356,7 +357,7 @@ export function ProjectForm({
                         : currentChecklistIds.filter((id) => id !== checklist.id)
                     );
                   }}
-                  className="h-4 w-4 accent-[var(--app-accent)]"
+                  className="app-form-checkbox"
                 />
                 <span className="min-w-0 break-words">{checklist.title}</span>
               </label>
@@ -369,13 +370,13 @@ export function ProjectForm({
 
       <fieldset className="grid gap-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <legend className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
+          <legend className="app-form-legend">
             Project tasks
           </legend>
           <button
             type="button"
             onClick={addProjectTask}
-            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md border border-zinc-300 px-3 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 sm:w-auto dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
+            className="app-form-secondary-button sm:w-auto"
           >
             <Plus aria-hidden="true" className="h-4 w-4" />
             Add task
@@ -387,9 +388,9 @@ export function ProjectForm({
             {newTasks.map((task) => (
               <div
                 key={task.clientId}
-                className="grid gap-3 rounded-md border border-zinc-200 bg-zinc-50 p-3 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end dark:border-zinc-800 dark:bg-zinc-900"
+                className="grid gap-3 rounded-md bg-zinc-50/80 p-3 shadow-sm md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end dark:bg-zinc-900/70"
               >
-                <div className="grid gap-2">
+                <div className="app-form-field">
                   <label htmlFor={`project-task-title-${task.clientId}`} className={labelClass}>
                     Task title
                   </label>
@@ -403,7 +404,7 @@ export function ProjectForm({
                     className={inputClass}
                   />
                 </div>
-                <div className="grid gap-2">
+                <div className="app-form-field">
                   <label htmlFor={`project-task-priority-${task.clientId}`} className={labelClass}>
                     Priority
                   </label>
@@ -422,7 +423,7 @@ export function ProjectForm({
                     ))}
                   </select>
                 </div>
-                <div className="grid gap-2">
+                <div className="app-form-field">
                   <label htmlFor={`project-task-status-${task.clientId}`} className={labelClass}>
                     Status
                   </label>
@@ -441,7 +442,7 @@ export function ProjectForm({
                     ))}
                   </select>
                 </div>
-                <div className="grid gap-2">
+                <div className="app-form-field">
                   <label htmlFor={`project-task-date-${task.clientId}`} className={labelClass}>
                     Due date
                   </label>
@@ -458,7 +459,7 @@ export function ProjectForm({
                 <button
                   type="button"
                   onClick={() => removeProjectTask(task.clientId)}
-                  className="grid h-12 w-full place-items-center rounded-md border border-zinc-300 text-zinc-500 transition hover:border-red-300 hover:text-red-600 md:w-12 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-red-500/60 dark:hover:text-red-300"
+                  className="app-form-icon-button w-full md:w-11"
                   aria-label={`Remove ${task.title || "project task"}`}
                   title="Remove task"
                 >
@@ -476,7 +477,7 @@ export function ProjectForm({
 
       <fieldset className="grid gap-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <legend className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
+          <legend className="app-form-legend">
             Kanban columns
           </legend>
           <button
@@ -492,7 +493,7 @@ export function ProjectForm({
                 }
               ])
             }
-            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md border border-zinc-300 px-3 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 sm:w-auto dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
+            className="app-form-secondary-button sm:w-auto"
           >
             <Plus aria-hidden="true" className="h-4 w-4" />
             Add column
@@ -503,9 +504,9 @@ export function ProjectForm({
           {kanbanColumns.map((column, index) => (
             <div
               key={`${column.id}-${index}`}
-              className="grid gap-3 rounded-md border border-zinc-200 bg-zinc-50 p-3 sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto] sm:items-end dark:border-zinc-800 dark:bg-zinc-900"
+              className="grid gap-3 rounded-md bg-zinc-50/80 p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto] sm:items-end dark:bg-zinc-900/70"
             >
-              <div className="grid gap-2">
+              <div className="app-form-field">
                 <label htmlFor={`kanban-title-${index}`} className={labelClass}>
                   Column title
                 </label>
@@ -523,7 +524,7 @@ export function ProjectForm({
                   className={inputClass}
                 />
               </div>
-              <div className="grid gap-2">
+              <div className="app-form-field">
                 <label htmlFor={`kanban-color-${index}`} className={labelClass}>
                   Color
                 </label>
@@ -534,17 +535,17 @@ export function ProjectForm({
                   onChange={(event) =>
                     updateKanbanColumn(index, { ...column, color: event.target.value })
                   }
-                  className="h-12 w-full min-w-0 rounded-md border border-zinc-300 bg-white p-1 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+                  className="app-form-color"
                 />
               </div>
-              <label className="inline-flex h-12 items-center gap-2 rounded-md border border-zinc-300 px-3 text-sm text-zinc-700 dark:border-zinc-700 dark:text-zinc-200">
+              <label className="app-form-checkbox-card h-11">
                 <input
                   type="checkbox"
                   checked={column.isDone}
                   onChange={(event) =>
                     updateKanbanColumn(index, { ...column, isDone: event.target.checked })
                   }
-                  className="h-4 w-4 accent-[var(--app-accent)]"
+                  className="app-form-checkbox"
                 />
                 Done
               </label>

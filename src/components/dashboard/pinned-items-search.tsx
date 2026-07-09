@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LayoutGrid, Search } from "lucide-react";
+import { CheckSquare, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CardDeleteButton } from "@/components/dashboard/card-delete-button";
 
@@ -84,12 +84,14 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
     );
   }
 
-  function showAllTypes() {
-    setSelectedTypes([]);
+  function toggleAllTypes() {
+    setSelectedTypes((currentTypes) =>
+      currentTypes.length === typeFilters.length ? [] : typeFilters.map((filter) => filter.value)
+    );
   }
 
   const hasActiveFilters = Boolean(normalizedQuery) || selectedTypes.length > 0;
-  const showsAllTypes = selectedTypes.length === 0;
+  const hasSelectedAllTypes = selectedTypes.length === typeFilters.length;
   const countLabel = hasActiveFilters
     ? `${filteredItems.length} of ${pinnedItems.length} saved items`
     : pinnedItems.length
@@ -127,17 +129,17 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
           <div className="flex flex-wrap gap-2 text-sm" aria-label="Pinned item type filters">
             <button
               type="button"
-              aria-label="Show all pinned item types"
-              aria-pressed={showsAllTypes}
-              title="Show all pinned item types"
-              onClick={showAllTypes}
+              aria-label={hasSelectedAllTypes ? "Deselect all pinned item types" : "Select all pinned item types"}
+              aria-pressed={hasSelectedAllTypes}
+              title={hasSelectedAllTypes ? "Deselect all pinned item types" : "Select all pinned item types"}
+              onClick={toggleAllTypes}
               className={`grid h-9 w-9 place-items-center rounded-md border transition ${
-                showsAllTypes
+                hasSelectedAllTypes
                   ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-white shadow-sm hover:opacity-90"
                   : "border-zinc-200 bg-white text-zinc-700 hover:border-[var(--app-accent)] hover:text-[var(--app-accent)] focus-visible:border-[var(--app-accent)] focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
               }`}
             >
-              <LayoutGrid aria-hidden="true" className="h-4 w-4" strokeWidth={2.25} />
+              <CheckSquare aria-hidden="true" className="h-4 w-4" strokeWidth={2.25} />
             </button>
             {typeFilters.map((filter) => {
               const isSelected = selectedTypeSet.has(filter.value);
@@ -167,7 +169,7 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
           filteredItems.map((item) => (
             <article
               key={item.id}
-              className="group relative min-w-0 transition hover:-translate-y-0.5"
+              className="group relative min-w-0 overflow-hidden rounded-lg transition hover:-translate-y-0.5"
             >
               {getPinnedItemDeleteEndpoint(item) ? (
                 <CardDeleteButton endpoint={getPinnedItemDeleteEndpoint(item)} />

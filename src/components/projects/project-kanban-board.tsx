@@ -19,6 +19,7 @@ type KanbanTask = {
   description: string;
   priority: string;
   statusId: string;
+  position: number;
   dueDateLabel?: string;
   tags: string[];
 };
@@ -93,9 +94,19 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
 
     setError(null);
     setMovingTaskId(task.id);
+    const nextPosition =
+      Math.max(
+        -1,
+        ...boardTasks
+          .filter((currentTask) => currentTask.id !== task.id && currentTask.statusId === nextStatusId)
+          .map((currentTask) => currentTask.position ?? 0)
+      ) + 1;
+
     setBoardTasks((currentTasks) =>
       currentTasks.map((currentTask) =>
-        currentTask.id === task.id ? { ...currentTask, statusId: nextStatusId } : currentTask
+        currentTask.id === task.id
+          ? { ...currentTask, statusId: nextStatusId, position: nextPosition }
+          : currentTask
       )
     );
 
@@ -106,7 +117,8 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
       },
       body: JSON.stringify({
         statusId: nextStatusId,
-        projectId
+        projectId,
+        position: nextPosition
       })
     });
 
@@ -235,7 +247,9 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
 
       <div className="grid min-w-0 gap-3 overflow-x-auto pb-2 lg:grid-flow-col lg:auto-cols-[minmax(17rem,1fr)]">
         {orderedColumns.map((column, columnIndex) => {
-          const columnTasks = boardTasks.filter((task) => task.statusId === column.id);
+          const columnTasks = boardTasks
+            .filter((task) => task.statusId === column.id)
+            .sort((firstTask, secondTask) => firstTask.position - secondTask.position);
           const previousColumnId = columnIds[columnIndex - 1];
           const nextColumnId = columnIds[columnIndex + 1];
           const progress = getColumnProgress(columnTasks, taskCount);

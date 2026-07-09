@@ -110,27 +110,26 @@ export function ChecklistForm({
     router.refresh();
   }
 
-  const inputClass =
-    "h-12 w-full min-w-0 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50";
+  const inputClass = "app-form-control";
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="grid w-full min-w-0 gap-6 rounded-md border border-zinc-200 bg-white p-4 shadow-sm sm:p-5 dark:border-zinc-800 dark:bg-zinc-950"
+      className="app-form-panel"
     >
-      <h2 className="text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
+      <h2 className="app-form-heading">
         {mode === "create" ? "Create checklist" : "Edit checklist"}
       </h2>
 
-      <div className="grid gap-2">
-        <label htmlFor="title" className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+      <div className="app-form-field">
+        <label htmlFor="title" className="app-form-label">
           Title
         </label>
         <input id="title" name="title" type="text" defaultValue={initialTitle} required className={inputClass} />
       </div>
 
-      <div className="grid gap-2">
-        <label htmlFor="description" className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+      <div className="app-form-field">
+        <label htmlFor="description" className="app-form-label">
           Description
         </label>
         <textarea
@@ -138,19 +137,19 @@ export function ChecklistForm({
           name="description"
           rows={5}
           defaultValue={initialDescription}
-          className="min-h-36 w-full min-w-0 resize-y rounded-md border border-zinc-300 bg-white px-3 py-3 text-sm leading-6 text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className="app-form-textarea"
         />
       </div>
 
       <TagInputs tags={tags} onChange={setTags} />
 
       <fieldset className="grid gap-3">
-        <legend className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">Items</legend>
+        <legend className="app-form-legend">Items</legend>
         <div className="grid gap-2">
           {items.map((item, index) => (
             <div
               key={index}
-              className="grid min-w-0 gap-2 rounded-md border border-zinc-200 bg-zinc-50 p-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center dark:border-zinc-800 dark:bg-zinc-900"
+              className="grid min-w-0 gap-2 rounded-md bg-zinc-50/80 p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center dark:bg-zinc-900/70"
             >
               <label htmlFor={`item-${index}`} className="sr-only">
                 Item {index + 1}
@@ -163,21 +162,21 @@ export function ChecklistForm({
                 onChange={(event) => updateItem(index, { ...item, title: event.target.value })}
                 className={inputClass}
               />
-              <label className="inline-flex h-11 items-center gap-2 rounded-md border border-zinc-300 px-3 text-sm text-zinc-700 dark:border-zinc-700 dark:text-zinc-200">
+              <label className="app-form-checkbox-card h-11">
                 <input
                   type="checkbox"
                   checked={item.isCompleted}
                   onChange={(event) =>
                     updateItem(index, { ...item, isCompleted: event.target.checked })
                   }
-                  className="h-4 w-4 accent-[var(--app-accent)]"
+                  className="app-form-checkbox"
                 />
                 Done
               </label>
               <button
                 type="button"
                 onClick={() => removeItem(index)}
-                className="grid h-11 w-11 place-items-center rounded-md border border-zinc-300 text-zinc-500 transition hover:border-red-300 hover:text-red-600 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-red-500/60 dark:hover:text-red-300"
+                className="app-form-icon-button"
                 aria-label={`Remove item ${index + 1}`}
                 title="Remove item"
               >
@@ -189,7 +188,7 @@ export function ChecklistForm({
         <button
           type="button"
           onClick={() => setItems([...items, { title: "", isCompleted: false }])}
-          className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md border border-zinc-300 px-3 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 sm:w-fit dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
+          className="app-form-secondary-button"
         >
           <Plus aria-hidden="true" className="h-4 w-4" />
           Add item

@@ -57,7 +57,7 @@ export function PinEntityButton({
         aria-label={pinId ? "Unpin" : "Pin"}
         className={`inline-flex h-11 w-12 items-center justify-center rounded-t-md border text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${
           pinId
-            ? "border-zinc-950 bg-zinc-950 text-white hover:opacity-90 dark:border-white dark:bg-white dark:text-zinc-950"
+            ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-white hover:opacity-90"
             : "border-zinc-200 bg-white text-[var(--app-accent)] hover:border-[var(--app-accent)] dark:border-zinc-800 dark:bg-zinc-950"
         }`}
       >

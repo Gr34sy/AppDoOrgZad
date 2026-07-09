@@ -10,15 +10,17 @@ type PinnedItem = {
   href: string;
 };
 
-type WorkflowColumn = {
+type DashboardMetric = {
   title: string;
   count: number;
+  colorKey: "notes" | "checklists" | "tasks" | "projects";
   items: Array<{
     id: string;
     title: string;
-    priority: string;
-    dueDate: string;
     href: string;
+    updatedAt: string;
+    meta: string;
+    priority?: string;
   }>;
 };
 
@@ -34,7 +36,7 @@ type CalendarEvent = {
 
 type PinnedBoardProps = {
   pinnedItems: PinnedItem[];
-  workflowColumns: WorkflowColumn[];
+  dashboardMetrics: DashboardMetric[];
   calendarEvents: CalendarEvent[];
 };
 
@@ -52,37 +54,12 @@ const priorityStyles: Record<string, string> = {
   urgent: "bg-rose-500"
 };
 
-const workflowStyles: Record<string, string> = {
-  todo: "bg-[var(--dashboard-todo-color)]",
-  in_progress: "bg-[var(--dashboard-progress-color)]",
-  done: "bg-[var(--dashboard-completed-color)]"
+const dashboardMetricStyles: Record<DashboardMetric["colorKey"], string> = {
+  notes: "bg-[var(--dashboard-upcoming-color)]",
+  checklists: "bg-[var(--dashboard-todo-color)]",
+  tasks: "bg-[var(--dashboard-progress-color)]",
+  projects: "bg-[var(--dashboard-completed-color)]"
 };
-
-const dashboardMetricOrder = ["todo", "in_progress", "done"];
-
-function formatLabel(value: string) {
-  return value.replace(/_/g, " ");
-}
-
-function getDashboardLabel(value: string) {
-  if (value === "todo") {
-    return "to do";
-  }
-
-  return value === "done" ? "completed" : formatLabel(value);
-}
-
-function getOrderedWorkflowColumns(workflowColumns: WorkflowColumn[]) {
-  const byTitle = new Map(workflowColumns.map((column) => [column.title, column]));
-  const ordered = dashboardMetricOrder
-    .map((title) => byTitle.get(title))
-    .filter((column): column is WorkflowColumn => Boolean(column));
-
-  return [
-    ...ordered,
-    ...workflowColumns.filter((column) => !dashboardMetricOrder.includes(column.title))
-  ];
-}
 
 function buildCalendarDays(events: CalendarEvent[]) {
   const today = new Date();
@@ -105,8 +82,8 @@ function buildCalendarDays(events: CalendarEvent[]) {
   });
 }
 
-function formatShortDate(date: string) {
-  return date ? new Date(date).toLocaleDateString("en") : "No due date";
+function formatUpdatedAt(date: string) {
+  return date ? `Updated ${new Date(date).toLocaleDateString("en")}` : "Recently updated";
 }
 
 function MetricOverlay({
@@ -118,9 +95,9 @@ function MetricOverlay({
     id: string;
     title: string;
     href: string;
-    type?: string;
+    meta?: string;
     priority?: string;
-    date?: string;
+    updatedAt?: string;
   }>;
 }) {
   return (
@@ -142,7 +119,7 @@ function MetricOverlay({
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-semibold">{item.title}</span>
                   <span className="mt-0.5 block truncate text-xs text-zinc-500 dark:text-zinc-400">
-                    {[item.type, item.date ? formatShortDate(item.date) : null, item.priority]
+                    {[item.meta, item.updatedAt ? formatUpdatedAt(item.updatedAt) : null]
                       .filter(Boolean)
                       .join(" / ")}
                   </span>
@@ -158,61 +135,39 @@ function MetricOverlay({
   );
 }
 
-export function PinnedBoard({ pinnedItems, workflowColumns, calendarEvents }: PinnedBoardProps) {
+export function PinnedBoard({ pinnedItems, dashboardMetrics, calendarEvents }: PinnedBoardProps) {
   const calendarDays = buildCalendarDays(calendarEvents);
-  const orderedWorkflowColumns = getOrderedWorkflowColumns(workflowColumns);
-  const dashboardMetrics = orderedWorkflowColumns.slice(0, 3);
   const monthLabel = new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(
     new Date()
   );
-  const upcomingEvents = calendarEvents
-    .slice()
-    .sort((first, second) => first.date.localeCompare(second.date))
-    .slice(0, 5);
 
   return (
     <div className="grid gap-6">
       <section className="grid gap-3">
         <div className="grid min-w-0 items-stretch gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,340px)] xl:justify-start">
           <div className="grid h-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:grid-rows-2 xl:max-w-[412px]">
-            <div className="group relative z-0 rounded-lg bg-[var(--dashboard-upcoming-color)] p-3 text-white shadow-lg shadow-black/15 transition hover:z-20 hover:-translate-y-0.5 hover:shadow-xl focus-within:z-20">
-              <div className="flex h-full flex-col items-center justify-center text-center">
-                <p className="text-[11px] font-medium uppercase text-white/80">Upcoming</p>
-                <p className="mt-2 text-2xl font-semibold text-white">{upcomingEvents.length}</p>
-              </div>
-              <MetricOverlay
-                emptyLabel="No due dates"
-                items={upcomingEvents.map((event) => ({
-                  id: event.id,
-                  title: event.title,
-                  href: event.href,
-                  type: event.type,
-                  priority: event.priority,
-                  date: event.date
-                }))}
-              />
-            </div>
-            {dashboardMetrics.map((column) => (
+            {dashboardMetrics.map((metric) => (
               <div
-                key={column.title}
+                key={metric.title}
                 className={`group relative z-0 rounded-lg ${
-                  workflowStyles[column.title] ?? "bg-zinc-900"
+                  dashboardMetricStyles[metric.colorKey] ?? "bg-zinc-900"
                 } p-3 shadow-lg shadow-black/20 transition hover:z-20 hover:-translate-y-0.5 hover:shadow-xl focus-within:z-20`}
               >
                 <div className="flex h-full flex-col items-center justify-center text-center">
                   <p className="text-[11px] font-medium uppercase text-zinc-200">
-                    {getDashboardLabel(column.title)}
+                    {metric.title}
                   </p>
-                  <p className="mt-2 text-2xl font-semibold text-zinc-100">{column.count}</p>
+                  <p className="mt-2 text-2xl font-semibold text-zinc-100">{metric.count}</p>
                 </div>
                 <MetricOverlay
-                  emptyLabel={`Nothing ${getDashboardLabel(column.title)}`}
-                  items={column.items.map((item) => ({
+                  emptyLabel={`No recently updated ${metric.title.toLowerCase()}`}
+                  items={metric.items.map((item) => ({
                     id: item.id,
                     title: item.title,
                     href: item.href,
+                    meta: item.meta,
                     priority: item.priority,
-                    date: item.dueDate
+                    updatedAt: item.updatedAt
                   }))}
                 />
               </div>

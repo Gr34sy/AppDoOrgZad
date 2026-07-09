@@ -144,7 +144,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
               return (
                 <article
                   key={taskId}
-                  className="group relative transition hover:-translate-y-0.5"
+                  className="group relative overflow-hidden rounded-md transition hover:-translate-y-0.5"
                 >
                   <CardDeleteButton endpoint={`/api/tasks/${taskId}`} />
                   <Link

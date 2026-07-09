@@ -15,3 +15,7 @@ export function tooManyRequestsResponse(retryAfterSeconds: number) {
     }
   );
 }
+
+export function serviceUnavailableResponse(message = "Service unavailable") {
+  return NextResponse.json({ message }, { status: 503 });
+}

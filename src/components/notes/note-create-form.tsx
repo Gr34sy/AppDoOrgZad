@@ -59,10 +59,10 @@ export function NoteCreateForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="grid w-full min-w-0 gap-6 rounded-md border border-zinc-200 bg-white p-4 shadow-sm sm:p-5 dark:border-zinc-800 dark:bg-zinc-950"
+      className="app-form-panel"
     >
-      <div className="grid gap-2">
-        <label htmlFor="title" className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+      <div className="app-form-field">
+        <label htmlFor="title" className="app-form-label">
           Title
         </label>
         <input
@@ -71,12 +71,12 @@ export function NoteCreateForm() {
           type="text"
           required
           placeholder="Give this note a clear name"
-          className="h-12 w-full min-w-0 rounded-md border border-zinc-300 bg-white px-3 text-base text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+          className="app-form-control"
         />
       </div>
 
-      <div className="grid gap-2">
-        <label htmlFor="content" className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+      <div className="app-form-field">
+        <label htmlFor="content" className="app-form-label">
           Content
         </label>
         <textarea
@@ -84,7 +84,7 @@ export function NoteCreateForm() {
           name="content"
           rows={12}
           placeholder="Write the note..."
-          className="min-h-72 w-full min-w-0 resize-y rounded-md border border-zinc-300 bg-white px-3 py-3 text-sm leading-6 text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+          className="app-form-textarea min-h-72"
         />
       </div>
 

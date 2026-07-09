@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save, X } from "lucide-react";
 import { TagInputs } from "@/components/dashboard/tag-inputs";
@@ -32,13 +32,6 @@ type TaskFormProps = {
 };
 
 const priorityOptions = ["low", "medium", "high", "urgent"];
-const defaultStatusOptions = [
-  { id: "backlog", title: "Backlog" },
-  { id: "todo", title: "To do" },
-  { id: "in_progress", title: "In progress" },
-  { id: "testing", title: "Testing" },
-  { id: "done", title: "Done" }
-];
 
 export function TaskForm({
   mode,
@@ -64,16 +57,25 @@ export function TaskForm({
   const [checklistIds, setChecklistIds] = useState(initialChecklistIds);
   const [selectedProjectId, setSelectedProjectId] = useState(initialProjectId);
   const [selectedStatusId, setSelectedStatusId] = useState(initialStatusId);
-  const selectedProject = projectOptions.find((project) => project.id === selectedProjectId);
-  const statusOptions = selectedProject?.kanbanColumns?.length
-    ? selectedProject.kanbanColumns
-    : defaultStatusOptions;
+  const selectedProject = useMemo(
+    () => projectOptions.find((project) => project.id === selectedProjectId),
+    [projectOptions, selectedProjectId]
+  );
+  const projectStatusOptions = useMemo(
+    () => selectedProject?.kanbanColumns ?? [],
+    [selectedProject]
+  );
+  const isProjectTask = Boolean(selectedProjectId);
 
   useEffect(() => {
-    if (!statusOptions.some((status) => status.id === selectedStatusId)) {
-      setSelectedStatusId(statusOptions[0]?.id ?? "todo");
+    if (
+      isProjectTask &&
+      projectStatusOptions.length &&
+      !projectStatusOptions.some((status) => status.id === selectedStatusId)
+    ) {
+      setSelectedStatusId(projectStatusOptions[0]?.id ?? "todo");
     }
-  }, [selectedStatusId, statusOptions]);
+  }, [isProjectTask, projectStatusOptions, selectedStatusId]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -85,6 +87,7 @@ export function TaskForm({
     const title = String(formData.get("title") ?? "").trim();
     const description = String(formData.get("description") ?? "");
     const projectId = String(formData.get("projectId") ?? "");
+    const statusId = String(formData.get("statusId") ?? "").trim() || "todo";
     const dueDate = String(formData.get("dueDate") ?? "").trim();
 
     if (!title) {
@@ -103,7 +106,7 @@ export function TaskForm({
         title,
         description,
         priority: String(formData.get("priority") ?? "medium"),
-        statusId: String(formData.get("statusId") ?? "todo"),
+        statusId,
         projectId: projectId || null,
         dueDate: dueDate ? new Date(`${dueDate}T00:00:00`).toISOString() : null,
         tags: tags.map((tag) => tag.trim()).filter(Boolean),
@@ -129,28 +132,24 @@ export function TaskForm({
     router.refresh();
   }
 
-  const inputClass =
-    "h-12 w-full min-w-0 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50";
-  const labelClass = "text-sm font-medium text-zinc-700 dark:text-zinc-200";
-
   return (
     <form
       onSubmit={handleSubmit}
-      className="grid w-full min-w-0 gap-6 rounded-md border border-zinc-200 bg-white p-4 shadow-sm sm:p-5 dark:border-zinc-800 dark:bg-zinc-950"
+      className="app-form-panel"
     >
-      <h2 className="text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
+      <h2 className="app-form-heading">
         {mode === "create" ? "Create task" : "Edit task"}
       </h2>
 
-      <div className="grid gap-2">
-        <label htmlFor="title" className={labelClass}>
+      <div className="app-form-field">
+        <label htmlFor="title" className="app-form-label">
           Title
         </label>
-        <input id="title" name="title" type="text" defaultValue={initialTitle} required className={inputClass} />
+        <input id="title" name="title" type="text" defaultValue={initialTitle} required className="app-form-control" />
       </div>
 
-      <div className="grid gap-2">
-        <label htmlFor="description" className={labelClass}>
+      <div className="app-form-field">
+        <label htmlFor="description" className="app-form-label">
           Description
         </label>
         <textarea
@@ -158,16 +157,17 @@ export function TaskForm({
           name="description"
           rows={6}
           defaultValue={initialDescription}
-          className="min-h-40 w-full min-w-0 resize-y rounded-md border border-zinc-300 bg-white px-3 py-3 text-sm leading-6 text-zinc-950 shadow-sm outline-none transition focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+          className="app-form-textarea min-h-40"
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="grid gap-2">
-          <label htmlFor="priority" className={labelClass}>
+      <div className="app-form-section">
+        <div className="app-form-grid">
+        <div className="app-form-field">
+          <label htmlFor="priority" className="app-form-label">
             Priority
           </label>
-          <select id="priority" name="priority" defaultValue={initialPriority} className={inputClass}>
+          <select id="priority" name="priority" defaultValue={initialPriority} className="app-form-control">
             {priorityOptions.map((priority) => (
               <option key={priority} value={priority}>
                 {priority}
@@ -176,27 +176,39 @@ export function TaskForm({
           </select>
         </div>
 
-        <div className="grid gap-2">
-          <label htmlFor="statusId" className={labelClass}>
+        <div className="app-form-field">
+          <label htmlFor="statusId" className="app-form-label">
             Status
           </label>
-          <select
-            id="statusId"
-            name="statusId"
-            value={selectedStatusId}
-            onChange={(event) => setSelectedStatusId(event.target.value)}
-            className={inputClass}
-          >
-            {statusOptions.map((status) => (
-              <option key={status.id} value={status.id}>
-                {status.title}
-              </option>
-            ))}
-          </select>
+          {isProjectTask ? (
+            <select
+              id="statusId"
+              name="statusId"
+              value={selectedStatusId}
+              onChange={(event) => setSelectedStatusId(event.target.value)}
+              className="app-form-control"
+            >
+              {projectStatusOptions.map((status) => (
+                <option key={status.id} value={status.id}>
+                  {status.title}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input
+              id="statusId"
+              name="statusId"
+              type="text"
+              value={selectedStatusId}
+              onChange={(event) => setSelectedStatusId(event.target.value)}
+              placeholder="todo"
+              className="app-form-control"
+            />
+          )}
         </div>
 
-        <div className="grid gap-2">
-          <label htmlFor="projectId" className={labelClass}>
+        <div className="app-form-field">
+          <label htmlFor="projectId" className="app-form-label">
             Project
           </label>
           <select
@@ -204,7 +216,7 @@ export function TaskForm({
             name="projectId"
             value={selectedProjectId}
             onChange={(event) => setSelectedProjectId(event.target.value)}
-            className={inputClass}
+            className="app-form-control"
           >
             <option value="">No project</option>
             {projectOptions.map((project) => (
@@ -215,18 +227,19 @@ export function TaskForm({
           </select>
         </div>
 
-        <div className="grid gap-2">
-          <label htmlFor="dueDate" className={labelClass}>
+        <div className="app-form-field">
+          <label htmlFor="dueDate" className="app-form-label">
             Due date
           </label>
-          <input id="dueDate" name="dueDate" type="date" defaultValue={initialDueDate} className={inputClass} />
+          <input id="dueDate" name="dueDate" type="date" defaultValue={initialDueDate} className="app-form-control" />
+        </div>
         </div>
       </div>
 
       <TagInputs tags={tags} onChange={setTags} />
 
       <fieldset className="grid gap-3">
-        <legend className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">
+        <legend className="app-form-legend">
           Checklists
         </legend>
         {checklistOptions.length ? (
@@ -234,7 +247,7 @@ export function TaskForm({
             {checklistOptions.map((checklist) => (
               <label
                 key={checklist.id}
-              className="flex min-w-0 items-center gap-3 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-3 text-sm text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
+                className="app-form-checkbox-card"
               >
                 <input
                   type="checkbox"
@@ -246,7 +259,7 @@ export function TaskForm({
                         : currentChecklistIds.filter((id) => id !== checklist.id)
                     );
                   }}
-                  className="h-4 w-4 accent-[var(--app-accent)]"
+                  className="app-form-checkbox"
                 />
                 <span className="min-w-0 break-words">{checklist.title}</span>
               </label>

@@ -21,7 +21,7 @@ export function TagInputs({ tags, onChange }: TagInputsProps) {
 
   return (
     <fieldset className="grid gap-3">
-      <legend className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">Tags</legend>
+      <legend className="app-form-legend">Tags</legend>
       <div className="grid gap-2">
         {tags.map((tag, index) => (
           <div key={index} className="grid grid-cols-[minmax(0,1fr)_2.75rem] gap-2">
@@ -34,12 +34,12 @@ export function TagInputs({ tags, onChange }: TagInputsProps) {
               value={tag}
               placeholder={`Tag ${index + 1}`}
               onChange={(event) => updateTag(index, event.target.value)}
-              className="h-11 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-[var(--app-accent)] focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500"
+              className="app-form-control"
             />
             <button
               type="button"
               onClick={() => removeTag(index)}
-              className="grid h-11 place-items-center rounded-md border border-zinc-300 text-zinc-500 transition hover:border-red-300 hover:text-red-600 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-red-500/60 dark:hover:text-red-300"
+              className="app-form-icon-button"
               aria-label={`Remove tag ${index + 1}`}
               title="Remove tag"
             >
@@ -51,7 +51,7 @@ export function TagInputs({ tags, onChange }: TagInputsProps) {
       <button
         type="button"
         onClick={() => onChange([...tags, ""])}
-        className="inline-flex h-10 w-fit items-center gap-2 rounded-md border border-zinc-300 px-3 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
+        className="app-form-secondary-button"
       >
         <Plus aria-hidden="true" className="h-4 w-4" />
         Add tag

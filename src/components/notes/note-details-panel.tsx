@@ -8,7 +8,7 @@ import { DetailsMeta } from "@/components/dashboard/details-meta";
 import { InlineEditableField } from "@/components/dashboard/inline-editable-field";
 import { PinEntityButton } from "@/components/dashboard/pin-entity-button";
 import { SaveChangesButton } from "@/components/dashboard/save-changes-button";
-import { TagList } from "@/components/dashboard/tag-list";
+import { TagInputs } from "@/components/dashboard/tag-inputs";
 import { getNoteCardStyle } from "@/lib/note-colors";
 
 type NoteDetailsPanelProps = {
@@ -21,6 +21,10 @@ type NoteDetailsPanelProps = {
   updatedAtLabel?: string;
   pinId?: string;
 };
+
+function normalizeTags(tags: string[]) {
+  return tags.map((tag) => tag.trim()).filter(Boolean);
+}
 
 export function NoteDetailsPanel({
   noteId,
@@ -35,15 +39,21 @@ export function NoteDetailsPanel({
   const router = useRouter();
   const [draftTitle, setDraftTitle] = useState(title);
   const [draftContent, setDraftContent] = useState(content);
+  const [draftTags, setDraftTags] = useState(tags.length ? tags : [""]);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const noteStyle = getNoteCardStyle(color);
-  const isDirty = draftTitle.trim() !== title.trim() || draftContent !== content;
+  const normalizedDraftTags = normalizeTags(draftTags);
+  const isDirty =
+    draftTitle.trim() !== title.trim() ||
+    draftContent !== content ||
+    normalizedDraftTags.join("\n") !== tags.join("\n");
 
   useEffect(() => {
     setDraftTitle(title);
     setDraftContent(content);
-  }, [title, content]);
+    setDraftTags(tags.length ? tags : [""]);
+  }, [title, content, tags]);
 
   async function saveChanges() {
     if (!draftTitle.trim()) {
@@ -60,7 +70,8 @@ export function NoteDetailsPanel({
       },
       body: JSON.stringify({
         title: draftTitle.trim(),
-        content: draftContent
+        content: draftContent,
+        tags: normalizedDraftTags
       })
     });
 
@@ -124,7 +135,9 @@ export function NoteDetailsPanel({
           inputClassName="mt-6 min-h-40 w-full rounded-md border border-[var(--app-accent)] bg-white/80 px-3 py-3 text-sm leading-7 outline-none ring-2 ring-[var(--app-accent)]/15"
         />
 
-        <TagList tags={tags} className="mt-8" />
+        <div className="mt-8 rounded-md border border-black/10 bg-white/35 p-3 backdrop-blur-sm">
+          <TagInputs tags={draftTags} onChange={setDraftTags} />
+        </div>
       </div>
 
     </article>
