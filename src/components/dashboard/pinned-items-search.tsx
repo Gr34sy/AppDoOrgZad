@@ -1,16 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { CheckSquare, Search } from "lucide-react";
+import { ArrowDownUp, ListChecks, ListX, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CardDeleteButton } from "@/components/dashboard/card-delete-button";
 
 type PinnedItem = {
   id: string;
   title: string;
+  description: string;
   type: string;
   meta: string;
   status: string;
+  createdAt: string;
+  updatedAt: string;
   href: string;
 };
 
@@ -24,6 +27,13 @@ const typeFilters = [
   { label: "Checklists", value: "Checklist" },
   { label: "Tasks", value: "Task" },
   { label: "Projects", value: "Project" }
+];
+
+const sortFieldOptions = [
+  { label: "updated", value: "updated" },
+  { label: "created", value: "created" },
+  { label: "title", value: "title" },
+  { label: "description", value: "description" }
 ];
 
 function formatLabel(value: string) {
@@ -62,19 +72,46 @@ function getPinnedItemDeleteEndpoint(item: PinnedItem) {
 
 export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearchProps) {
   const [query, setQuery] = useState("");
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(() =>
+    typeFilters.map((filter) => filter.value)
+  );
+  const [sortField, setSortField] = useState("updated");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const normalizedQuery = query.trim().toLowerCase();
   const selectedTypeSet = useMemo(() => new Set(selectedTypes), [selectedTypes]);
   const filteredItems = useMemo(() => {
     return pinnedItems.filter((item) =>
-      (selectedTypeSet.size === 0 || selectedTypeSet.has(item.type)) &&
+      selectedTypeSet.has(item.type) &&
       (!normalizedQuery ||
-        [item.title, item.type, item.meta, item.status]
+        [item.title, item.description, item.type, item.meta, item.status]
           .join(" ")
           .toLowerCase()
           .includes(normalizedQuery))
     );
   }, [normalizedQuery, pinnedItems, selectedTypeSet]);
+  const sortedItems = useMemo(() => {
+    const directionModifier = sortDirection === "asc" ? 1 : -1;
+
+    return [...filteredItems].sort((firstItem, secondItem) => {
+      if (sortField === "title") {
+        return firstItem.title.localeCompare(secondItem.title) * directionModifier;
+      }
+
+      if (sortField === "description") {
+        const firstDescription = firstItem.description || firstItem.meta;
+        const secondDescription = secondItem.description || secondItem.meta;
+
+        return firstDescription.localeCompare(secondDescription) * directionModifier;
+      }
+
+      const firstDate = sortField === "created" ? firstItem.createdAt : firstItem.updatedAt;
+      const secondDate = sortField === "created" ? secondItem.createdAt : secondItem.updatedAt;
+      const firstTime = firstDate ? new Date(firstDate).getTime() : 0;
+      const secondTime = secondDate ? new Date(secondDate).getTime() : 0;
+
+      return (firstTime - secondTime) * directionModifier;
+    });
+  }, [filteredItems, sortDirection, sortField]);
 
   function toggleType(type: string) {
     setSelectedTypes((currentTypes) =>
@@ -90,7 +127,12 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
     );
   }
 
-  const hasActiveFilters = Boolean(normalizedQuery) || selectedTypes.length > 0;
+  function updateSortField(nextSortField: string) {
+    setSortField(nextSortField);
+    setSortDirection(nextSortField === "title" || nextSortField === "description" ? "asc" : "desc");
+  }
+
+  const hasActiveFilters = Boolean(normalizedQuery) || selectedTypes.length !== typeFilters.length;
   const hasSelectedAllTypes = selectedTypes.length === typeFilters.length;
   const countLabel = hasActiveFilters
     ? `${filteredItems.length} of ${pinnedItems.length} saved items`
@@ -113,7 +155,7 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
             <div className="relative">
               <Search
                 aria-hidden="true"
-                className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500"
+                className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
                 strokeWidth={2.25}
               />
               <input
@@ -122,51 +164,88 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search"
-                className="h-12 w-full rounded-full border border-zinc-400 bg-white pl-12 pr-4 text-base text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-700 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500 dark:focus:border-zinc-300 dark:focus:ring-white/10"
+                className="h-11 w-full rounded-full border border-zinc-400 bg-white pl-11 pr-4 text-sm text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-700 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500 dark:focus:border-zinc-300 dark:focus:ring-white/10"
               />
             </div>
           </div>
-          <div className="flex flex-wrap gap-2 text-sm" aria-label="Pinned item type filters">
-            <button
-              type="button"
-              aria-label={hasSelectedAllTypes ? "Deselect all pinned item types" : "Select all pinned item types"}
-              aria-pressed={hasSelectedAllTypes}
-              title={hasSelectedAllTypes ? "Deselect all pinned item types" : "Select all pinned item types"}
-              onClick={toggleAllTypes}
-              className={`grid h-9 w-9 place-items-center rounded-md border transition ${
-                hasSelectedAllTypes
-                  ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-white shadow-sm hover:opacity-90"
-                  : "border-zinc-200 bg-white text-zinc-700 hover:border-[var(--app-accent)] hover:text-[var(--app-accent)] focus-visible:border-[var(--app-accent)] focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
-              }`}
-            >
-              <CheckSquare aria-hidden="true" className="h-4 w-4" strokeWidth={2.25} />
-            </button>
-            {typeFilters.map((filter) => {
-              const isSelected = selectedTypeSet.has(filter.value);
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex flex-wrap gap-2 text-sm" aria-label="Pinned item type filters">
+              <button
+                type="button"
+                aria-label={hasSelectedAllTypes ? "Deselect all pinned item types" : "Select all pinned item types"}
+                aria-pressed={hasSelectedAllTypes}
+                title={hasSelectedAllTypes ? "Deselect all pinned item types" : "Select all pinned item types"}
+                onClick={toggleAllTypes}
+                className={`grid h-9 w-9 place-items-center rounded-md border transition ${
+                  hasSelectedAllTypes
+                    ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-white shadow-sm hover:opacity-90"
+                    : "border-zinc-200 bg-white text-zinc-700 hover:border-[var(--app-accent)] hover:text-[var(--app-accent)] focus-visible:border-[var(--app-accent)] focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
+                }`}
+              >
+                {hasSelectedAllTypes ? (
+                  <ListX aria-hidden="true" className="h-4 w-4" strokeWidth={2.25} />
+                ) : (
+                  <ListChecks aria-hidden="true" className="h-4 w-4" strokeWidth={2.25} />
+                )}
+              </button>
+              {typeFilters.map((filter) => {
+                const isSelected = selectedTypeSet.has(filter.value);
 
-              return (
-                <button
-                  key={filter.value}
-                  type="button"
-                  aria-pressed={isSelected}
-                  onClick={() => toggleType(filter.value)}
-                  className={`rounded-md border px-4 py-2 font-medium transition ${
-                    isSelected
-                      ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-white shadow-sm hover:opacity-90"
-                      : "border-zinc-200 bg-white text-zinc-700 hover:border-[var(--app-accent)] hover:text-[var(--app-accent)] focus-visible:border-[var(--app-accent)] focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
-                  }`}
+                return (
+                  <button
+                    key={filter.value}
+                    type="button"
+                    aria-pressed={isSelected}
+                    onClick={() => toggleType(filter.value)}
+                    className={`rounded-md border px-4 py-2 font-medium transition ${
+                      isSelected
+                        ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-white shadow-sm hover:opacity-90"
+                        : "border-zinc-200 bg-white text-zinc-700 hover:border-[var(--app-accent)] hover:text-[var(--app-accent)] focus-visible:border-[var(--app-accent)] focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/20 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
+                    }`}
+                  >
+                    {filter.label}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="flex min-w-0 flex-wrap items-end gap-2">
+              <label className="grid min-w-[11rem] gap-1">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase text-zinc-500 dark:text-zinc-400">
+                  <ArrowDownUp aria-hidden="true" className="h-3.5 w-3.5 text-sky-500" />
+                  Sort
+                </span>
+                <select
+                  value={sortField}
+                  onChange={(event) => updateSortField(event.target.value)}
+                  className="h-9 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition focus:border-[var(--app-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:bg-zinc-950"
                 >
-                  {filter.label}
-                </button>
-              );
-            })}
+                  {sortFieldOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="button"
+                onClick={() =>
+                  setSortDirection((currentDirection) =>
+                    currentDirection === "asc" ? "desc" : "asc"
+                  )
+                }
+                className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-[var(--app-accent)] dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
+              >
+                <ArrowDownUp aria-hidden="true" className="h-4 w-4" />
+                {sortDirection === "asc" ? "Ascending" : "Descending"}
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
       <section className="app-card-grid content-start">
-        {filteredItems.length ? (
-          filteredItems.map((item) => (
+        {sortedItems.length ? (
+          sortedItems.map((item) => (
             <article
               key={item.id}
               className="group relative min-w-0 overflow-hidden rounded-lg transition hover:-translate-y-0.5"

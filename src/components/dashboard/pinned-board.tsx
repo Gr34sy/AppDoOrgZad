@@ -4,9 +4,12 @@ import { PinnedItemsSearch } from "@/components/dashboard/pinned-items-search";
 type PinnedItem = {
   id: string;
   title: string;
+  description: string;
   type: string;
   meta: string;
   status: string;
+  createdAt: string;
+  updatedAt: string;
   href: string;
 };
 

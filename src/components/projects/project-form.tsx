@@ -3,7 +3,8 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowDown, ArrowUp, Plus, Save, Trash2, X } from "lucide-react";
-import { TagInputs } from "@/components/dashboard/tag-inputs";
+import { FormShell } from "@/components/dashboard/form-shell";
+import { TagEditor } from "@/components/dashboard/tag-editor";
 
 type EntityOption = {
   id: string;
@@ -257,14 +258,7 @@ export function ProjectForm({
   const labelClass = "app-form-label";
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="app-form-panel"
-    >
-      <h2 className="app-form-heading">
-        {mode === "create" ? "Create project" : "Edit project"}
-      </h2>
-
+    <FormShell entityType="project" mode={mode} onSubmit={handleSubmit}>
       <div className="app-form-field">
         <label htmlFor="title" className={labelClass}>
           Title
@@ -334,7 +328,7 @@ export function ProjectForm({
         </div>
       </div>
 
-      <TagInputs tags={tags} onChange={setTags} />
+      <TagEditor tags={tags} onChange={setTags} />
 
       <fieldset className="grid gap-3">
         <legend className="app-form-legend">
@@ -621,6 +615,6 @@ export function ProjectForm({
           </button>
         ) : null}
       </div>
-    </form>
+    </FormShell>
   );
 }

@@ -296,14 +296,14 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
                             className="h-10 w-full rounded-md border border-zinc-300 bg-white p-1 dark:border-zinc-700 dark:bg-zinc-950"
                             aria-label={`${column.title} color`}
                           />
-                          <label className="inline-flex h-10 items-center gap-2 rounded-md border border-zinc-300 px-2 text-xs text-zinc-700 dark:border-zinc-700 dark:text-zinc-200">
+                          <label className="inline-flex h-10 items-center gap-2 rounded-md border border-zinc-300 px-2 text-xs text-zinc-700 [--app-checkbox-check-color:#fff] dark:border-zinc-700 dark:text-zinc-200 dark:[--app-checkbox-check-color:#09090b]">
                             <input
                               type="checkbox"
                               checked={columnDraft.isDone}
                               onChange={(event) =>
                                 setColumnDraft({ ...columnDraft, isDone: event.target.checked })
                               }
-                              className="h-3.5 w-3.5 accent-[var(--app-accent)]"
+                              className="app-form-checkbox h-3.5 w-3.5"
                             />
                             Done
                           </label>

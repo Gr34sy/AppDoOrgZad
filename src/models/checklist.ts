@@ -41,20 +41,9 @@ const checklistSchema = new Schema(
       trim: true,
       maxlength: 160
     },
-    description: {
-      type: String,
-      trim: true,
-      maxlength: 2000,
-      default: ""
-    },
     items: {
       type: [checklistItemSchema],
       default: []
-    },
-    tags: {
-      type: [String],
-      default: [],
-      index: true
     },
     parentType: {
       type: String,

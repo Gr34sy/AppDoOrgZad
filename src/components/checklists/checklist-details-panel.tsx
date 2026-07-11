@@ -2,66 +2,68 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ListChecks } from "lucide-react";
+import { Check, Edit2, ListChecks, Trash2 } from "lucide-react";
 import { DeleteEntityButton } from "@/components/dashboard/delete-entity-button";
-import { DetailsMeta } from "@/components/dashboard/details-meta";
 import { InlineEditableField } from "@/components/dashboard/inline-editable-field";
 import { PinEntityButton } from "@/components/dashboard/pin-entity-button";
 import { SaveChangesButton } from "@/components/dashboard/save-changes-button";
-import { TagInputs } from "@/components/dashboard/tag-inputs";
 
 type ChecklistDetailsPanelProps = {
   checklistId: string;
   title: string;
-  description: string;
-  tags: string[];
   items: {
     title: string;
     isCompleted: boolean;
     completedAt?: string | null;
     position?: number;
   }[];
-  parentType?: string | null;
   createdAtLabel?: string;
   updatedAtLabel?: string;
   pinId?: string;
 };
 
-function normalizeTags(tags: string[]) {
-  return tags.map((tag) => tag.trim()).filter(Boolean);
-}
-
 export function ChecklistDetailsPanel({
   checklistId,
   title,
-  description,
-  tags,
   items,
-  parentType,
   createdAtLabel,
   updatedAtLabel,
   pinId
 }: ChecklistDetailsPanelProps) {
   const router = useRouter();
   const [draftTitle, setDraftTitle] = useState(title);
-  const [draftDescription, setDraftDescription] = useState(description);
-  const [draftTags, setDraftTags] = useState(tags.length ? tags : [""]);
   const [draftItems, setDraftItems] = useState(items);
+  const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [savingItemIndex, setSavingItemIndex] = useState<number | null>(null);
   const [error, setError] = useState("");
-  const normalizedDraftTags = normalizeTags(draftTags);
-  const isDirty =
-    draftTitle.trim() !== title.trim() ||
-    draftDescription !== description ||
-    normalizedDraftTags.join("\n") !== tags.join("\n");
+  const itemSnapshot = JSON.stringify(
+    items.map((item) => ({
+      title: item.title,
+      isCompleted: item.isCompleted,
+      completedAt: item.completedAt ?? null
+    }))
+  );
+  const draftItemSnapshot = JSON.stringify(
+    draftItems.map((item) => ({
+      title: item.title,
+      isCompleted: item.isCompleted,
+      completedAt: item.completedAt ?? null
+    }))
+  );
+  const isDirty = draftTitle.trim() !== title.trim() || draftItemSnapshot !== itemSnapshot;
 
   useEffect(() => {
     setDraftTitle(title);
-    setDraftDescription(description);
-    setDraftTags(tags.length ? tags : [""]);
     setDraftItems(items);
-  }, [title, description, tags, items]);
+    setEditingItemIndex(null);
+  }, [title, items]);
+
+  function resetDrafts() {
+    setDraftTitle(title);
+    setDraftItems(items);
+    setEditingItemIndex(null);
+    setError("");
+  }
 
   async function saveChanges() {
     if (!draftTitle.trim()) {
@@ -78,8 +80,14 @@ export function ChecklistDetailsPanel({
       },
       body: JSON.stringify({
         title: draftTitle.trim(),
-        description: draftDescription,
-        tags: normalizedDraftTags
+        items: draftItems
+          .map((item, index) => ({
+            title: item.title.trim(),
+            isCompleted: item.isCompleted,
+            completedAt: item.completedAt ?? null,
+            position: index
+          }))
+          .filter((item) => item.title)
       })
     });
 
@@ -93,50 +101,45 @@ export function ChecklistDetailsPanel({
     router.refresh();
   }
 
-  async function toggleItem(index: number) {
-    const nextItems = draftItems.map((item, itemIndex) => {
-      if (itemIndex !== index) {
-        return item;
-      }
+  function toggleItem(index: number) {
+    setDraftItems((currentItems) =>
+      currentItems.map((item, itemIndex) => {
+        if (itemIndex !== index) {
+          return item;
+        }
 
-      const isCompleted = !item.isCompleted;
+        const isCompleted = !item.isCompleted;
 
-      return {
-        ...item,
-        isCompleted,
-        completedAt: isCompleted ? new Date().toISOString() : null,
-        position: item.position ?? itemIndex
-      };
-    });
-
-    setError("");
-    setSavingItemIndex(index);
-    setDraftItems(nextItems);
-
-    const response = await fetch(`/api/checklists/${checklistId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        items: nextItems.map((item, itemIndex) => ({
-          title: item.title,
-          isCompleted: item.isCompleted,
-          completedAt: item.completedAt ?? null,
-          position: item.position ?? itemIndex
-        }))
+        return {
+          ...item,
+          isCompleted,
+          completedAt: isCompleted ? new Date().toISOString() : null
+        };
       })
-    });
+    );
+  }
 
-    setSavingItemIndex(null);
+  function updateItemTitle(index: number, nextTitle: string) {
+    setDraftItems((currentItems) =>
+      currentItems.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, title: nextTitle } : item
+      )
+    );
+  }
 
-    if (!response.ok) {
-      setDraftItems(draftItems);
-      setError("Could not update the checklist item.");
-      return;
-    }
+  function removeItem(index: number) {
+    setDraftItems((currentItems) => currentItems.filter((_, itemIndex) => itemIndex !== index));
+    setEditingItemIndex(null);
+  }
 
-    router.refresh();
+  function cancelItemEdit(index: number) {
+    const originalTitle = items[index]?.title ?? "";
+    setDraftItems((currentItems) =>
+      currentItems.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, title: originalTitle } : item
+      )
+    );
+    setEditingItemIndex(null);
   }
 
   return (
@@ -149,95 +152,144 @@ export function ChecklistDetailsPanel({
           className="-mb-5 z-10"
         />
       </div>
-      <div className="flex flex-col gap-3 rounded-md border border-zinc-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-          <DetailsMeta createdAtLabel={createdAtLabel} updatedAtLabel={updatedAtLabel} />
-        </div>
-        <div className="app-action-row">
-          <SaveChangesButton isDirty={isDirty} isSaving={isSaving} onClick={saveChanges} />
-          <DeleteEntityButton
-            endpoint={`/api/checklists/${checklistId}`}
-            redirectTo="/dashboard/checklists"
-            label="Delete"
-            errorLabel="Could not delete the checklist."
-          />
-        </div>
-        {error ? <p className="text-sm text-red-600 dark:text-red-300 sm:w-full">{error}</p> : null}
-      </div>
-
       <div className="rounded-md border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <InlineEditableField
-              value={draftTitle}
-              onChange={setDraftTitle}
-              required
-              className="break-words p-1 text-2xl font-semibold tracking-normal text-zinc-950 sm:text-3xl dark:text-zinc-50"
-              inputClassName="w-full rounded-md border border-[var(--app-accent)] bg-white px-2 py-1 text-2xl font-semibold text-zinc-950 outline-none ring-2 ring-[var(--app-accent)]/15 sm:text-3xl dark:bg-zinc-900 dark:text-zinc-50"
+          <div className="flex min-w-0 flex-1 items-start gap-3">
+            <ListChecks
+              aria-hidden="true"
+              className="mt-2 h-7 w-7 shrink-0 text-[var(--app-accent)]"
             />
-            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-              {items.length} {items.length === 1 ? "item" : "items"}
-              {parentType ? ` / parent: ${parentType}` : ""}
-            </p>
+            <div className="min-w-0 flex-1">
+              <InlineEditableField
+                value={draftTitle}
+                onChange={setDraftTitle}
+                required
+                className="min-w-0 break-words p-1 text-2xl font-semibold tracking-normal text-zinc-950 sm:text-3xl dark:text-zinc-50"
+                inputClassName="w-full rounded-md border border-[var(--app-accent)] bg-white px-2 py-1 text-2xl font-semibold text-zinc-950 outline-none ring-2 ring-[var(--app-accent)]/15 sm:text-3xl dark:bg-zinc-900 dark:text-zinc-50"
+              />
+              <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500 dark:text-zinc-400">
+                {createdAtLabel ? (
+                  <span>
+                    <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Created:</strong>{" "}
+                    {createdAtLabel}
+                  </span>
+                ) : null}
+                {updatedAtLabel ? (
+                  <span>
+                    <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Updated:</strong>{" "}
+                    {updatedAtLabel}
+                  </span>
+                ) : null}
+              </div>
+            </div>
           </div>
-          <ListChecks aria-hidden="true" className="h-7 w-7 text-[var(--app-accent)]" />
+          <div className="app-action-row">
+            <SaveChangesButton
+              isDirty={isDirty}
+              isSaving={isSaving}
+              onClick={saveChanges}
+              label="Save"
+            />
+            {isDirty ? (
+              <button
+                type="button"
+                onClick={resetDrafts}
+                disabled={isSaving}
+                className="inline-flex h-10 w-full items-center justify-center rounded-md border border-zinc-300 px-3 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
+              >
+                Cancel
+              </button>
+            ) : null}
+            <DeleteEntityButton
+              endpoint={`/api/checklists/${checklistId}`}
+              redirectTo="/dashboard/checklists"
+              label="Delete"
+              errorLabel="Could not delete the checklist."
+              iconOnly
+            />
+          </div>
         </div>
 
-        <InlineEditableField
-          value={draftDescription}
-          onChange={setDraftDescription}
-          multiline
-          emptyLabel="No description yet."
-          className="mt-6 whitespace-pre-wrap p-1 text-sm leading-7 text-zinc-700 dark:text-zinc-300"
-          inputClassName="mt-6 min-h-32 w-full rounded-md border border-[var(--app-accent)] bg-white px-3 py-3 text-sm leading-7 text-zinc-950 outline-none ring-2 ring-[var(--app-accent)]/15 dark:bg-zinc-900 dark:text-zinc-50"
-        />
+        {error ? <p className="mt-4 text-sm text-red-600 dark:text-red-300">{error}</p> : null}
 
-        <div className="mt-6">
-          <TagInputs tags={draftTags} onChange={setDraftTags} />
-        </div>
-      </div>
-
-      <div className="rounded-md border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-        <h2 className="text-lg font-semibold tracking-normal text-zinc-950 dark:text-zinc-50">
-          Items
-        </h2>
         {draftItems.length ? (
-          <ul className="mt-4 grid gap-2">
+          <ul className="mt-6 grid gap-1">
             {draftItems.map((item, index) => (
               <li
                 key={`${item.title}-${index}`}
-                className="rounded-md border border-zinc-200 bg-zinc-50 text-sm text-zinc-700 transition hover:border-[var(--app-accent)] dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
+                className="group relative rounded-md text-sm text-zinc-700 transition [--app-checkbox-check-color:#fff] hover:bg-zinc-50 hover:[--app-checkbox-check-color:#fafafa] dark:text-zinc-200 dark:[--app-checkbox-check-color:#09090b] dark:hover:bg-zinc-900 dark:hover:[--app-checkbox-check-color:#18181b]"
               >
-                <label
-                  className={`flex cursor-pointer items-center gap-3 px-3 py-3 ${
-                    savingItemIndex === index ? "opacity-60" : ""
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={item.isCompleted}
-                    disabled={savingItemIndex === index}
-                    onChange={() => void toggleItem(index)}
-                    className="sr-only"
-                  />
-                  <span
+                <div className="flex items-center gap-3 py-3 pl-3 pr-24">
+                  <button
+                    type="button"
+                    onClick={() => toggleItem(index)}
+                    aria-pressed={item.isCompleted}
+                    aria-label={item.isCompleted ? `Mark ${item.title} as incomplete` : `Mark ${item.title} as complete`}
                     className={`grid h-5 w-5 shrink-0 place-items-center rounded border ${
                       item.isCompleted
-                        ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-white"
+                        ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-[var(--app-checkbox-check-color)]"
                         : "border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-950"
-                    }`}
+                    } transition`}
                   >
                     {item.isCompleted ? <Check aria-hidden="true" className="h-3 w-3" /> : null}
+                  </button>
+                  <span className="min-w-0 flex-1">
+                    {editingItemIndex === index ? (
+                      <input
+                        value={item.title}
+                        autoFocus
+                        onChange={(event) => updateItemTitle(index, event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            setEditingItemIndex(null);
+                          }
+
+                          if (event.key === "Escape") {
+                            cancelItemEdit(index);
+                          }
+                        }}
+                        onBlur={() => setEditingItemIndex(null)}
+                        onClick={(event) => event.stopPropagation()}
+                        className="w-full rounded-md border border-[var(--app-accent)] bg-white px-2 py-1 text-sm font-medium text-zinc-950 outline-none ring-2 ring-[var(--app-accent)]/15 dark:bg-zinc-900 dark:text-zinc-50"
+                      />
+                    ) : (
+                      <span
+                        className={`block min-w-0 break-words p-1 ${
+                          item.isCompleted ? "line-through opacity-70" : ""
+                        }`}
+                      >
+                        {item.title}
+                      </span>
+                    )}
                   </span>
-                  <span className={item.isCompleted ? "line-through opacity-70" : ""}>
-                    {item.title}
-                  </span>
-                </label>
+                </div>
+                <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-2">
+                  {editingItemIndex === index ? (
+                    <button
+                      type="button"
+                      onClick={() => removeItem(index)}
+                      className="grid h-8 w-8 place-items-center rounded-md border border-red-200 text-red-600 transition hover:border-red-300 hover:bg-red-50 dark:border-red-500/30 dark:text-red-300 dark:hover:border-red-500/60 dark:hover:bg-red-500/10"
+                      aria-label={`Remove ${item.title || "checklist entry"}`}
+                      title="Remove"
+                    >
+                      <Trash2 aria-hidden="true" className="h-4 w-4" />
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => setEditingItemIndex(index)}
+                    className="grid h-8 w-8 place-items-center rounded-md border border-zinc-200 text-zinc-600 transition hover:border-[var(--app-accent)] hover:text-[var(--app-accent)] dark:border-zinc-800 dark:text-zinc-300"
+                    aria-label={`Edit ${item.title || "checklist entry"}`}
+                    title="Edit"
+                  >
+                    <Edit2 aria-hidden="true" className="h-4 w-4" />
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">No items yet.</p>
+          <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">No checklist entries yet.</p>
         )}
       </div>
 

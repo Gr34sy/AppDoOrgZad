@@ -209,7 +209,7 @@ Modele mają indeksy głównie po:
 
 - `ownerId`, żeby szybko pobierać dane aktualnego użytkownika;
 - `position`, żeby sortować elementy na listach i dashboardzie;
-- `tags`, żeby filtrować notatki, zadania, checklisty i projekty;
+- `tags`, żeby filtrować notatki, zadania i projekty;
 - `dueDate`, `priority`, `statusId`, żeby sortować i filtrować zadania oraz projekty;
 - `targetType` i `targetId`, żeby nie tworzyć duplikatów przypięć.
 

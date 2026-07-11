@@ -47,9 +47,7 @@ export const checklistItemSchema = z
 export const checklistCreateSchema = z
   .object({
     title: z.string().trim().min(1).max(160),
-    description: z.string().max(2000).optional(),
     items: z.array(checklistItemSchema).max(200).optional(),
-    tags: tagListSchema.optional(),
     parentType: z.enum(["task", "project"]).nullable().optional(),
     parentId: objectIdStringSchema.nullable().optional(),
     position: z.number().finite().optional()

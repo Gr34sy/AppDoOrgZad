@@ -26,6 +26,8 @@ type PinnedTarget = {
   statusId?: string;
   dueDate?: Date | string | null;
   items?: unknown[];
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 };
 
 type DashboardMetricDocument = {
@@ -159,9 +161,12 @@ export default async function DashboardPage() {
         return {
           id: String(pin._id),
           title: target.title,
+          description: target.description ?? target.content ?? "",
           type: config.label,
           meta,
           status: target.lifecycleStatus ?? target.statusId ?? target.priority ?? "Pinned",
+          createdAt: target.createdAt ? new Date(target.createdAt).toISOString() : "",
+          updatedAt: target.updatedAt ? new Date(target.updatedAt).toISOString() : "",
           href: `${config.hrefBase}/${targetId}`
         };
       })

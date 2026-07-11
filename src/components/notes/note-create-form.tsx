@@ -3,7 +3,8 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
-import { TagInputs } from "@/components/dashboard/tag-inputs";
+import { FormShell } from "@/components/dashboard/form-shell";
+import { TagEditor } from "@/components/dashboard/tag-editor";
 import { NoteColorInput } from "@/components/notes/note-color-input";
 
 export function NoteCreateForm() {
@@ -57,10 +58,7 @@ export function NoteCreateForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="app-form-panel"
-    >
+    <FormShell entityType="note" mode="create" onSubmit={handleSubmit}>
       <div className="app-form-field">
         <label htmlFor="title" className="app-form-label">
           Title
@@ -95,7 +93,7 @@ export function NoteCreateForm() {
         onHexColorChange={setHexColor}
       />
 
-      <TagInputs tags={tags} onChange={setTags} />
+      <TagEditor tags={tags} onChange={setTags} />
 
       {error ? (
         <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
@@ -111,6 +109,6 @@ export function NoteCreateForm() {
         <Save aria-hidden="true" className="h-4 w-4" />
         {isSubmitting ? "Creating..." : "Create note"}
       </button>
-    </form>
+    </FormShell>
   );
 }

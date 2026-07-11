@@ -25,8 +25,6 @@ type ChecklistItemDetails = {
 
 type ChecklistDetails = {
   title: string;
-  description?: string;
-  tags?: string[];
   items?: ChecklistItemDetails[];
   parentType?: string | null;
   parentId?: unknown;
@@ -82,15 +80,12 @@ export default async function ChecklistPage({ params }: ChecklistPageProps) {
         <ChecklistDetailsPanel
           checklistId={params.checklistId}
           title={checklist.title}
-          description={checklist.description ?? ""}
-          tags={checklist.tags ?? []}
           items={items.map((item) => ({
             title: item.title,
             isCompleted: Boolean(item.isCompleted),
             completedAt: item.completedAt?.toISOString() ?? null,
             position: item.position ?? 0
           }))}
-          parentType={checklist.parentType}
           createdAtLabel={checklist.createdAt?.toLocaleString("pl-PL")}
           updatedAtLabel={checklist.updatedAt?.toLocaleString("pl-PL")}
           pinId={pin ? String(pin._id) : undefined}

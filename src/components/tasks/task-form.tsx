@@ -3,7 +3,8 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save, X } from "lucide-react";
-import { TagInputs } from "@/components/dashboard/tag-inputs";
+import { FormShell } from "@/components/dashboard/form-shell";
+import { TagEditor } from "@/components/dashboard/tag-editor";
 
 type EntityOption = {
   id: string;
@@ -133,14 +134,7 @@ export function TaskForm({
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="app-form-panel"
-    >
-      <h2 className="app-form-heading">
-        {mode === "create" ? "Create task" : "Edit task"}
-      </h2>
-
+    <FormShell entityType="task" mode={mode} onSubmit={handleSubmit}>
       <div className="app-form-field">
         <label htmlFor="title" className="app-form-label">
           Title
@@ -236,7 +230,7 @@ export function TaskForm({
         </div>
       </div>
 
-      <TagInputs tags={tags} onChange={setTags} />
+      <TagEditor tags={tags} onChange={setTags} />
 
       <fieldset className="grid gap-3">
         <legend className="app-form-legend">
@@ -301,6 +295,6 @@ export function TaskForm({
           </button>
         ) : null}
       </div>
-    </form>
+    </FormShell>
   );
 }

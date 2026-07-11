@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Save, Trash2, X } from "lucide-react";
-import { TagInputs } from "@/components/dashboard/tag-inputs";
+import { FormShell } from "@/components/dashboard/form-shell";
 
 type ChecklistItemInput = {
   title: string;
@@ -14,8 +14,6 @@ type ChecklistFormProps = {
   mode: "create" | "edit";
   checklistId?: string;
   initialTitle?: string;
-  initialDescription?: string;
-  initialTags?: string[];
   initialItems?: ChecklistItemInput[];
   onCancel?: () => void;
   onSaved?: () => void;
@@ -25,8 +23,6 @@ export function ChecklistForm({
   mode,
   checklistId,
   initialTitle = "",
-  initialDescription = "",
-  initialTags = [],
   initialItems = [],
   onCancel,
   onSaved
@@ -35,7 +31,6 @@ export function ChecklistForm({
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [tags, setTags] = useState(initialTags.length ? initialTags : [""]);
   const [items, setItems] = useState<ChecklistItemInput[]>(
     initialItems.length ? initialItems : [{ title: "", isCompleted: false }]
   );
@@ -59,8 +54,6 @@ export function ChecklistForm({
 
     const formData = new FormData(event.currentTarget);
     const title = String(formData.get("title") ?? "").trim();
-    const description = String(formData.get("description") ?? "");
-    const checklistTags = tags.map((tag) => tag.trim()).filter(Boolean);
     const checklistItems = items
       .map((item, position) => ({
         title: item.title.trim(),
@@ -84,8 +77,6 @@ export function ChecklistForm({
       },
       body: JSON.stringify({
         title,
-        description,
-        tags: checklistTags,
         items: checklistItems
       })
     });
@@ -113,35 +104,13 @@ export function ChecklistForm({
   const inputClass = "app-form-control";
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="app-form-panel"
-    >
-      <h2 className="app-form-heading">
-        {mode === "create" ? "Create checklist" : "Edit checklist"}
-      </h2>
-
+    <FormShell entityType="checklist" mode={mode} onSubmit={handleSubmit}>
       <div className="app-form-field">
         <label htmlFor="title" className="app-form-label">
           Title
         </label>
         <input id="title" name="title" type="text" defaultValue={initialTitle} required className={inputClass} />
       </div>
-
-      <div className="app-form-field">
-        <label htmlFor="description" className="app-form-label">
-          Description
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          rows={5}
-          defaultValue={initialDescription}
-          className="app-form-textarea"
-        />
-      </div>
-
-      <TagInputs tags={tags} onChange={setTags} />
 
       <fieldset className="grid gap-3">
         <legend className="app-form-legend">Items</legend>
@@ -230,6 +199,6 @@ export function ChecklistForm({
           </button>
         ) : null}
       </div>
-    </form>
+    </FormShell>
   );
 }

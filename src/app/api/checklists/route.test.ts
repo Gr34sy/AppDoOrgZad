@@ -81,8 +81,6 @@ describe("/api/checklists", () => {
     const response = await POST(
       createJsonRequest({
         title: "Launch",
-        description: "Release checklist",
-        tags: ["release"],
         items: [{ title: "Run tests", isCompleted: false, position: 0 }]
       }) as never
     );
@@ -91,8 +89,6 @@ describe("/api/checklists", () => {
     expect(response.status).toBe(201);
     expect(Checklist.create).toHaveBeenCalledWith({
       title: "Launch",
-      description: "Release checklist",
-      tags: ["release"],
       items: [{ title: "Run tests", isCompleted: false, position: 0 }],
       ownerId: "user-1"
     });
