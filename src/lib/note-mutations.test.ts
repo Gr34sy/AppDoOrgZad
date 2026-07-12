@@ -12,7 +12,7 @@ describe("sanitizeNoteMutation", () => {
       ownerId: "other-user",
       title: "Meeting notes",
       content: "Follow up tomorrow",
-      color: "#fff7cc",
+      linkedItems: [{ targetType: "task", targetId: "task-id" }],
       tags: ["work"],
       position: 2,
       archivedAt: new Date(),
@@ -24,22 +24,19 @@ describe("sanitizeNoteMutation", () => {
     expect(payload).toEqual({
       title: "Meeting notes",
       content: "Follow up tomorrow",
-      color: "#fff7cc",
+      linkedItems: [{ targetType: "task", targetId: "task-id" }],
       tags: ["work"],
       position: 2
     });
   });
 
-  it("maps named note colors to hex values", () => {
+  it("does not accept legacy per-note colors", () => {
     const payload = sanitizeNoteMutation({
       title: "Color note",
       color: "turquoise"
     });
 
-    expect(payload).toEqual({
-      title: "Color note",
-      color: "#5eead4"
-    });
+    expect(payload).toEqual({ title: "Color note" });
   });
 
   it("detects empty mutation payloads", () => {

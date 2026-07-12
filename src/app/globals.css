@@ -5,6 +5,7 @@
 :root {
   color-scheme: light;
   --app-background: #fefefe;
+  --app-sidebar-background: #ffffff;
   --dashboard-accent: #16a085;
   --dashboard-accent-strong: #0e806d;
   --dashboard-accent-soft: #d4f3e8;
@@ -21,6 +22,7 @@
 .dark {
   color-scheme: dark;
   --app-background: #0b0b0f;
+  --app-sidebar-background: #09090b;
   --dashboard-accent: #22d3ee;
   --dashboard-accent-strong: #67e8f9;
   --dashboard-accent-soft: rgba(34, 211, 238, 0.16);
@@ -39,6 +41,11 @@ body {
 
   body {
     @apply overflow-x-hidden bg-[var(--app-background)] text-zinc-950 antialiased dark:text-zinc-50;
+  }
+
+  select,
+  select option {
+    text-transform: capitalize;
   }
 }
 

@@ -2,19 +2,30 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus, StickyNote, Tag, X } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, Link2, Plus, StickyNote, Tag, X } from "lucide-react";
 import { DeleteEntityButton } from "@/components/dashboard/delete-entity-button";
 import { InlineEditableField } from "@/components/dashboard/inline-editable-field";
 import { PinEntityButton } from "@/components/dashboard/pin-entity-button";
 import { SaveChangesButton } from "@/components/dashboard/save-changes-button";
-import { getNoteCardStyle } from "@/lib/note-colors";
+
+type LinkedItem = {
+  targetType: "note" | "checklist" | "task" | "project";
+  targetId: string;
+};
+
+type LinkOption = LinkedItem & {
+  title: string;
+  href: string;
+};
 
 type NoteDetailsPanelProps = {
   noteId: string;
   title: string;
   content: string;
-  color: string;
   tags: string[];
+  linkedItems: LinkedItem[];
+  linkOptions: LinkOption[];
   createdAtLabel?: string;
   updatedAtLabel?: string;
   pinId?: string;
@@ -53,8 +64,9 @@ export function NoteDetailsPanel({
   noteId,
   title,
   content,
-  color,
   tags,
+  linkedItems,
+  linkOptions,
   createdAtLabel,
   updatedAtLabel,
   pinId
@@ -64,25 +76,30 @@ export function NoteDetailsPanel({
   const [draftContent, setDraftContent] = useState(content);
   const [draftTags, setDraftTags] = useState(tags.length ? tags : [""]);
   const [isTagEditorOpen, setIsTagEditorOpen] = useState(false);
+  const [draftLinkedItems, setDraftLinkedItems] = useState(linkedItems);
+  const [selectedLinkKey, setSelectedLinkKey] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
-  const noteStyle = getNoteCardStyle(color);
   const normalizedDraftTags = normalizeTags(draftTags);
   const isDirty =
     draftTitle.trim() !== title.trim() ||
     draftContent !== content ||
-    normalizedDraftTags.join("\n") !== tags.join("\n");
+    normalizedDraftTags.join("\n") !== tags.join("\n") ||
+    draftLinkedItems.map((item) => `${item.targetType}:${item.targetId}`).join("\n") !==
+      linkedItems.map((item) => `${item.targetType}:${item.targetId}`).join("\n");
 
   useEffect(() => {
     setDraftTitle(title);
     setDraftContent(content);
     setDraftTags(tags.length ? tags : [""]);
-  }, [title, content, tags]);
+    setDraftLinkedItems(linkedItems);
+  }, [title, content, tags, linkedItems]);
 
   function resetDrafts() {
     setDraftTitle(title);
     setDraftContent(content);
     setDraftTags(tags.length ? tags : [""]);
+    setDraftLinkedItems(linkedItems);
     setError("");
   }
 
@@ -119,7 +136,8 @@ export function NoteDetailsPanel({
       body: JSON.stringify({
         title: draftTitle.trim(),
         content: draftContent,
-        tags: normalizedDraftTags
+        tags: normalizedDraftTags,
+        linkedItems: draftLinkedItems
       })
     });
 
@@ -145,12 +163,14 @@ export function NoteDetailsPanel({
       </div>
 
       <div
-        className="min-h-[20rem] rounded-md border p-4 shadow-sm sm:min-h-[28rem] sm:p-6"
-        style={noteStyle}
+        className="min-h-[20rem] rounded-md border border-zinc-200 bg-[var(--app-sidebar-background)] p-4 text-zinc-950 shadow-sm sm:min-h-[28rem] sm:p-6 dark:border-zinc-800 dark:text-zinc-50"
       >
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex min-w-0 flex-1 items-start gap-3">
-            <StickyNote aria-hidden="true" className="mt-2 h-7 w-7 shrink-0 opacity-60" />
+            <StickyNote
+              aria-hidden="true"
+              className="mt-2 h-7 w-7 shrink-0 text-[var(--app-accent)]"
+            />
             <InlineEditableField
               value={draftTitle}
               onChange={setDraftTitle}
@@ -267,6 +287,67 @@ export function NoteDetailsPanel({
           className="mt-6 whitespace-pre-wrap p-1 text-sm leading-7 opacity-90"
           inputClassName="mt-6 min-h-40 w-full rounded-md border border-[var(--app-accent)] bg-white/80 px-3 py-3 text-sm leading-7 outline-none ring-2 ring-[var(--app-accent)]/15"
         />
+
+        <section className="mt-8 border-t border-zinc-200 pt-5 dark:border-zinc-800">
+          <div className="flex items-center gap-2">
+            <Link2 aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
+            <h2 className="text-sm font-semibold">Linked items</h2>
+          </div>
+
+          {draftLinkedItems.length ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {draftLinkedItems.map((linkedItem) => {
+                const option = linkOptions.find((candidate) =>
+                  candidate.targetType === linkedItem.targetType && candidate.targetId === linkedItem.targetId
+                );
+
+                return (
+                  <span key={`${linkedItem.targetType}:${linkedItem.targetId}`} className="inline-flex max-w-full items-center rounded-md border border-zinc-200 bg-white text-sm dark:border-zinc-700 dark:bg-zinc-900">
+                    {option ? (
+                      <Link href={option.href} className="min-w-0 truncate px-3 py-2 hover:text-[var(--app-accent)]">
+                        <span className="mr-2 text-xs uppercase text-zinc-500">{linkedItem.targetType}</span>
+                        {option.title}
+                      </Link>
+                    ) : (
+                      <span className="px-3 py-2 text-zinc-500">Unavailable item</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setDraftLinkedItems((current) => current.filter((item) => !(item.targetType === linkedItem.targetType && item.targetId === linkedItem.targetId)))}
+                      className="grid h-9 w-9 shrink-0 place-items-center border-l border-zinc-200 text-zinc-500 hover:text-red-600 dark:border-zinc-700"
+                      aria-label={`Remove linked ${linkedItem.targetType}`}
+                    >
+                      <X aria-hidden="true" className="h-4 w-4" />
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          ) : <p className="mt-3 text-sm text-zinc-500">No linked items.</p>}
+
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <select value={selectedLinkKey} onChange={(event) => setSelectedLinkKey(event.target.value)} className="h-10 min-w-0 flex-1 rounded-md border border-zinc-300 bg-white px-3 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+              <option value="">Select an item</option>
+              {linkOptions.filter((option) => !draftLinkedItems.some((item) => item.targetType === option.targetType && item.targetId === option.targetId)).map((option) => (
+                <option key={`${option.targetType}:${option.targetId}`} value={`${option.targetType}:${option.targetId}`}>
+                  {option.targetType}: {option.title}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              disabled={!selectedLinkKey}
+              onClick={() => {
+                const option = linkOptions.find((candidate) => `${candidate.targetType}:${candidate.targetId}` === selectedLinkKey);
+                if (option) setDraftLinkedItems((current) => [...current, { targetType: option.targetType, targetId: option.targetId }]);
+                setSelectedLinkKey("");
+              }}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-[var(--app-accent)] px-4 text-sm font-medium text-white disabled:opacity-50"
+            >
+              <Plus aria-hidden="true" className="h-4 w-4" /> Add link
+            </button>
+          </div>
+        </section>
 
         {error ? <p className="mt-4 text-sm text-red-600">{error}</p> : null}
       </div>

@@ -1,7 +1,5 @@
 import { sanitizeMutation } from "@/lib/sanitize-mutation";
-import { normalizeNoteColor } from "@/lib/note-colors";
-
-const noteMutationFields = ["title", "content", "color", "tags", "position"] as const;
+const noteMutationFields = ["title", "content", "linkedItems", "tags", "position"] as const;
 
 type NoteMutationField = (typeof noteMutationFields)[number];
 
@@ -15,13 +13,6 @@ export function sanitizeNoteMutation(payload: Record<string, unknown>) {
     if (field in sanitizedPayload) {
       noteMutation[field] = sanitizedPayload[field];
     }
-  }
-
-  if ("color" in noteMutation) {
-    noteMutation.color =
-      typeof noteMutation.color === "string"
-        ? normalizeNoteColor(noteMutation.color)
-        : noteMutation.color;
   }
 
   return noteMutation;

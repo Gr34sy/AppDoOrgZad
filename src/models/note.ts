@@ -19,9 +19,24 @@ const noteSchema = new Schema(
       default: "",
       maxlength: 20000
     },
-    color: {
-      type: String,
-      default: "#fff7cc"
+    linkedItems: {
+      type: [
+        new Schema(
+          {
+            targetType: {
+              type: String,
+              enum: ["note", "checklist", "task", "project"],
+              required: true
+            },
+            targetId: {
+              type: Schema.Types.ObjectId,
+              required: true
+            }
+          },
+          { _id: false }
+        )
+      ],
+      default: []
     },
     tags: {
       type: [String],

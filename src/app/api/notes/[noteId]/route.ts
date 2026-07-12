@@ -10,6 +10,7 @@ import {
 } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
 import { sanitizeNoteMutation } from "@/lib/note-mutations";
+import { areValidNoteLinks } from "@/lib/note-links";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { noteUpdateSchema } from "@/lib/validation-schemas";
 import { Note } from "@/models/note";
@@ -70,6 +71,9 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
   }
 
   await connectDatabase();
+  if (data.linkedItems && !(await areValidNoteLinks(data.linkedItems, ownerId))) {
+    return badRequestResponse("One or more linked items are invalid");
+  }
   const payload = sanitizeNoteMutation(data);
 
   const note = await Note.findOneAndUpdate(

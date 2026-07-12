@@ -15,6 +15,7 @@ type ProjectsPageProps = {
     q?: string | string[];
     priority?: string | string[];
     sort?: string | string[];
+    direction?: string | string[];
   };
 };
 
@@ -28,16 +29,16 @@ type ListedProject = {
   tags?: string[];
 };
 
-function getProjectSort(sort: string): Record<string, 1 | -1> {
+function getProjectSort(sort: string, direction: string): Record<string, 1 | -1> {
+  const order = direction === "asc" ? 1 : -1;
+
   switch (sort) {
-    case "due-desc":
-      return { dueDate: -1, updatedAt: -1 };
-    case "due-asc":
-      return { dueDate: 1, updatedAt: -1 };
-    case "priority-asc":
-      return { priority: 1, updatedAt: -1 };
+    case "due":
+      return { dueDate: order, updatedAt: -1 };
+    case "priority":
+      return { priority: order, updatedAt: -1 };
     default:
-      return getListSort(sort);
+      return getListSort(sort, direction);
   }
 }
 
@@ -51,7 +52,8 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   const ownerId = session.user.id;
   const search = getSearchParam(searchParams?.q).trim();
   const priority = getSearchParam(searchParams?.priority).trim();
-  const sort = getSearchParam(searchParams?.sort) || "updated-desc";
+  const sort = getSearchParam(searchParams?.sort) || "updated";
+  const direction = getSearchParam(searchParams?.direction) === "asc" ? "asc" : "desc";
   const query: Record<string, unknown> = {
     ownerId,
     archivedAt: null
@@ -67,7 +69,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   }
 
   await connectDatabase();
-  const projects = await Project.find(query).sort(getProjectSort(sort)).lean<ListedProject[]>();
+  const projects = await Project.find(query).sort(getProjectSort(sort, direction)).lean<ListedProject[]>();
 
   return (
     <AppShell>
@@ -93,6 +95,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
           searchValue={search}
           filterValue={priority}
           sortValue={sort}
+          sortDirection={direction}
           clearHref="/dashboard/projects"
         />
 

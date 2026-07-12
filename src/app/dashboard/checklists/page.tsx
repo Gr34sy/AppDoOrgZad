@@ -14,12 +14,14 @@ type ChecklistsPageProps = {
   searchParams?: {
     q?: string | string[];
     sort?: string | string[];
+    direction?: string | string[];
   };
 };
 
 type ListedChecklist = {
   _id: unknown;
   title: string;
+  items?: Array<{ title: string; isCompleted?: boolean }>;
 };
 
 export default async function ChecklistsPage({ searchParams }: ChecklistsPageProps) {
@@ -31,7 +33,8 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
 
   const ownerId = session.user.id;
   const search = getSearchParam(searchParams?.q).trim();
-  const sort = getSearchParam(searchParams?.sort) || "updated-desc";
+  const sort = getSearchParam(searchParams?.sort) || "updated";
+  const direction = getSearchParam(searchParams?.direction) === "asc" ? "asc" : "desc";
   const query: Record<string, unknown> = {
     ownerId,
     archivedAt: null
@@ -44,7 +47,7 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
 
   await connectDatabase();
 
-  const checklists = await Checklist.find(query).sort(getListSort(sort)).lean<ListedChecklist[]>();
+  const checklists = await Checklist.find(query).sort(getListSort(sort, direction)).lean<ListedChecklist[]>();
 
   return (
     <AppShell>
@@ -69,6 +72,7 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
           entityType="checklists"
           searchValue={search}
           sortValue={sort}
+          sortDirection={direction}
           clearHref="/dashboard/checklists"
         />
 
@@ -84,6 +88,7 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
                   title={checklist.title}
                   icon={ListChecks}
                   deleteEndpoint={`/api/checklists/${checklistId}`}
+                  previewItems={checklist.items ?? []}
                 />
               );
             })}

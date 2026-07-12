@@ -8,6 +8,9 @@ type PinnedItem = {
   type: string;
   meta: string;
   status: string;
+  priority?: string;
+  tags: string[];
+  items?: Array<{ title: string; isCompleted?: boolean }>;
   createdAt: string;
   updatedAt: string;
   href: string;
@@ -41,13 +44,6 @@ type PinnedBoardProps = {
   pinnedItems: PinnedItem[];
   dashboardMetrics: DashboardMetric[];
   calendarEvents: CalendarEvent[];
-};
-
-const typeStyles: Record<string, string> = {
-  Note: "border-fuchsia-300/70 bg-fuchsia-100 text-fuchsia-950",
-  Checklist: "border-emerald-300/70 bg-emerald-100 text-emerald-950",
-  Task: "border-sky-300/70 bg-sky-100 text-sky-950",
-  Project: "border-violet-300/70 bg-violet-100 text-violet-950"
 };
 
 const priorityStyles: Record<string, string> = {
@@ -147,8 +143,8 @@ export function PinnedBoard({ pinnedItems, dashboardMetrics, calendarEvents }: P
   return (
     <div className="grid gap-6">
       <section className="grid gap-3">
-        <div className="grid min-w-0 items-stretch gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,340px)] xl:justify-start">
-          <div className="grid h-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:grid-rows-2 xl:max-w-[412px]">
+        <div className="grid min-w-0 items-stretch gap-4 md:grid-cols-[minmax(0,412px)_minmax(18rem,340px)] md:justify-start">
+          <div className="grid h-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:grid-rows-2">
             {dashboardMetrics.map((metric) => (
               <div
                 key={metric.title}
@@ -221,7 +217,7 @@ export function PinnedBoard({ pinnedItems, dashboardMetrics, calendarEvents }: P
         </div>
       </section>
 
-      <PinnedItemsSearch pinnedItems={pinnedItems} typeStyles={typeStyles} />
+      <PinnedItemsSearch pinnedItems={pinnedItems} />
     </div>
   );
 }

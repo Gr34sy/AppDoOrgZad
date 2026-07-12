@@ -17,15 +17,15 @@ const formTitleByType: Record<EntityFormType, string> = {
 };
 
 export function FormShell({ entityType, mode = "create", children, onSubmit }: FormShellProps) {
-  const actionLabel = mode === "create" ? "Create" : "Edit";
-
   return (
     <form onSubmit={onSubmit} className="app-form-panel">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="app-form-heading">
-          {actionLabel} {formTitleByType[entityType].toLowerCase()}
-        </h2>
-      </div>
+      {mode === "edit" ? (
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="app-form-heading">
+            Edit {formTitleByType[entityType].toLowerCase()}
+          </h2>
+        </div>
+      ) : null}
       {children}
     </form>
   );

@@ -253,13 +253,16 @@ export function ChecklistDetailsPanel({
                         className="w-full rounded-md border border-[var(--app-accent)] bg-white px-2 py-1 text-sm font-medium text-zinc-950 outline-none ring-2 ring-[var(--app-accent)]/15 dark:bg-zinc-900 dark:text-zinc-50"
                       />
                     ) : (
-                      <span
-                        className={`block min-w-0 break-words p-1 ${
+                      <button
+                        type="button"
+                        onClick={() => toggleItem(index)}
+                        aria-label={item.isCompleted ? `Mark ${item.title} as incomplete` : `Mark ${item.title} as complete`}
+                        className={`block w-full min-w-0 cursor-pointer break-words rounded p-1 text-left transition hover:text-[var(--app-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/25 ${
                           item.isCompleted ? "line-through opacity-70" : ""
                         }`}
                       >
                         {item.title}
-                      </span>
+                      </button>
                     )}
                   </span>
                 </div>

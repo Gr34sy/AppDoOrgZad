@@ -1,9 +1,10 @@
 "use client";
 
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { ArrowDownUp, Filter, Search, SlidersHorizontal } from "lucide-react";
 import { defaultSortOptions } from "@/lib/list-query";
+import { SortDirectionButton } from "@/components/dashboard/sort-direction-button";
 
 type ListEntityType = "notes" | "tasks" | "checklists" | "projects";
 
@@ -16,6 +17,7 @@ type ListControlsProps = {
   entityType: ListEntityType;
   searchValue: string;
   sortValue: string;
+  sortDirection: "asc" | "desc";
   clearHref: string;
   filterValue?: string;
   filterOptions?: SelectOption[];
@@ -30,9 +32,8 @@ const priorityOptions = [
 
 const taskProjectSortOptions = [
   ...defaultSortOptions,
-  { label: "due date newest", value: "due-desc" },
-  { label: "due date oldest", value: "due-asc" },
-  { label: "priority", value: "priority-asc" }
+  { label: "due date", value: "due" },
+  { label: "priority", value: "priority" }
 ];
 
 const controlConfig: Record<
@@ -71,6 +72,7 @@ export function ListControls({
   entityType,
   searchValue,
   sortValue,
+  sortDirection,
   clearHref,
   filterValue = "",
   filterOptions
@@ -80,6 +82,7 @@ export function ListControls({
   const config = controlConfig[entityType];
   const resolvedFilterOptions = filterOptions ?? config.filterOptions ?? [];
   const hasFilter = Boolean(config.filterName);
+  const [direction, setDirection] = useState<"asc" | "desc">(sortDirection);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -89,6 +92,7 @@ export function ListControls({
     const query = getFormValue(formData, "q");
     const selectedFilter = config.filterName ? getFormValue(formData, config.filterName) : "";
     const selectedSort = getFormValue(formData, "sort");
+    const selectedDirection = getFormValue(formData, "direction");
 
     if (query) {
       params.set("q", query);
@@ -98,8 +102,12 @@ export function ListControls({
       params.set(config.filterName, selectedFilter);
     }
 
-    if (selectedSort && selectedSort !== "updated-desc") {
+    if (selectedSort && selectedSort !== "updated") {
       params.set("sort", selectedSort);
+    }
+
+    if (selectedDirection === "asc") {
+      params.set("direction", selectedDirection);
     }
 
     const queryString = params.toString();
@@ -118,9 +126,9 @@ export function ListControls({
       <div
         className={`grid min-w-0 items-end gap-3 ${
           hasFilter
-            ? "lg:grid-cols-[minmax(16rem,1.5fr)_minmax(10rem,0.75fr)_minmax(10rem,0.75fr)_auto_auto]"
-            : "lg:grid-cols-[minmax(16rem,1.5fr)_minmax(10rem,0.75fr)_auto_auto]"
-        }`}
+            ? "lg:grid-cols-[minmax(16rem,24rem)_minmax(10rem,0.75fr)_minmax(10rem,0.75fr)_auto_auto_auto]"
+            : "lg:grid-cols-[minmax(16rem,24rem)_minmax(10rem,0.75fr)_auto_auto_auto]"
+        } lg:justify-start`}
       >
         <div className="w-full min-w-0">
           <label htmlFor={`${entityType}-search`} className="sr-only">
@@ -181,6 +189,12 @@ export function ListControls({
             ))}
           </select>
         </label>
+
+        <input type="hidden" name="direction" value={direction} />
+        <SortDirectionButton
+          direction={direction}
+          onToggle={() => setDirection((current) => current === "asc" ? "desc" : "asc")}
+        />
 
         <button
           type="submit"

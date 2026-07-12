@@ -25,7 +25,8 @@ type PinnedTarget = {
   lifecycleStatus?: string;
   statusId?: string;
   dueDate?: Date | string | null;
-  items?: unknown[];
+  items?: Array<{ title: string; isCompleted?: boolean }>;
+  tags?: string[];
   createdAt?: Date | string;
   updatedAt?: Date | string;
 };
@@ -165,6 +166,9 @@ export default async function DashboardPage() {
           type: config.label,
           meta,
           status: target.lifecycleStatus ?? target.statusId ?? target.priority ?? "Pinned",
+          priority: target.priority,
+          tags: target.tags ?? [],
+          items: pin.targetType === "checklist" ? target.items ?? [] : undefined,
           createdAt: target.createdAt ? new Date(target.createdAt).toISOString() : "",
           updatedAt: target.updatedAt ? new Date(target.updatedAt).toISOString() : "",
           href: `${config.hrefBase}/${targetId}`

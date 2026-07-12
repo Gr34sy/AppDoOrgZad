@@ -47,7 +47,7 @@ export default async function NewNotePage() {
               Notes stay lightweight
             </h2>
             <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-              Add a title, write the important details, then use color and tags to make it easy to
+              Add a title, write the important details, then use tags to make it easy to
               find later.
             </p>
           </aside>

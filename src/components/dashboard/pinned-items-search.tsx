@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowDownUp, ListChecks, ListX, Search } from "lucide-react";
+import { ArrowDownUp, ClipboardList, FolderKanban, ListChecks, ListX, Search, StickyNote } from "lucide-react";
 import { useMemo, useState } from "react";
-import { CardDeleteButton } from "@/components/dashboard/card-delete-button";
+import { ObjectCard } from "@/components/dashboard/object-card";
+import { SortDirectionButton } from "@/components/dashboard/sort-direction-button";
 
 type PinnedItem = {
   id: string;
@@ -12,6 +12,9 @@ type PinnedItem = {
   type: string;
   meta: string;
   status: string;
+  priority?: string;
+  tags: string[];
+  items?: Array<{ title: string; isCompleted?: boolean }>;
   createdAt: string;
   updatedAt: string;
   href: string;
@@ -19,7 +22,6 @@ type PinnedItem = {
 
 type PinnedItemsSearchProps = {
   pinnedItems: PinnedItem[];
-  typeStyles: Record<string, string>;
 };
 
 const typeFilters = [
@@ -36,26 +38,6 @@ const sortFieldOptions = [
   { label: "description", value: "description" }
 ];
 
-function formatLabel(value: string) {
-  return value.replace(/_/g, " ");
-}
-
-function getProgressColor(type: string) {
-  if (type === "Note") {
-    return "bg-fuchsia-400";
-  }
-
-  if (type === "Checklist") {
-    return "bg-emerald-400";
-  }
-
-  if (type === "Project") {
-    return "bg-violet-400";
-  }
-
-  return "bg-sky-400";
-}
-
 function getPinnedItemDeleteEndpoint(item: PinnedItem) {
   const hrefParts = item.href.split("/").filter(Boolean);
   const targetId = hrefParts[hrefParts.length - 1];
@@ -70,7 +52,14 @@ function getPinnedItemDeleteEndpoint(item: PinnedItem) {
   return targetId && endpointType ? `/api/${endpointType}/${targetId}` : "";
 }
 
-export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearchProps) {
+const iconByType = {
+  Note: StickyNote,
+  Checklist: ListChecks,
+  Task: ClipboardList,
+  Project: FolderKanban
+};
+
+export function PinnedItemsSearch({ pinnedItems }: PinnedItemsSearchProps) {
   const [query, setQuery] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>(() =>
     typeFilters.map((filter) => filter.value)
@@ -148,7 +137,7 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{countLabel}</p>
         </div>
         <div className="grid gap-3">
-          <div className="w-full min-w-0">
+          <div className="w-full min-w-0 sm:max-w-2xl">
             <label htmlFor="pinned-search" className="sr-only">
               Search pinned items
             </label>
@@ -226,18 +215,15 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
                   ))}
                 </select>
               </label>
-              <button
-                type="button"
-                onClick={() =>
+              <SortDirectionButton
+                direction={sortDirection}
+                className="h-9"
+                onToggle={() =>
                   setSortDirection((currentDirection) =>
                     currentDirection === "asc" ? "desc" : "asc"
                   )
                 }
-                className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-[var(--app-accent)] dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
-              >
-                <ArrowDownUp aria-hidden="true" className="h-4 w-4" />
-                {sortDirection === "asc" ? "Ascending" : "Descending"}
-              </button>
+              />
             </div>
           </div>
         </div>
@@ -245,45 +231,25 @@ export function PinnedItemsSearch({ pinnedItems, typeStyles }: PinnedItemsSearch
 
       <section className="app-card-grid content-start">
         {sortedItems.length ? (
-          sortedItems.map((item) => (
-            <article
-              key={item.id}
-              className="group relative min-w-0 overflow-hidden rounded-lg transition hover:-translate-y-0.5"
-            >
-              {getPinnedItemDeleteEndpoint(item) ? (
-                <CardDeleteButton endpoint={getPinnedItemDeleteEndpoint(item)} />
-              ) : null}
-              <Link
+          sortedItems.map((item) => {
+            const Icon = iconByType[item.type as keyof typeof iconByType] ?? StickyNote;
+            const isTaskOrProject = item.type === "Task" || item.type === "Project";
+
+            return (
+              <ObjectCard
+                key={item.id}
                 href={item.href}
-                className="block min-h-44 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition hover:border-[var(--app-accent)] hover:shadow-xl hover:shadow-[var(--app-accent)]/10 focus-visible:border-[var(--app-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/20 dark:border-zinc-800 dark:bg-zinc-900"
-              >
-                <div className="flex items-center justify-between gap-3 pr-9">
-                  <span
-                    className={`rounded-md border px-2.5 py-1 text-xs font-semibold ${
-                      typeStyles[item.type] ?? "border-zinc-300 bg-zinc-100 text-zinc-900"
-                    }`}
-                  >
-                    {item.type}
-                  </span>
-                  <span className="min-w-0 max-w-[9rem] truncate rounded-md bg-zinc-100 px-2 py-1 text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-                    {formatLabel(item.status)}
-                  </span>
-                </div>
-                <h3 className="mt-5 line-clamp-2 text-lg font-semibold tracking-normal">
-                  {item.title}
-                </h3>
-                <p className="mt-3 line-clamp-3 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-                  {item.meta}
-                </p>
-                <div className="mt-5 h-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800">
-                  <div
-                    className={`h-1.5 rounded-full ${getProgressColor(item.type)}`}
-                    style={{ width: "42%" }}
-                  />
-                </div>
-              </Link>
-            </article>
-          ))
+                title={item.title}
+                icon={Icon}
+                deleteEndpoint={getPinnedItemDeleteEndpoint(item)}
+                description={item.description}
+                tags={item.tags}
+                status={isTaskOrProject ? item.status : undefined}
+                priority={isTaskOrProject ? item.priority : undefined}
+                previewItems={item.type === "Checklist" ? item.items : undefined}
+              />
+            );
+          })
         ) : (
           <article className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
             <h3 className="text-lg font-semibold">

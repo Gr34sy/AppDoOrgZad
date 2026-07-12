@@ -5,7 +5,7 @@ import { isValidObjectId } from "mongoose";
 import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { ProjectDetailsPanel } from "@/components/projects/project-details-panel";
-import { ProjectKanbanBoard } from "@/components/projects/project-kanban-board";
+import { ProjectTaskView } from "@/components/projects/project-task-view";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
 import { Checklist } from "@/models/checklist";
@@ -37,6 +37,7 @@ type ProjectDetails = {
   checklistIds?: unknown[];
   taskIds?: unknown[];
   kanbanColumns?: KanbanColumnDetails[];
+  taskView?: "kanban" | "list";
   completedAt?: Date | null;
   createdAt?: Date;
   updatedAt?: Date;
@@ -113,15 +114,16 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   return (
     <AppShell>
       <section className="app-page">
-        <Link
-          href="/dashboard/projects"
-          className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
-        >
-          <ArrowLeft aria-hidden="true" className="h-4 w-4" />
-          Back to projects
-        </Link>
-
-        <ProjectDetailsPanel
+        <ProjectTaskView
+          projectId={params.projectId}
+          initialView={project.taskView ?? "kanban"}
+          projectInformation={<><Link
+            href="/dashboard/projects"
+            className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
+          >
+            <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+            Back to projects
+          </Link><ProjectDetailsPanel
           projectId={params.projectId}
           checklistOptions={checklists.map((checklist) => ({
             id: String(checklist._id),
@@ -146,9 +148,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           createdAtLabel={project.createdAt?.toLocaleString("pl-PL")}
           updatedAtLabel={project.updatedAt?.toLocaleString("pl-PL")}
           pinId={pin ? String(pin._id) : undefined}
-        />
-        <ProjectKanbanBoard
-          projectId={params.projectId}
+        /></>}
           columns={kanbanColumns.map((column) => ({
             id: column.id,
             title: column.title,

@@ -26,7 +26,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
       >
         <ChevronRight aria-hidden="true" className="h-5 w-5" strokeWidth={2.25} />
       </label>
-      <aside className="fixed inset-y-0 left-0 z-40 flex w-[min(18rem,calc(100vw-2rem))] -translate-x-full flex-col border-r border-zinc-200 bg-white px-4 py-5 shadow-2xl shadow-zinc-950/10 transition-[transform,width] duration-300 peer-checked:translate-x-0 peer-checked:lg:w-20 lg:w-72 lg:translate-x-0 dark:border-zinc-800 dark:bg-zinc-950">
+      <aside className="fixed inset-y-0 left-0 z-40 flex w-[min(18rem,calc(100vw-2rem))] -translate-x-full flex-col border-r border-zinc-200 bg-[var(--app-sidebar-background)] px-4 py-5 shadow-2xl shadow-zinc-950/10 transition-[transform,width] duration-300 peer-checked:translate-x-0 peer-checked:lg:w-20 lg:w-72 lg:translate-x-0 dark:border-zinc-800">
         <div className="sidebar-user flex items-center gap-3 border-b border-zinc-200 pb-5 dark:border-zinc-800">
           <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-zinc-950 text-sm font-semibold text-white dark:bg-white dark:text-zinc-950">
             {userInitial}

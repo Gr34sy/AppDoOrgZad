@@ -8,7 +8,7 @@ type SearchInputProps = {
 
 export function SearchInput({ defaultValue, label = "search", name = "q" }: SearchInputProps) {
   return (
-    <div className="w-full min-w-0">
+    <div className="w-full min-w-0 sm:max-w-2xl">
       <label htmlFor={name} className="sr-only">
         {label}
       </label>

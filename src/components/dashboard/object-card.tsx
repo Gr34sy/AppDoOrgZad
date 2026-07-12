@@ -12,6 +12,7 @@ type ObjectCardProps = {
   tags?: string[];
   status?: string;
   priority?: string;
+  previewItems?: Array<{ title: string; isCompleted?: boolean }>;
 };
 
 function formatMeta(value: string) {
@@ -38,9 +39,11 @@ export function ObjectCard({
   description,
   tags = [],
   status,
-  priority
+  priority,
+  previewItems
 }: ObjectCardProps) {
   const hasMeta = Boolean(status || priority);
+  const hasItemPreview = previewItems !== undefined;
 
   return (
     <article className="group relative min-w-0 max-w-sm overflow-hidden rounded-md transition hover:-translate-y-0.5">
@@ -65,11 +68,29 @@ export function ObjectCard({
           </p>
         ) : null}
 
-        <TagList tags={tags} className="mt-4" showEmpty />
-
-        <p className="mt-4 min-w-0 break-words text-sm leading-6 text-zinc-600 dark:text-zinc-300">
-          {getDescriptionPreview(description)}
-        </p>
+        {hasItemPreview ? (
+          previewItems.length ? (
+            <ul className="mt-4 grid gap-1.5 text-sm text-zinc-600 dark:text-zinc-300">
+              {previewItems.slice(0, 5).map((item, index) => (
+                <li key={`${item.title}-${index}`} className="flex min-w-0 items-center gap-2">
+                  <span className={`h-2 w-2 shrink-0 rounded-full ${item.isCompleted ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-700"}`} />
+                  <span className={`truncate ${item.isCompleted ? "text-zinc-400 line-through dark:text-zinc-500" : ""}`}>
+                    {item.title}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">No checklist items yet.</p>
+          )
+        ) : (
+          <>
+            <TagList tags={tags} className="mt-4" showEmpty />
+            <p className="mt-4 min-w-0 break-words text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+              {getDescriptionPreview(description)}
+            </p>
+          </>
+        )}
       </Link>
     </article>
   );

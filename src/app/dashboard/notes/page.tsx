@@ -14,6 +14,7 @@ type NotesPageProps = {
   searchParams?: {
     q?: string | string[];
     sort?: string | string[];
+    direction?: string | string[];
   };
 };
 
@@ -21,7 +22,6 @@ type ListedNote = {
   _id: unknown;
   title: string;
   content?: string;
-  color?: string | null;
   tags?: string[];
 };
 
@@ -34,7 +34,8 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
 
   const ownerId = session.user.id;
   const search = getSearchParam(searchParams?.q).trim();
-  const sort = getSearchParam(searchParams?.sort) || "updated-desc";
+  const sort = getSearchParam(searchParams?.sort) || "updated";
+  const direction = getSearchParam(searchParams?.direction) === "asc" ? "asc" : "desc";
   const query: Record<string, unknown> = {
     ownerId,
     archivedAt: null
@@ -47,7 +48,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
 
   await connectDatabase();
 
-  const notes = await Note.find(query).sort(getListSort(sort)).lean<ListedNote[]>();
+  const notes = await Note.find(query).sort(getListSort(sort, direction)).lean<ListedNote[]>();
 
   return (
     <AppShell>
@@ -55,6 +56,9 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
         <div className="app-page-header">
           <div className="app-page-heading">
             <h1 className="app-page-title">Notes</h1>
+            <p className="app-page-description">
+              Capture ideas, organize information and keep important details in one place.
+            </p>
           </div>
           <Link
             href="/dashboard/notes/new"
@@ -69,6 +73,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
           entityType="notes"
           searchValue={search}
           sortValue={sort}
+          sortDirection={direction}
           clearHref="/dashboard/notes"
         />
 

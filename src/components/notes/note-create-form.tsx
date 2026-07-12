@@ -5,15 +5,12 @@ import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
 import { FormShell } from "@/components/dashboard/form-shell";
 import { TagEditor } from "@/components/dashboard/tag-editor";
-import { NoteColorInput } from "@/components/notes/note-color-input";
 
 export function NoteCreateForm() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tags, setTags] = useState([""]);
-  const [colorMode, setColorMode] = useState("");
-  const [hexColor, setHexColor] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -23,7 +20,6 @@ export function NoteCreateForm() {
     const formData = new FormData(event.currentTarget);
     const title = String(formData.get("title") ?? "").trim();
     const content = String(formData.get("content") ?? "");
-    const noteColor = colorMode === "hexadecimal" ? hexColor.trim() || "#fff7cc" : colorMode;
     const noteTags = tags
       .map((tag) => tag.trim())
       .filter(Boolean);
@@ -42,7 +38,6 @@ export function NoteCreateForm() {
       body: JSON.stringify({
         title,
         content,
-        color: noteColor,
         tags: noteTags
       })
     });
@@ -85,13 +80,6 @@ export function NoteCreateForm() {
           className="app-form-textarea min-h-72"
         />
       </div>
-
-      <NoteColorInput
-        colorMode={colorMode}
-        hexColor={hexColor}
-        onColorModeChange={setColorMode}
-        onHexColorChange={setHexColor}
-      />
 
       <TagEditor tags={tags} onChange={setTags} />
 

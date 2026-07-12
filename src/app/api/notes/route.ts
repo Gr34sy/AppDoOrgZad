@@ -5,6 +5,7 @@ import { connectDatabase } from "@/lib/mongoose";
 import { getCurrentUserId, unauthorizedResponse } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
 import { sanitizeNoteMutation } from "@/lib/note-mutations";
+import { areValidNoteLinks } from "@/lib/note-links";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { noteCreateSchema } from "@/lib/validation-schemas";
 import { Note } from "@/models/note";
@@ -46,6 +47,9 @@ export async function POST(request: NextRequest) {
   }
 
   await connectDatabase();
+  if (data.linkedItems && !(await areValidNoteLinks(data.linkedItems, ownerId))) {
+    return badRequestResponse("One or more linked items are invalid");
+  }
   const payload = sanitizeNoteMutation(data);
   const note = await Note.create({ ...payload, ownerId });
   await recordActivityEvent({ ownerId, entityType: "note", entityId: note.id, action: "created" });

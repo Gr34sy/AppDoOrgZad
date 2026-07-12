@@ -18,7 +18,10 @@ export const noteCreateSchema = z
   .object({
     title: z.string().trim().min(1).max(160),
     content: z.string().max(20000).optional(),
-    color: z.string().trim().max(40).optional(),
+    linkedItems: z.array(z.object({
+      targetType: z.enum(["note", "checklist", "task", "project"]),
+      targetId: z.string().trim().min(1).max(80)
+    }).strict()).max(100).optional(),
     tags: z.array(z.string().trim().min(1).max(60)).max(20).optional(),
     position: z.number().finite().optional()
   })
@@ -112,6 +115,7 @@ export const projectCreateSchema = z
     taskIds: z.array(objectIdStringSchema).max(200).optional(),
     newTasks: z.array(projectTaskCreateSchema).max(50).optional(),
     kanbanColumns: z.array(kanbanColumnSchema).min(1).max(12).optional(),
+    taskView: z.enum(["kanban", "list"]).optional(),
     position: z.number().finite().optional(),
     completedAt: optionalDateStringSchema.optional()
   })

@@ -4,13 +4,11 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Save, X } from "lucide-react";
 import { TagInputs } from "@/components/dashboard/tag-inputs";
-import { NoteColorInput } from "@/components/notes/note-color-input";
 
 type NoteEditFormProps = {
   noteId: string;
   initialTitle: string;
   initialContent: string;
-  initialColor: string;
   initialTags: string[];
   onCancel?: () => void;
   onSaved?: () => void;
@@ -20,7 +18,6 @@ export function NoteEditForm({
   noteId,
   initialTitle,
   initialContent,
-  initialColor,
   initialTags,
   onCancel,
   onSaved
@@ -30,8 +27,6 @@ export function NoteEditForm({
   const [message, setMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tags, setTags] = useState(initialTags.length ? initialTags : [""]);
-  const [colorMode, setColorMode] = useState(initialColor ? "hexadecimal" : "");
-  const [hexColor, setHexColor] = useState(initialColor);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,7 +37,6 @@ export function NoteEditForm({
     const formData = new FormData(event.currentTarget);
     const title = String(formData.get("title") ?? "").trim();
     const content = String(formData.get("content") ?? "");
-    const noteColor = colorMode === "hexadecimal" ? hexColor.trim() || "#fff7cc" : colorMode;
     const noteTags = tags
       .map((tag) => tag.trim())
       .filter(Boolean);
@@ -61,7 +55,6 @@ export function NoteEditForm({
       body: JSON.stringify({
         title,
         content,
-        color: noteColor,
         tags: noteTags
       })
     });
@@ -113,13 +106,6 @@ export function NoteEditForm({
           className="app-form-textarea min-h-72"
         />
       </div>
-
-      <NoteColorInput
-        colorMode={colorMode}
-        hexColor={hexColor}
-        onColorModeChange={setColorMode}
-        onHexColorChange={setHexColor}
-      />
 
       <TagInputs tags={tags} onChange={setTags} />
 

@@ -85,7 +85,6 @@ describe("/api/notes", () => {
       createJsonRequest({
         title: "Demo note",
         content: "Hello",
-        color: "turquoise",
         tags: ["work"]
       }) as never
     );
@@ -95,7 +94,6 @@ describe("/api/notes", () => {
     expect(Note.create).toHaveBeenCalledWith({
       title: "Demo note",
       content: "Hello",
-      color: "#5eead4",
       tags: ["work"],
       ownerId: "user-1"
     });
