@@ -7,6 +7,7 @@ import { TaskForm } from "@/components/tasks/task-form";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
 import { Checklist } from "@/models/checklist";
+import { Note } from "@/models/note";
 import { Project } from "@/models/project";
 
 type EntityOptionDocument = {
@@ -36,11 +37,15 @@ export default async function NewTaskPage({ searchParams }: NewTaskPageProps) {
   }
 
   await connectDatabase();
-  const [projects, checklists] = await Promise.all([
+  const [projects, checklists, notes] = await Promise.all([
     Project.find({ ownerId: session.user.id, archivedAt: null })
       .sort({ title: 1 })
       .lean<EntityOptionDocument[]>(),
     Checklist.find({ ownerId: session.user.id, archivedAt: null })
+      .sort({ title: 1 })
+      .lean<EntityOptionDocument[]>(),
+    Note.find({ ownerId: session.user.id, archivedAt: null })
+      .select({ title: 1 })
       .sort({ title: 1 })
       .lean<EntityOptionDocument[]>()
   ]);
@@ -79,6 +84,10 @@ export default async function NewTaskPage({ searchParams }: NewTaskPageProps) {
           checklistOptions={checklists.map((checklist) => ({
             id: String(checklist._id),
             title: checklist.title
+          }))}
+          noteOptions={notes.map((note) => ({
+            id: String(note._id),
+            title: note.title
           }))}
           initialProjectId={initialProjectId}
         />

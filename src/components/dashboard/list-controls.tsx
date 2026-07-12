@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ArrowDownUp, Filter, Search, SlidersHorizontal } from "lucide-react";
 import { defaultSortOptions } from "@/lib/list-query";
 import { SortDirectionButton } from "@/components/dashboard/sort-direction-button";
@@ -79,39 +79,144 @@ export function ListControls({
 }: ListControlsProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const config = controlConfig[entityType];
   const resolvedFilterOptions = filterOptions ?? config.filterOptions ?? [];
   const hasFilter = Boolean(config.filterName);
+  const [query, setQuery] = useState(searchValue);
+  const [selectedFilter, setSelectedFilter] = useState(filterValue);
+  const [selectedSort, setSelectedSort] = useState(sortValue);
   const [direction, setDirection] = useState<"asc" | "desc">(sortDirection);
+  const hasSearchSettled = useRef(false);
+
+  const navigateWithControls = useCallback(({
+    nextQuery,
+    nextFilter,
+    nextSort,
+    nextDirection,
+    replace
+  }: {
+    nextQuery: string;
+    nextFilter: string;
+    nextSort: string;
+    nextDirection: "asc" | "desc";
+    replace: boolean;
+  }) => {
+    const params = new URLSearchParams();
+    const trimmedQuery = nextQuery.trim();
+
+    if (trimmedQuery) {
+      params.set("q", trimmedQuery);
+    }
+
+    if (config.filterName && nextFilter) {
+      params.set(config.filterName, nextFilter);
+    }
+
+    if (nextSort && nextSort !== "updated") {
+      params.set("sort", nextSort);
+    }
+
+    if (nextDirection === "asc") {
+      params.set("direction", nextDirection);
+    }
+
+    const queryString = params.toString();
+    const nextHref = queryString ? `${pathname}?${queryString}` : pathname;
+    const currentQueryString = searchParams.toString();
+    const currentHref = currentQueryString ? `${pathname}?${currentQueryString}` : pathname;
+
+    if (nextHref === currentHref) {
+      return;
+    }
+
+    if (replace) {
+      router.replace(nextHref);
+      return;
+    }
+
+    router.push(nextHref);
+  }, [config.filterName, pathname, router, searchParams]);
+
+  useEffect(() => {
+    setQuery(searchValue);
+  }, [searchValue]);
+
+  useEffect(() => {
+    setSelectedFilter(filterValue);
+  }, [filterValue]);
+
+  useEffect(() => {
+    setSelectedSort(sortValue);
+  }, [sortValue]);
+
+  useEffect(() => {
+    setDirection(sortDirection);
+  }, [sortDirection]);
+
+  useEffect(() => {
+    if (!hasSearchSettled.current) {
+      hasSearchSettled.current = true;
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      navigateWithControls({
+        nextQuery: query,
+        nextFilter: selectedFilter,
+        nextSort: sortValue,
+        nextDirection: direction,
+        replace: true
+      });
+    }, 250);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [direction, navigateWithControls, query, selectedFilter, sortValue]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
-    const params = new URLSearchParams();
-    const query = getFormValue(formData, "q");
-    const selectedFilter = config.filterName ? getFormValue(formData, config.filterName) : "";
-    const selectedSort = getFormValue(formData, "sort");
-    const selectedDirection = getFormValue(formData, "direction");
+    navigateWithControls({
+      nextQuery: query,
+      nextFilter: selectedFilter,
+      nextSort: selectedSort,
+      nextDirection: direction,
+      replace: false
+    });
+  }
 
-    if (query) {
-      params.set("q", query);
-    }
+  function handleFilterChange(event: ChangeEvent<HTMLSelectElement>) {
+    const nextFilter = event.target.value;
 
-    if (config.filterName && selectedFilter) {
-      params.set(config.filterName, selectedFilter);
-    }
+    setSelectedFilter(nextFilter);
+    navigateWithControls({
+      nextQuery: query,
+      nextFilter,
+      nextSort: sortValue,
+      nextDirection: direction,
+      replace: true
+    });
+  }
 
-    if (selectedSort && selectedSort !== "updated") {
-      params.set("sort", selectedSort);
-    }
+  function toggleDirection() {
+    const nextDirection = direction === "asc" ? "desc" : "asc";
 
-    if (selectedDirection === "asc") {
-      params.set("direction", selectedDirection);
-    }
+    setDirection(nextDirection);
+    navigateWithControls({
+      nextQuery: query,
+      nextFilter: selectedFilter,
+      nextSort: sortValue,
+      nextDirection,
+      replace: true
+    });
+  }
 
-    const queryString = params.toString();
-    router.push(queryString ? `${pathname}?${queryString}` : pathname);
+  function clearControls() {
+    setQuery("");
+    setSelectedFilter("");
+    setSelectedSort("updated");
+    setDirection("desc");
+    router.push(clearHref);
   }
 
   return (
@@ -144,7 +249,8 @@ export function ListControls({
               id={`${entityType}-search`}
               name="q"
               type="search"
-              defaultValue={searchValue}
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
               placeholder="Search"
               className="h-11 w-full rounded-full border border-zinc-300 bg-white pl-11 pr-4 text-sm text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-700 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500 dark:focus:border-zinc-300 dark:focus:ring-white/10"
             />
@@ -159,7 +265,8 @@ export function ListControls({
             </span>
             <select
               name={config.filterName}
-              defaultValue={filterValue}
+              value={selectedFilter}
+              onChange={handleFilterChange}
               className="h-11 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition focus:border-[var(--app-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:bg-zinc-950"
             >
               <option value="">{config.filterPlaceholder ?? "all"}</option>
@@ -179,7 +286,8 @@ export function ListControls({
           </span>
           <select
             name="sort"
-            defaultValue={sortValue}
+            value={selectedSort}
+            onChange={(event) => setSelectedSort(event.target.value)}
             className="h-11 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition focus:border-[var(--app-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:bg-zinc-950"
           >
             {config.sortOptions.map((option) => (
@@ -193,7 +301,7 @@ export function ListControls({
         <input type="hidden" name="direction" value={direction} />
         <SortDirectionButton
           direction={direction}
-          onToggle={() => setDirection((current) => current === "asc" ? "desc" : "asc")}
+          onToggle={toggleDirection}
         />
 
         <button
@@ -205,7 +313,7 @@ export function ListControls({
         </button>
         <button
           type="button"
-          onClick={() => router.push(clearHref)}
+          onClick={clearControls}
           className="inline-flex h-11 items-center justify-center rounded-md border border-zinc-300 px-4 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
         >
           Clear
@@ -213,9 +321,4 @@ export function ListControls({
       </div>
     </form>
   );
-}
-
-function getFormValue(formData: FormData, name: string) {
-  const value = formData.get(name);
-  return typeof value === "string" ? value.trim() : "";
 }

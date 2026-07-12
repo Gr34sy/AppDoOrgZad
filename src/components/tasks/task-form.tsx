@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Save, X } from "lucide-react";
+import { Plus, Save, Trash2, X } from "lucide-react";
 import { FormShell } from "@/components/dashboard/form-shell";
 import { TagEditor } from "@/components/dashboard/tag-editor";
 
@@ -20,6 +20,7 @@ type TaskFormProps = {
   taskId?: string;
   projectOptions: EntityOption[];
   checklistOptions: EntityOption[];
+  noteOptions: EntityOption[];
   initialTitle?: string;
   initialDescription?: string;
   initialPriority?: string;
@@ -28,6 +29,7 @@ type TaskFormProps = {
   initialDueDate?: string;
   initialTags?: string[];
   initialChecklistIds?: string[];
+  initialNoteIds?: string[];
   onCancel?: () => void;
   onSaved?: () => void;
 };
@@ -39,6 +41,7 @@ export function TaskForm({
   taskId,
   projectOptions,
   checklistOptions,
+  noteOptions,
   initialTitle = "",
   initialDescription = "",
   initialPriority = "medium",
@@ -47,6 +50,7 @@ export function TaskForm({
   initialDueDate = "",
   initialTags = [],
   initialChecklistIds = [],
+  initialNoteIds = [],
   onCancel,
   onSaved
 }: TaskFormProps) {
@@ -56,6 +60,8 @@ export function TaskForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tags, setTags] = useState(initialTags.length ? initialTags : [""]);
   const [checklistIds, setChecklistIds] = useState(initialChecklistIds);
+  const [noteIds, setNoteIds] = useState(initialNoteIds);
+  const [newChecklistTitles, setNewChecklistTitles] = useState<string[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState(initialProjectId);
   const [selectedStatusId, setSelectedStatusId] = useState(initialStatusId);
   const selectedProject = useMemo(
@@ -67,6 +73,22 @@ export function TaskForm({
     [selectedProject]
   );
   const isProjectTask = Boolean(selectedProjectId);
+
+  function addNewChecklist() {
+    setNewChecklistTitles((currentTitles) => [...currentTitles, ""]);
+  }
+
+  function updateNewChecklist(index: number, title: string) {
+    setNewChecklistTitles((currentTitles) =>
+      currentTitles.map((currentTitle, titleIndex) => titleIndex === index ? title : currentTitle)
+    );
+  }
+
+  function removeNewChecklist(index: number) {
+    setNewChecklistTitles((currentTitles) =>
+      currentTitles.filter((_, titleIndex) => titleIndex !== index)
+    );
+  }
 
   useEffect(() => {
     if (
@@ -111,7 +133,11 @@ export function TaskForm({
         projectId: projectId || null,
         dueDate: dueDate ? new Date(`${dueDate}T00:00:00`).toISOString() : null,
         tags: tags.map((tag) => tag.trim()).filter(Boolean),
-        checklistIds
+        checklistIds,
+        newChecklists: newChecklistTitles
+          .map((checklistTitle) => ({ title: checklistTitle.trim() }))
+          .filter((checklist) => checklist.title),
+        noteIds
       })
     });
 
@@ -233,9 +259,19 @@ export function TaskForm({
       <TagEditor tags={tags} onChange={setTags} />
 
       <fieldset className="grid gap-3">
-        <legend className="app-form-legend">
-          Checklists
-        </legend>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <legend className="app-form-legend">
+            Checklists
+          </legend>
+          <button
+            type="button"
+            onClick={addNewChecklist}
+            className="app-form-secondary-button sm:w-auto"
+          >
+            <Plus aria-hidden="true" className="h-4 w-4" />
+            Add checklist
+          </button>
+        </div>
         {checklistOptions.length ? (
           <div className="grid gap-2 sm:grid-cols-2">
             {checklistOptions.map((checklist) => (
@@ -261,6 +297,64 @@ export function TaskForm({
           </div>
         ) : (
           <p className="text-sm text-zinc-500 dark:text-zinc-400">No checklists available.</p>
+        )}
+        {newChecklistTitles.length ? (
+          <div className="grid gap-2">
+            {newChecklistTitles.map((newChecklistTitle, index) => (
+              <div
+                key={index}
+                className="grid gap-2 rounded-md bg-zinc-50/80 p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end dark:bg-zinc-900/70"
+              >
+                <label className="app-form-field">
+                  <span className="app-form-label">New checklist title</span>
+                  <input
+                    type="text"
+                    value={newChecklistTitle}
+                    onChange={(event) => updateNewChecklist(index, event.target.value)}
+                    className="app-form-control"
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => removeNewChecklist(index)}
+                  className="app-form-icon-button w-full sm:w-11"
+                  aria-label="Remove new checklist"
+                  title="Remove checklist"
+                >
+                  <Trash2 aria-hidden="true" className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </fieldset>
+
+      <fieldset className="grid gap-3">
+        <legend className="app-form-legend">
+          Linked notes
+        </legend>
+        {noteOptions.length ? (
+          <div className="grid gap-2 sm:grid-cols-2">
+            {noteOptions.map((note) => (
+              <label key={note.id} className="app-form-checkbox-card">
+                <input
+                  type="checkbox"
+                  checked={noteIds.includes(note.id)}
+                  onChange={(event) => {
+                    setNoteIds((currentNoteIds) =>
+                      event.target.checked
+                        ? [...currentNoteIds, note.id]
+                        : currentNoteIds.filter((id) => id !== note.id)
+                    );
+                  }}
+                  className="app-form-checkbox"
+                />
+                <span className="min-w-0 break-words">{note.title}</span>
+              </label>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">No notes available.</p>
         )}
       </fieldset>
 

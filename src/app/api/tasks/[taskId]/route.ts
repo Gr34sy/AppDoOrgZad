@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose";
 import { badRequestResponse } from "@/lib/api-responses";
 import { parseJsonBody } from "@/lib/api-request";
+import { areValidNoteIds, syncEntityNoteLinks } from "@/lib/entity-note-links";
 import { connectDatabase } from "@/lib/mongoose";
 import {
   getCurrentUserId,
@@ -11,6 +12,7 @@ import {
 } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
 import { taskUpdateSchema } from "@/lib/validation-schemas";
+import { Checklist } from "@/models/checklist";
 import { Project } from "@/models/project";
 import { Task } from "@/models/task";
 
@@ -59,7 +61,8 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
   }
 
   await connectDatabase();
-  const payload = sanitizeMutation(data);
+  const { newChecklists, noteIds, ...taskData } = data;
+  const payload = sanitizeMutation(taskData);
   if (payload.projectId) {
     const projectExists = await Project.exists({
       _id: payload.projectId,
@@ -70,6 +73,10 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     if (!projectExists) {
       return badRequestResponse("Selected project does not exist.");
     }
+  }
+
+  if (noteIds?.length && !(await areValidNoteIds(noteIds, ownerId))) {
+    return badRequestResponse("One or more linked notes are invalid.");
   }
 
   const previousTask = await Task.findOne({
@@ -90,6 +97,34 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
   if (!task) {
     return notFoundResponse();
+  }
+
+  const createdChecklists = await Promise.all(
+    (newChecklists ?? []).map((checklist, index) =>
+      Checklist.create({
+        title: checklist.title,
+        ownerId,
+        parentType: "task",
+        parentId: task._id,
+        position: (task.checklistIds?.length ?? 0) + index
+      })
+    )
+  );
+
+  if (createdChecklists.length) {
+    await Task.updateOne(
+      { _id: task._id, ownerId, archivedAt: null },
+      { $addToSet: { checklistIds: { $each: createdChecklists.map((checklist) => checklist._id) } } }
+    );
+  }
+
+  if (noteIds) {
+    await syncEntityNoteLinks({
+      ownerId,
+      targetType: "task",
+      targetId: task.id,
+      noteIds
+    });
   }
 
   const previousProjectId = previousTask.projectId ? String(previousTask.projectId) : "";

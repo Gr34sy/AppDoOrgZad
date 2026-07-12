@@ -46,6 +46,10 @@ type ProjectDetails = {
 type EntityOptionDocument = {
   _id: unknown;
   title: string;
+  items?: Array<{
+    title: string;
+    isCompleted?: boolean;
+  }>;
 };
 
 type ProjectTask = {
@@ -127,7 +131,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           projectId={params.projectId}
           checklistOptions={checklists.map((checklist) => ({
             id: String(checklist._id),
-            title: checklist.title
+            title: checklist.title,
+            items: (checklist.items ?? []).map((item) => ({
+              title: item.title,
+              isCompleted: Boolean(item.isCompleted)
+            }))
           }))}
           title={project.title}
           description={project.description ?? ""}

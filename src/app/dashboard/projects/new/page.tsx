@@ -7,6 +7,7 @@ import { ProjectForm } from "@/components/projects/project-form";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
 import { Checklist } from "@/models/checklist";
+import { Note } from "@/models/note";
 
 type EntityOptionDocument = {
   _id: unknown;
@@ -21,9 +22,15 @@ export default async function NewProjectPage() {
   }
 
   await connectDatabase();
-  const checklists = await Checklist.find({ ownerId: session.user.id, archivedAt: null })
-    .sort({ title: 1 })
-    .lean<EntityOptionDocument[]>();
+  const [checklists, notes] = await Promise.all([
+    Checklist.find({ ownerId: session.user.id, archivedAt: null })
+      .sort({ title: 1 })
+      .lean<EntityOptionDocument[]>(),
+    Note.find({ ownerId: session.user.id, archivedAt: null })
+      .select({ title: 1 })
+      .sort({ title: 1 })
+      .lean<EntityOptionDocument[]>()
+  ]);
 
   return (
     <AppShell>
@@ -50,6 +57,10 @@ export default async function NewProjectPage() {
           checklistOptions={checklists.map((checklist) => ({
             id: String(checklist._id),
             title: checklist.title
+          }))}
+          noteOptions={notes.map((note) => ({
+            id: String(note._id),
+            title: note.title
           }))}
         />
       </section>

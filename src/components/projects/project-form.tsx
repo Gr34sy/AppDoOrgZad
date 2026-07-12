@@ -30,6 +30,7 @@ type ProjectFormProps = {
   mode: "create" | "edit";
   projectId?: string;
   checklistOptions: EntityOption[];
+  noteOptions: EntityOption[];
   initialTitle?: string;
   initialDescription?: string;
   initialPriority?: string;
@@ -37,6 +38,7 @@ type ProjectFormProps = {
   initialDueDate?: string;
   initialTags?: string[];
   initialChecklistIds?: string[];
+  initialNoteIds?: string[];
   initialKanbanColumns?: KanbanColumnInput[];
   onCancel?: () => void;
   onSaved?: () => void;
@@ -95,6 +97,7 @@ export function ProjectForm({
   mode,
   projectId,
   checklistOptions,
+  noteOptions,
   initialTitle = "",
   initialDescription = "",
   initialPriority = "medium",
@@ -102,6 +105,7 @@ export function ProjectForm({
   initialDueDate = "",
   initialTags = [],
   initialChecklistIds = [],
+  initialNoteIds = [],
   initialKanbanColumns = defaultKanbanColumns,
   onCancel,
   onSaved
@@ -112,10 +116,28 @@ export function ProjectForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [tags, setTags] = useState(initialTags.length ? initialTags : [""]);
   const [checklistIds, setChecklistIds] = useState(initialChecklistIds);
+  const [noteIds, setNoteIds] = useState(initialNoteIds);
+  const [newChecklistTitles, setNewChecklistTitles] = useState<string[]>([]);
   const [kanbanColumns, setKanbanColumns] = useState<KanbanColumnInput[]>(
     initialKanbanColumns.length ? initialKanbanColumns : defaultKanbanColumns
   );
   const [newTasks, setNewTasks] = useState<ProjectTaskInput[]>([]);
+
+  function addNewChecklist() {
+    setNewChecklistTitles((currentTitles) => [...currentTitles, ""]);
+  }
+
+  function updateNewChecklist(index: number, title: string) {
+    setNewChecklistTitles((currentTitles) =>
+      currentTitles.map((currentTitle, titleIndex) => titleIndex === index ? title : currentTitle)
+    );
+  }
+
+  function removeNewChecklist(index: number) {
+    setNewChecklistTitles((currentTitles) =>
+      currentTitles.filter((_, titleIndex) => titleIndex !== index)
+    );
+  }
 
   function updateKanbanColumn(index: number, column: KanbanColumnInput) {
     const previousColumnId = kanbanColumns[index]?.id;
@@ -231,6 +253,10 @@ export function ProjectForm({
         dueDate: dueDate ? new Date(`${dueDate}T00:00:00`).toISOString() : null,
         tags: tags.map((tag) => tag.trim()).filter(Boolean),
         checklistIds,
+        newChecklists: newChecklistTitles
+          .map((checklistTitle) => ({ title: checklistTitle.trim() }))
+          .filter((checklist) => checklist.title),
+        noteIds,
         newTasks: projectTasks,
         kanbanColumns: normalizedKanbanColumns
       })
@@ -331,9 +357,19 @@ export function ProjectForm({
       <TagEditor tags={tags} onChange={setTags} />
 
       <fieldset className="grid gap-3">
-        <legend className="app-form-legend">
-          Project checklists
-        </legend>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <legend className="app-form-legend">
+            Project checklists
+          </legend>
+          <button
+            type="button"
+            onClick={addNewChecklist}
+            className="app-form-secondary-button sm:w-auto"
+          >
+            <Plus aria-hidden="true" className="h-4 w-4" />
+            Add checklist
+          </button>
+        </div>
         {checklistOptions.length ? (
           <div className="grid gap-2 sm:grid-cols-2">
             {checklistOptions.map((checklist) => (
@@ -359,6 +395,64 @@ export function ProjectForm({
           </div>
         ) : (
           <p className="text-sm text-zinc-500 dark:text-zinc-400">No checklists available.</p>
+        )}
+        {newChecklistTitles.length ? (
+          <div className="grid gap-2">
+            {newChecklistTitles.map((newChecklistTitle, index) => (
+              <div
+                key={index}
+                className="grid gap-2 rounded-md bg-zinc-50/80 p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end dark:bg-zinc-900/70"
+              >
+                <label className="app-form-field">
+                  <span className={labelClass}>New checklist title</span>
+                  <input
+                    type="text"
+                    value={newChecklistTitle}
+                    onChange={(event) => updateNewChecklist(index, event.target.value)}
+                    className={inputClass}
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => removeNewChecklist(index)}
+                  className="app-form-icon-button w-full sm:w-11"
+                  aria-label="Remove new checklist"
+                  title="Remove checklist"
+                >
+                  <Trash2 aria-hidden="true" className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </fieldset>
+
+      <fieldset className="grid gap-3">
+        <legend className="app-form-legend">
+          Linked notes
+        </legend>
+        {noteOptions.length ? (
+          <div className="grid gap-2 sm:grid-cols-2">
+            {noteOptions.map((note) => (
+              <label key={note.id} className="app-form-checkbox-card">
+                <input
+                  type="checkbox"
+                  checked={noteIds.includes(note.id)}
+                  onChange={(event) => {
+                    setNoteIds((currentNoteIds) =>
+                      event.target.checked
+                        ? [...currentNoteIds, note.id]
+                        : currentNoteIds.filter((id) => id !== note.id)
+                    );
+                  }}
+                  className="app-form-checkbox"
+                />
+                <span className="min-w-0 break-words">{note.title}</span>
+              </label>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">No notes available.</p>
         )}
       </fieldset>
 

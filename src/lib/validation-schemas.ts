@@ -37,6 +37,11 @@ const objectIdStringSchema = z.string().trim().min(1).max(80);
 const optionalDateStringSchema = z.string().datetime().nullable();
 const prioritySchema = z.enum(["low", "medium", "high", "urgent"]);
 const lifecycleStatusSchema = z.enum(["active", "paused", "completed", "archived"]);
+const newChecklistSchema = z
+  .object({
+    title: z.string().trim().min(1).max(160)
+  })
+  .strict();
 
 export const checklistItemSchema = z
   .object({
@@ -72,6 +77,8 @@ export const taskCreateSchema = z
     dueDate: optionalDateStringSchema.optional(),
     tags: tagListSchema.optional(),
     checklistIds: z.array(objectIdStringSchema).max(100).optional(),
+    newChecklists: z.array(newChecklistSchema).max(50).optional(),
+    noteIds: z.array(objectIdStringSchema).max(100).optional(),
     position: z.number().finite().optional(),
     completedAt: optionalDateStringSchema.optional()
   })
@@ -112,6 +119,8 @@ export const projectCreateSchema = z
     dueDate: optionalDateStringSchema.optional(),
     tags: tagListSchema.optional(),
     checklistIds: z.array(objectIdStringSchema).max(100).optional(),
+    newChecklists: z.array(newChecklistSchema).max(50).optional(),
+    noteIds: z.array(objectIdStringSchema).max(100).optional(),
     taskIds: z.array(objectIdStringSchema).max(200).optional(),
     newTasks: z.array(projectTaskCreateSchema).max(50).optional(),
     kanbanColumns: z.array(kanbanColumnSchema).min(1).max(12).optional(),

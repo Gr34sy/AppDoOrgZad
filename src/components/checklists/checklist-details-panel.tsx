@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Edit2, ListChecks, Trash2 } from "lucide-react";
+import { Check, Edit2, ListChecks, Plus, Trash2 } from "lucide-react";
 import { DeleteEntityButton } from "@/components/dashboard/delete-entity-button";
 import { InlineEditableField } from "@/components/dashboard/inline-editable-field";
 import { PinEntityButton } from "@/components/dashboard/pin-entity-button";
@@ -22,6 +22,33 @@ type ChecklistDetailsPanelProps = {
   pinId?: string;
 };
 
+type ChecklistItem = ChecklistDetailsPanelProps["items"][number];
+
+type DraftChecklistItem = ChecklistItem & {
+  localId: string;
+  sourceIndex: number | null;
+};
+
+function createLocalId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function createDraftItems(items: ChecklistItem[]): DraftChecklistItem[] {
+  return items.map((item, index) => ({
+    ...item,
+    localId: `item-${item.position ?? index}-${index}`,
+    sourceIndex: index
+  }));
+}
+
+function getEditableItemSnapshot(items: Array<Pick<ChecklistItem, "title">>) {
+  return JSON.stringify(items.map((item) => ({ title: item.title })));
+}
+
 export function ChecklistDetailsPanel({
   checklistId,
   title,
@@ -32,35 +59,25 @@ export function ChecklistDetailsPanel({
 }: ChecklistDetailsPanelProps) {
   const router = useRouter();
   const [draftTitle, setDraftTitle] = useState(title);
-  const [draftItems, setDraftItems] = useState(items);
+  const [savedItems, setSavedItems] = useState(items);
+  const [draftItems, setDraftItems] = useState<DraftChecklistItem[]>(() => createDraftItems(items));
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
-  const itemSnapshot = JSON.stringify(
-    items.map((item) => ({
-      title: item.title,
-      isCompleted: item.isCompleted,
-      completedAt: item.completedAt ?? null
-    }))
-  );
-  const draftItemSnapshot = JSON.stringify(
-    draftItems.map((item) => ({
-      title: item.title,
-      isCompleted: item.isCompleted,
-      completedAt: item.completedAt ?? null
-    }))
-  );
+  const itemSnapshot = getEditableItemSnapshot(savedItems);
+  const draftItemSnapshot = getEditableItemSnapshot(draftItems);
   const isDirty = draftTitle.trim() !== title.trim() || draftItemSnapshot !== itemSnapshot;
 
   useEffect(() => {
     setDraftTitle(title);
-    setDraftItems(items);
+    setSavedItems(items);
+    setDraftItems(createDraftItems(items));
     setEditingItemIndex(null);
   }, [title, items]);
 
   function resetDrafts() {
     setDraftTitle(title);
-    setDraftItems(items);
+    setDraftItems(createDraftItems(savedItems));
     setEditingItemIndex(null);
     setError("");
   }
@@ -101,22 +118,78 @@ export function ChecklistDetailsPanel({
     router.refresh();
   }
 
-  function toggleItem(index: number) {
+  async function toggleItem(index: number) {
+    const targetItem = draftItems[index];
+
+    if (!targetItem) {
+      return;
+    }
+
+    const isCompleted = !targetItem.isCompleted;
+    const completedAt = isCompleted ? new Date().toISOString() : null;
+
     setDraftItems((currentItems) =>
       currentItems.map((item, itemIndex) => {
         if (itemIndex !== index) {
           return item;
         }
 
-        const isCompleted = !item.isCompleted;
-
         return {
           ...item,
           isCompleted,
-          completedAt: isCompleted ? new Date().toISOString() : null
+          completedAt
         };
       })
     );
+
+    if (targetItem.sourceIndex === null) {
+      return;
+    }
+
+    const nextSavedItems = savedItems.map((item, itemIndex) =>
+      itemIndex === targetItem.sourceIndex
+        ? {
+            ...item,
+            isCompleted,
+            completedAt
+          }
+        : item
+    );
+
+    setError("");
+    const response = await fetch(`/api/checklists/${checklistId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        title,
+        items: nextSavedItems.map((item, itemIndex) => ({
+          title: item.title.trim(),
+          isCompleted: item.isCompleted,
+          completedAt: item.completedAt ?? null,
+          position: itemIndex
+        }))
+      })
+    });
+
+    if (!response.ok) {
+      setDraftItems((currentItems) =>
+        currentItems.map((item, itemIndex) =>
+          itemIndex === index
+            ? {
+                ...item,
+                isCompleted: targetItem.isCompleted,
+                completedAt: targetItem.completedAt ?? null
+              }
+            : item
+        )
+      );
+      setError("Could not save checklist status.");
+      return;
+    }
+
+    setSavedItems(nextSavedItems);
   }
 
   function updateItemTitle(index: number, nextTitle: string) {
@@ -132,8 +205,26 @@ export function ChecklistDetailsPanel({
     setEditingItemIndex(null);
   }
 
+  function addItem() {
+    const newItem: DraftChecklistItem = {
+      localId: createLocalId(),
+      sourceIndex: null,
+      title: "",
+      isCompleted: false,
+      completedAt: null,
+      position: draftItems.length
+    };
+
+    setDraftItems((currentItems) => [...currentItems, newItem]);
+    setEditingItemIndex(draftItems.length);
+    setError("");
+  }
+
   function cancelItemEdit(index: number) {
-    const originalTitle = items[index]?.title ?? "";
+    const sourceIndex = draftItems[index]?.sourceIndex;
+    const originalTitle = sourceIndex === null || sourceIndex === undefined
+      ? ""
+      : savedItems[sourceIndex]?.title ?? "";
     setDraftItems((currentItems) =>
       currentItems.map((item, itemIndex) =>
         itemIndex === index ? { ...item, title: originalTitle } : item
@@ -216,7 +307,7 @@ export function ChecklistDetailsPanel({
           <ul className="mt-6 grid gap-1">
             {draftItems.map((item, index) => (
               <li
-                key={`${item.title}-${index}`}
+                key={item.localId}
                 className="group relative rounded-md text-sm text-zinc-700 transition [--app-checkbox-check-color:#fff] hover:bg-zinc-50 hover:[--app-checkbox-check-color:#fafafa] dark:text-zinc-200 dark:[--app-checkbox-check-color:#09090b] dark:hover:bg-zinc-900 dark:hover:[--app-checkbox-check-color:#18181b]"
               >
                 <div className="flex items-center gap-3 py-3 pl-3 pr-24">
@@ -270,6 +361,7 @@ export function ChecklistDetailsPanel({
                   {editingItemIndex === index ? (
                     <button
                       type="button"
+                      onMouseDown={(event) => event.preventDefault()}
                       onClick={() => removeItem(index)}
                       className="grid h-8 w-8 place-items-center rounded-md border border-red-200 text-red-600 transition hover:border-red-300 hover:bg-red-50 dark:border-red-500/30 dark:text-red-300 dark:hover:border-red-500/60 dark:hover:bg-red-500/10"
                       aria-label={`Remove ${item.title || "checklist entry"}`}
@@ -294,6 +386,15 @@ export function ChecklistDetailsPanel({
         ) : (
           <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">No checklist entries yet.</p>
         )}
+        <button
+          type="button"
+          onClick={addItem}
+          disabled={isSaving}
+          className="mt-4 inline-flex h-10 w-full items-center justify-center gap-2 rounded-md border border-dashed border-[var(--app-accent)]/50 px-3 text-sm font-medium text-[var(--app-accent)] transition hover:border-[var(--app-accent)] hover:bg-[var(--app-accent)]/5 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+        >
+          <Plus aria-hidden="true" className="h-4 w-4" />
+          Add item
+        </button>
       </div>
 
     </article>

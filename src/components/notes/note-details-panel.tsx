@@ -176,7 +176,7 @@ export function NoteDetailsPanel({
               onChange={setDraftTitle}
               required
               className="min-w-0 break-words p-1 text-2xl font-semibold tracking-normal sm:text-3xl"
-              inputClassName="w-full rounded-md border border-[var(--app-accent)] bg-white/80 px-2 py-1 text-2xl font-semibold outline-none ring-2 ring-[var(--app-accent)]/15 sm:text-3xl"
+              inputClassName="w-full rounded-md border border-[var(--app-accent)] bg-white/80 px-2 py-1 text-2xl font-semibold outline-none ring-2 ring-[var(--app-accent)]/15 sm:text-3xl dark:bg-zinc-900 dark:text-zinc-50"
             />
           </div>
           <div className="app-action-row">
@@ -285,7 +285,7 @@ export function NoteDetailsPanel({
           multiline
           emptyLabel="No content yet."
           className="mt-6 whitespace-pre-wrap p-1 text-sm leading-7 opacity-90"
-          inputClassName="mt-6 min-h-40 w-full rounded-md border border-[var(--app-accent)] bg-white/80 px-3 py-3 text-sm leading-7 outline-none ring-2 ring-[var(--app-accent)]/15"
+          inputClassName="mt-6 min-h-40 w-full rounded-md border border-[var(--app-accent)] bg-white/80 px-3 py-3 text-sm leading-7 outline-none ring-2 ring-[var(--app-accent)]/15 dark:bg-zinc-900 dark:text-zinc-50"
         />
 
         <section className="mt-8 border-t border-zinc-200 pt-5 dark:border-zinc-800">

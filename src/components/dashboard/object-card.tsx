@@ -74,7 +74,13 @@ export function ObjectCard({
               {previewItems.slice(0, 5).map((item, index) => (
                 <li key={`${item.title}-${index}`} className="flex min-w-0 items-center gap-2">
                   <span className={`h-2 w-2 shrink-0 rounded-full ${item.isCompleted ? "bg-emerald-500" : "bg-zinc-300 dark:bg-zinc-700"}`} />
-                  <span className={`truncate ${item.isCompleted ? "text-zinc-400 line-through dark:text-zinc-500" : ""}`}>
+                  <span
+                    className={`min-w-0 truncate ${
+                      item.isCompleted
+                        ? "text-zinc-400 line-through decoration-2 decoration-zinc-400 dark:text-zinc-500 dark:decoration-zinc-500"
+                        : ""
+                    }`}
+                  >
                     {item.title}
                   </span>
                 </li>

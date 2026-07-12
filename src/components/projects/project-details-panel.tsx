@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, CalendarClock, FolderKanban, Gauge, ListChecks, Plus, Tag, X } from "lucide-react";
+import { LinkedChecklistList, type LinkedChecklistOption } from "@/components/checklists/linked-checklist-list";
 import { DeleteEntityButton } from "@/components/dashboard/delete-entity-button";
 import { InlineEditableField } from "@/components/dashboard/inline-editable-field";
 import { PinEntityButton } from "@/components/dashboard/pin-entity-button";
@@ -11,6 +12,7 @@ import { SaveChangesButton } from "@/components/dashboard/save-changes-button";
 type EntityOption = {
   id: string;
   title: string;
+  items?: LinkedChecklistOption["items"];
 };
 
 type KanbanColumn = {
@@ -102,7 +104,6 @@ export function ProjectDetailsPanel({
   const [isTagEditorOpen, setIsTagEditorOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
-  void checklistOptions;
   void dueDate;
   void dueDateLabel;
   void kanbanColumns;
@@ -334,6 +335,12 @@ export function ProjectDetailsPanel({
           emptyLabel="No description yet."
           className="mt-6 whitespace-pre-wrap p-1 text-sm leading-7 text-zinc-700 dark:text-zinc-300"
           inputClassName="mt-6 min-h-32 w-full rounded-md border border-[var(--app-accent)] bg-white px-3 py-3 text-sm leading-7 text-zinc-950 outline-none ring-2 ring-[var(--app-accent)]/15 dark:bg-zinc-900 dark:text-zinc-50"
+        />
+
+        <LinkedChecklistList
+          checklistIds={checklistIds}
+          checklistOptions={checklistOptions}
+          className="mt-6"
         />
 
         {error ? <p className="mt-4 text-sm text-red-600 dark:text-red-300">{error}</p> : null}

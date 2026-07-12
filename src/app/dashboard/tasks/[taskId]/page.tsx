@@ -36,6 +36,10 @@ type TaskDetails = {
 type EntityOptionDocument = {
   _id: unknown;
   title: string;
+  items?: Array<{
+    title: string;
+    isCompleted?: boolean;
+  }>;
   kanbanColumns?: Array<{
     id: string;
     title: string;
@@ -109,7 +113,11 @@ export default async function TaskPage({ params }: TaskPageProps) {
           }))}
           checklistOptions={checklists.map((checklist) => ({
             id: String(checklist._id),
-            title: checklist.title
+            title: checklist.title,
+            items: (checklist.items ?? []).map((item) => ({
+              title: item.title,
+              isCompleted: Boolean(item.isCompleted)
+            }))
           }))}
           title={task.title}
           description={task.description ?? ""}
