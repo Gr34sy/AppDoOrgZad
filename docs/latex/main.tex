@@ -1,0 +1,121 @@
+\documentclass[12pt,a4paper]{report}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+\usepackage{hyperref}
+
+\geometry{
+  left=3.5cm,
+  right=2.5cm,
+  top=2.5cm,
+  bottom=2.5cm
+}
+
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0pt}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=black
+}
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  {\large Nazwa uczelni\par}
+  \vspace{1cm}
+  {\large Wydział\par}
+  \vspace{3cm}
+  {\Large\bfseries Projekt i implementacja aplikacji internetowej do organizacji zadań, notatek, checklist oraz projektów\par}
+  \vspace{2cm}
+  {\large Praca inżynierska\par}
+  \vfill
+  \begin{flushright}
+    Autor: Imię i nazwisko\\
+    Promotor: tytuł, imię i nazwisko
+  \end{flushright}
+  \vspace{2cm}
+  {\large Miejscowość, 2026\par}
+\end{titlepage}
+
+\tableofcontents
+\clearpage
+
+\chapter{Wstęp}
+
+Treść rozdziału wprowadzającego.
+
+\chapter{Analiza wymagań}
+
+Treść rozdziału dotyczącego analizy wymagań.
+
+\section{Historie użytkownika}
+
+Treść sekcji dotyczącej historii użytkownika.
+
+\section{Przypadki użycia}
+
+Treść sekcji dotyczącej przypadków użycia.
+
+\chapter{Projekt systemu}
+
+Treść rozdziału dotyczącego projektu systemu.
+
+\section{Kanban}
+
+Po przeanalizowaniu wcześniej wymienionych aplikacji wywnioskowano, że Kanban jest jednym z~kluczowych i~najważniejszych aspektów organizowania zadań. W~wielu narzędziach stanowi on centralny sposób prezentowania pracy, ponieważ pozwala szybko ocenić, na jakim etapie znajduje się dane zadanie oraz jakie działania wymagają jeszcze wykonania.
+
+Kanban jest metodą organizacji pracy opartą na wizualizacji zadań oraz ich aktualnego stanu. W~aplikacjach do zarządzania zadaniami przyjmuje najczęściej postać tablicy podzielonej na kolumny, które reprezentują kolejne etapy realizacji pracy. Poszczególne zadania są przedstawiane jako karty, a~ich przenoszenie pomiędzy kolumnami pokazuje postęp realizacji.
+
+Celem tablicy Kanban jest ułatwienie kontroli nad przepływem pracy. Użytkownik może szybko zobaczyć, które zadania dopiero czekają na rozpoczęcie, które są aktualnie wykonywane, które wymagają sprawdzenia, a~które zostały już ukończone. Takie przedstawienie danych jest czytelne i~dobrze sprawdza się zarówno przy pracy indywidualnej, jak i~zespołowej.
+
+Przykładowa tablica Kanban może wyglądać następująco:
+
+\begin{table}[H]
+  \centering
+  \caption{Przykładowa tablica Kanban}
+  \begin{tabular}{|p{3cm}|p{3cm}|p{3cm}|p{3cm}|p{3cm}|}
+    \hline
+    Backlog & To do & In progress & Testing & Done \\
+    \hline
+    Przygotowanie wymagań & Zaprojektowanie formularza taska & Implementacja widoku projektu & Testowanie zapisu checklisty & Konfiguracja logowania \\
+    \hline
+    Analiza podobnych aplikacji & Dodanie filtrów listy & Integracja notatek z~taskami & Sprawdzenie walidacji API & Utworzenie modelu użytkownika \\
+    \hline
+  \end{tabular}
+\end{table}
+
+Elementami przykładowej tablicy są kolumny, karty zadań oraz stany pracy. Kolumny oznaczają etapy, przez które przechodzą zadania, takie jak Backlog, To do, In progress, Testing oraz Done. Karty zadań reprezentują konkretne elementy pracy, na przykład implementację widoku projektu. Backlog przechowuje pomysły lub zadania, które nie zostały jeszcze zaplanowane do wykonania. Kolumna To do zawiera zadania wybrane do realizacji, ale jeszcze nierozpoczęte. In progress pokazuje zadania aktualnie wykonywane. Testing grupuje zadania wymagające sprawdzenia lub weryfikacji, natomiast Done zawiera zadania zakończone.
+
+W~kontekście tworzonej aplikacji tablica Kanban może być używana w~widoku projektu. Projekt posiada własne kolumny, a~powiązane z~nim taski mogą być przenoszone pomiędzy nimi. Dzięki temu użytkownik otrzymuje szybki podgląd stanu prac w~projekcie oraz może wygodnie zarządzać zadaniami bez konieczności przechodzenia przez wiele oddzielnych widoków.
+
+\chapter{Implementacja}
+
+Treść rozdziału dotyczącego implementacji aplikacji.
+
+\chapter{Testowanie}
+
+Treść rozdziału dotyczącego testowania aplikacji.
+
+\chapter{Podsumowanie}
+
+Treść podsumowania pracy.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
