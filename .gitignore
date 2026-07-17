@@ -12,5 +12,16 @@ pnpm-debug.log*
 .DS_Store
 tsconfig.tsbuildinfo
 
+# LaTeX build artifacts
+*.aux
+*.lof
+*.log
+*.lot
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
 # Local Node DNS workaround
 dns-fix.cjs
