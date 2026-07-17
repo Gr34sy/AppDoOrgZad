@@ -67,7 +67,7 @@
   name={Tabela}
 }
 
-\renewcommand{\footnotelayout}{\setstretch{1}\fontsize{10}{12}\selectfont}
+\renewcommand{\footnotelayout}{\setstretch{1}\fontsize{10}{12}\selectfont\setlength{\parindent}{0pt}}
 \renewcommand{\footnotesize}{\fontsize{10}{12}\selectfont}
 
 \pagestyle{fancy}
@@ -95,7 +95,7 @@
   \vspace*{50\p@}%
   {\parindent \z@ \raggedright \normalfont
     \interlinepenalty\@M
-    \Huge\bfseries #1\par\nobreak
+    \Huge\bfseries \thechapter.\ #1\par\nobreak
     \vskip 40\p@}}
 \def\@makeschapterhead#1{%
   \vspace*{50\p@}%
@@ -103,6 +103,13 @@
     \interlinepenalty\@M
     \Huge\bfseries #1\par\nobreak
     \vskip 40\p@}}
+\let\original@l@chapter\l@chapter
+\renewcommand*\l@chapter[2]{%
+  \begingroup
+  \let\original@numberline\numberline
+  \renewcommand{\numberline}[1]{\original@numberline{##1.}}%
+  \original@l@chapter{#1}{#2}%
+  \endgroup}
 \makeatother
 
 \newcommand{\universityfaculty}{Wydział Informatyki}
@@ -189,17 +196,30 @@ w projekcie zdecydowano się na zaadaptowanie najważniejszych funkcji z wcześn
 Strona internetowa powinna umożliwiać użytkownikom organizowanie pracy w sposób przejrzysty oraz intuicyjny, z wykorzystaniem funkcji takich jak na przykład przypinanie wybranych treści do widoku strony głównej. Istotnym założeniem projektu jest również zapewnienie bezpieczeństwa danych poprzez wdrożenie mechanizmów logowania, rejestracji oraz autoryzacji użytkowników.
 
 Do celów szczegółowych pracy należy zaprojektowanie graficznego wyglądu interfejsu użytkownika, opracowanie logiki aplikacji zarówno po stronie klienckiej, jak
-i serwerowej, zaprojektowanie struktury bazy danych oraz implementacja mechanizmów obsługi kont użytkowników. Projekt zakłada wykorzystanie współczesnych technologii webowych\footnote{Webowy - z języka angielskiego oznaczający dosłownie ``sieciowy''. Termin używany powszechnie jako synonim słowa ``internetowy''.}, umożliwiających budowę aplikacji działającej w architekturze klient--serwer, z rozdzieleniem warstwy prezentacji, logiki biznesowej\footnote{Logika biznesowa - to zbiór reguł i mechanizmów aplikacji, określających sposób przetwarzania danych oraz realizacji operacji zgodnie z wymaganiami systemu..} oraz przechowywania danych.
+i serwerowej, zaprojektowanie struktury bazy danych oraz implementacja mechanizmów obsługi kont użytkowników. Projekt zakłada wykorzystanie współczesnych technologii webowych\footnote{Webowy - z języka angielskiego oznaczający dosłownie ``sieciowy''. Termin używany powszechnie jako synonim słowa ``internetowy''.}, umożliwiających budowę aplikacji działającej w architekturze klient--serwer\footnote{Architektura klient-serwer - model działania systemu, w którym klient wysyła żądania, a serwer je przetwarza i zwraca odpowiedź.}, z rozdzieleniem warstwy prezentacji, logiki biznesowej\footnote{Logika biznesowa - zbiór reguł i mechanizmów aplikacji określających sposób przetwarzania danych oraz realizacji operacji zgodnie z wymaganiami systemu.} oraz przechowywania danych.
 
 Zakres realizowanych prac obejmuje analizę dostępnych na rynku rozwiązań, opis odpowiednich narzędzi programistycznych, przygotowanie widoków interfejsu użytkownika oraz przedstawienie implementacji kodu aplikacji. Zakres pracy nie obejmuje publikacji aplikacji w domenie publicznej ani jej komercyjnego wdrożenia.
 Rezultatem pracy jest funkcjonalna aplikacja internetowa, stanowiąca przykład zastosowania nowoczesnych technologii frontendowych i backendowych w praktycznej realizacji systemu wspierającego zarządzanie zadaniami.
-Cele szczegółowe niniejszej pracy obejmują zaprojektowanie graficznego wyglądu interfejsu użytkownika w sposób zapewniający intuicyjną obsługę, czytelność oraz estetykę; opracowanie logiki działania systemu zarówno po stronie klienckiej, odpowiedzialnej za interakcję z użytkownikiem, jak i po stronie serwerowej, realizującej logikę biznesową oraz komunikację z bazą danych. Praca zakłada również zaprojektowanie struktury bazy danych dostosowanej do przechowywania i przetwarzania informacji o użytkownikach, zadaniach oraz projektach. Istotnym celem jest także wdrożenie mechanizmów logowania, rejestracji oraz autoryzacji użytkowników, zapewniających bezpieczny dostęp do zasobów aplikacji.
+Cele szczegółowe niniejszej pracy obejmują:
+
+\begin{itemize}
+\item
+  zaprojektowanie graficznego wyglądu interfejsu użytkownika w sposób zapewniający intuicyjną obsługę, czytelność oraz estetykę,
+\item
+  opracowanie logiki działania systemu po stronie klienckiej, odpowiedzialnej za interakcję z użytkownikiem,
+\item
+  opracowanie logiki działania systemu po stronie serwerowej, realizującej logikę biznesową oraz komunikację z bazą danych,
+\item
+  zaprojektowanie struktury bazy danych dostosowanej do przechowywania i przetwarzania informacji o użytkownikach, zadaniach oraz projektach,
+\item
+  wdrożenie mechanizmów logowania, rejestracji oraz autoryzacji użytkowników, zapewniających bezpieczny dostęp do zasobów aplikacji.
+\end{itemize}
 
 \section*{Streszczenie rozdziałów}
 
-Rozdział pierwszy przedstawia analizę wymagań projektowanej aplikacji. Omówiono w nim potrzeby użytkownika indywidualnego, porównano podobne narzędzia do organizacji zadań oraz wskazano wymagania funkcjonalne i niefunkcjonalne systemu. W rozdziale opisano również historie użytkownika oraz podstawy metody Kanban, która została wykorzystana jako jeden ze sposobów organizacji zadań w projektach.
+Rozdział pierwszy przedstawia analizę wymagań projektowanej aplikacji. Omówiono w nim potrzeby użytkownika indywidualnego, porównano podobne narzędzia do organizacji zadań oraz wskazano wymagania funkcjonalne i niefunkcjonalne systemu. W rozdziale opisano również historie użytkownika oraz podstawy metody kanban\footnote{Kanban - metoda wizualnego zarządzania pracą, w której zadania przedstawiane są na tablicy podzielonej na etapy realizacji.}, która została wykorzystana jako jeden ze sposobów organizacji zadań w projektach.
 
-Rozdział drugi dotyczy technologii frontendowych zastosowanych podczas realizacji aplikacji. Przedstawiono w nim rolę języków HTML, CSS i JavaScript, a także opisano wykorzystanie biblioteki React, mechanizmu React Hooks, frameworka TailwindCSS oraz języka TypeScript. Rozdział ten wyjaśnia, w jaki sposób wskazane technologie wspierają budowę interaktywnego i responsywnego interfejsu użytkownika.
+Rozdział drugi dotyczy technologii frontendowych zastosowanych podczas realizacji aplikacji. Przedstawiono w nim rolę języków HTML, CSS i JavaScript\footnote{JavaScript - język programowania wykorzystywany do tworzenia interaktywnych elementów stron internetowych.}, a także opisano wykorzystanie biblioteki React, mechanizmu React Hooks, frameworka TailwindCSS oraz języka TypeScript. Rozdział ten wyjaśnia, w jaki sposób wskazane technologie wspierają budowę interaktywnego i responsywnego interfejsu użytkownika.
 
 Rozdział trzeci opisuje technologie backendowe oraz mechanizmy odpowiedzialne za działanie aplikacji po stronie serwera. Szczególną uwagę poświęcono frameworkowi NextJS, routingowi, generowaniu zawartości strony, obsłudze endpointów API oraz procesom autoryzacji i autentykacji użytkowników.
 
@@ -210,7 +230,7 @@ Rozdział piąty zawiera opis architektury systemu. Przedstawiono w nim podział
 Rozdział szósty prezentuje projekt interfejsu użytkownika oraz scenariusze przypadków użycia. Opisano w nim sposób korzystania z głównych funkcji systemu, takich jak obsługa konta użytkownika, praca z notatkami, checklistami, zadaniami i projektami oraz wykorzystanie widoku kanban.
 
 
-Rozdział siódmy opisuje wybrane elementy implementacji kodu frontendowego. Skupiono się w nim na realizacji widoku Kanban oraz sekcji przypiętych elementów dashboardu, ponieważ są to części aplikacji istotne dla codziennej pracy użytkownika oraz wygody korzystania z aplikacji.
+Rozdział siódmy opisuje wybrane elementy implementacji kodu frontendowego. Skupiono się w nim na realizacji widoku kanban oraz sekcji przypiętych elementów dashboardu, ponieważ są to części aplikacji istotne dla codziennej pracy użytkownika oraz wygody korzystania z aplikacji.
 
 \chapter{Analiza wymagań}
 
@@ -284,17 +304,17 @@ z informacją odnośnie przebiegu dostawy oraz ilości palet zwróconych przez r
 
 Na podstawie powyższych historii użytkownika opracowano szczegółowe scenariusze przypadków użycia, opisujące sposób interakcji użytkownika z systemem w konkretnych sytuacjach. Znajdują się one w szóstym rozdziale pracy.
 
-\section{Kanban}
+\section{kanban}
 
 Kanban jest metodą organizacji pracy opartą na wizualnym przedstawianiu zadań oraz etapów ich realizacji. W aplikacjach do zarządzania zadaniami przyjmuje najczęściej postać tablicy podzielonej na kolumny, które odpowiadają kolejnym stanom pracy. Zadania są przedstawiane jako karty, a ich przenoszenie pomiędzy kolumnami pozwala szybko ocenić, które elementy są dopiero planowane, które są aktualnie wykonywane, a które zostały już zakończone.
 
-Zaletą tablicy Kanban jest jej prostota. Użytkownik nie musi analizować długiej listy zadań ani otwierać każdego elementu osobno, aby sprawdzić postęp pracy. Wystarczy spojrzeć na układ kart w kolumnach. Dzięki temu metoda dobrze sprawdza się zarówno w pracy zespołowej, jak i w pracy indywidualnej, na przykład podczas planowania projektu, nauki, pisania pracy dyplomowej lub organizowania obowiązków domowych.
+Zaletą tablicy kanban jest jej prostota. Użytkownik nie musi analizować długiej listy zadań ani otwierać każdego elementu osobno, aby sprawdzić postęp pracy. Wystarczy spojrzeć na układ kart w kolumnach. Dzięki temu metoda dobrze sprawdza się zarówno w pracy zespołowej, jak i w pracy indywidualnej, na przykład podczas planowania projektu, nauki, pisania pracy dyplomowej lub organizowania obowiązków domowych.
 
-Przykładowa tablica Kanban może wyglądać następująco:
+Przykładowa tablica kanban może wyglądać następująco:
 
 \begin{table}[H]
   \centering
-  \caption{Przykładowa tablica Kanban}
+  \caption{Przykładowa tablica kanban}
   \begin{tabular}{|>{\raggedright\arraybackslash}p{2.55cm}|>{\raggedright\arraybackslash}p{2.55cm}|>{\raggedright\arraybackslash}p{2.55cm}|>{\raggedright\arraybackslash}p{2.55cm}|>{\raggedright\arraybackslash}p{2.55cm}|}
     \hline
     \textbf{Backlog} & \textbf{Do zrobienia} & \textbf{W trakcie} & \textbf{Testowanie} & \textbf{Zrobione} \\
@@ -308,13 +328,13 @@ Przykładowa tablica Kanban może wyglądać następująco:
 
 Kolumna \textit{Backlog} przechowuje pomysły lub zadania, które nie zostały jeszcze wybrane do realizacji. Kolumna \textit{Do zrobienia} zawiera elementy zaplanowane jako najbliższe prace. Kolumna \textit{W trakcie} pokazuje zadania aktualnie wykonywane, natomiast \textit{Testowanie} grupuje elementy wymagające sprawdzenia przed uznaniem ich za ukończone. Ostatnia kolumna, \textit{Zrobione}, zawiera zadania zakończone.
 
-W projektowanej aplikacji tablica Kanban może zostać wykorzystana przede wszystkim w widoku projektu. Projekt zawiera własne kolumny, a powiązane z nim zadania mogą być przenoszone pomiędzy nimi. Takie rozwiązanie ułatwia kontrolowanie postępu pracy i pozwala użytkownikowi szybko zobaczyć, które zadania wymagają jeszcze uwagi.
+W projektowanej aplikacji tablica kanban może zostać wykorzystana przede wszystkim w widoku projektu. Projekt zawiera własne kolumny, a powiązane z nim zadania mogą być przenoszone pomiędzy nimi. Takie rozwiązanie ułatwia kontrolowanie postępu pracy i pozwala użytkownikowi szybko zobaczyć, które zadania wymagają jeszcze uwagi.
 
 \section{Najważniejsze funkcje aplikacji}
 
 Wymagania funkcjonalne i niefunkcjonalne stanowią podstawę do opracowania architektury aplikacji, zaprojektowania interfejsu użytkownika oraz implementacji poszczególnych modułów.
 Podstawową funkcjonalnością systemu jest umożliwienie użytkownikowi kompleksowego zarządzania elementami organizacyjnymi, którymi są checklisty, notatki, taski oraz projekty. Aplikacja wspiera pełen zestaw operacji CRUD\footnote{CRUD (z jęz. ang. Create, Read, Update, Delete) - zestaw podstawowych operacji wykonywanych na danych w systemach informatycznych, obejmujący ich tworzenie, odczyt, modyfikację oraz usuwanie.}, co pozwala na swobodne dodawanie elementów, ich edycję oraz usuwanie w zależności od potrzeb użytkownika.
-Istotnym elementem systemu jest możliwość prezentacji projektów w formie tablicy kanban\footnote{Kanban - metoda wizualnego zarządzania pracą wywodząca się z metodyk zwinnych, polegająca na przedstawieniu zadań w formie tablicy z kolumnami reprezentującymi etapy realizacji.}. Rozwiązanie to pozwala na wizualne przedstawienie stanu realizacji zadań poprzez podział na kolumny, odpowiadające poszczególnym etapom pracy
+Istotnym elementem systemu jest możliwość prezentacji projektów w formie tablicy kanban. Rozwiązanie to pozwala na wizualne przedstawienie stanu realizacji zadań poprzez podział na kolumny, odpowiadające poszczególnym etapom pracy
 (np. „w trakcie'', „do zmiany'', „zakończone'', „testowane''). Użytkownik może samodzielnie definiować statusy oraz przenosić zadania pomiędzy kolumnami, co wspiera przejrzyste planowanie i monitorowanie postępów.
 Dodatkowo aplikacja udostępnia panel strony głównej (tzw.dashboard), na którym wyświetlane są przypięte przez użytkownika elementy aplikacji, takie jak na przykłąd checklisty. Funkcja ta umożliwia szybki dostęp do najważniejszych informacji bez konieczności przeszukiwania całej aplikacji. System pozwala także na wzbogacanie zadań i projektów o dodatkowe dane, takie jak opis, tagi tematyczne, poziom priorytetu czy przewidywany czas realizacji. Dzięki temu użytkownik może lepiej organizować pracę, filtrować elementy oraz ustalać kolejność wykonywania obowiązków. 
 Oprócz funkcjonalności biznesowych istotne znaczenie mają również aspekty jakościowe systemu. Aplikacja umożliwia personalizację poprzez zmianę motywów kolorystycznych oraz przełączanie interfejsu na tryb nocny, co zwiększa komfort użytkowania w różnych warunkach oświetleniowych. Interfejs powinien być minimalistyczny, intuicyjny oraz estetyczny, aby zapewnić łatwość obsługi nawet dla nowych użytkowników.
@@ -337,7 +357,7 @@ Frontend\footnote{Frontend - termin pochodzący z języka angielskiego, będący
   Responsywność - automatyczne dostosowywanie się aplikacji do różnych wielkości ekranu
 \end{enumerate}
 
-Fundamentalne narzędzia używane do tworzenia frontendu to HTML\footnote{HTML - z jęz. ang. Hypertext Markup Language, czyli ``hipertekstowy język znaczników''.}, CSS\footnote{CSS - z jęz. ang. Cascading Style Sheets, oznaczające ``kaskadujące arkusze stylów''.} oraz JavaScript\textbf{.} HTML to język znaczników, odpowiadający za strukturę strony internetowej. Określa on semantyczny układ treści, takich jak nagłówki, akapity, listy, obrazy czy formularze. HTML stanowi szkielet warstwy frontendowej aplikacji webowej, będąc interpretowanym przez przeglądarkę w celu prezentacji treści użytkownikowi. Odpowiednie ustawienie Poprawne i semantyczne rozmieszczenie znaczników HTML ma kluczowe znaczenie dla dostępności cyfrowej, ponieważ umożliwia prawidłową interpretację treści przez czytniki ekranu wykorzystywane przez osoby
+Fundamentalne narzędzia używane do tworzenia frontendu to HTML\footnote{HTML - z jęz. ang. Hypertext Markup Language, czyli ``hipertekstowy język znaczników''.}, CSS\footnote{CSS - z jęz. ang. Cascading Style Sheets, oznaczające ``kaskadujące arkusze stylów''.} oraz JavaScript. HTML to język znaczników, odpowiadający za strukturę strony internetowej. Określa on semantyczny układ treści, takich jak nagłówki, akapity, listy, obrazy czy formularze. HTML stanowi szkielet warstwy frontendowej aplikacji webowej, będąc interpretowanym przez przeglądarkę w celu prezentacji treści użytkownikowi. Odpowiednie ustawienie Poprawne i semantyczne rozmieszczenie znaczników HTML ma kluczowe znaczenie dla dostępności cyfrowej, ponieważ umożliwia prawidłową interpretację treści przez czytniki ekranu wykorzystywane przez osoby
 z niepełnosprawnościami wzroku.
 
 \textbf{CSS} jest językiem służącym do definiowania warstwy prezentacji stron internetowych. Odpowiada za wygląd i układ elementów HTML, w tym kolory, czcionki, odstępy, pozycjonowanie oraz animacje. Dzięki określonemu mechanizmowi dziedziczenia, CSS umożliwia spójne oraz elastyczne zarządzanie stylem w obrębie całej aplikacji webowej, a jego poprawne zastosowanie wspiera czytelność interfejsu oraz dostępność treści dla użytkowników.
@@ -700,9 +720,9 @@ Główne dane aplikacji zostały podzielone na kolekcje \texttt{notes}, \texttt{
 
 Checklisty są przechowywane w kolekcji \texttt{checklists}. Każda checklista posiada tytuł, pozycję, opcjonalne powiązanie z rodzicem oraz tablicę elementów. Elementy checklisty zostały osadzone bezpośrednio w dokumencie checklisty, ponieważ są odczytywane i aktualizowane razem z nią. Pojedynczy element zawiera nazwę, informację o ukończeniu, datę ukończenia oraz pozycję. Checklista może funkcjonować samodzielnie albo być powiązana z zadaniem lub projektem przez pola \texttt{parentType} i \texttt{parentId}.
 
-Zadania są zapisywane w kolekcji \texttt{tasks}. Dokument zadania zawiera tytuł, opis, priorytet, status, termin wykonania, tagi, pozycję, datę ukończenia oraz datę archiwizacji. Zadanie może być samodzielnym elementem listy zadań albo częścią projektu. W drugim przypadku pole \texttt{projectId} wskazuje projekt, do którego należy zadanie. Status zadania jest przechowywany w polu \texttt{statusId}; w widoku tablicy Kanban odpowiada on identyfikatorowi jednej z kolumn projektu. Zadanie może mieć również powiązane checklisty, których identyfikatory są przechowywane w tablicy \texttt{checklistIds}.
+Zadania są zapisywane w kolekcji \texttt{tasks}. Dokument zadania zawiera tytuł, opis, priorytet, status, termin wykonania, tagi, pozycję, datę ukończenia oraz datę archiwizacji. Zadanie może być samodzielnym elementem listy zadań albo częścią projektu. W drugim przypadku pole \texttt{projectId} wskazuje projekt, do którego należy zadanie. Status zadania jest przechowywany w polu \texttt{statusId}; w widoku tablicy kanban odpowiada on identyfikatorowi jednej z kolumn projektu. Zadanie może mieć również powiązane checklisty, których identyfikatory są przechowywane w tablicy \texttt{checklistIds}.
 
-Projekty są przechowywane w kolekcji \texttt{projects}. Dokument projektu zawiera tytuł, opis, priorytet, status cyklu życia, termin, tagi, pozycję, listę zadań, listę checklist oraz konfigurację widoku zadań. W projekcie przechowywana jest tablica \texttt{kanbanColumns}, opisująca kolumny tablicy Kanban. Każda kolumna ma identyfikator, nazwę, kolor, pozycję oraz informację, czy oznacza stan zakończony. Domyślny zestaw kolumn obejmuje \texttt{backlog}, \texttt{todo}, \texttt{in\_progress}, \texttt{testing} oraz \texttt{done}. Pole \texttt{taskView} określa, czy zadania projektu są prezentowane jako lista, czy jako tablica Kanban.
+Projekty są przechowywane w kolekcji \texttt{projects}. Dokument projektu zawiera tytuł, opis, priorytet, status cyklu życia, termin, tagi, pozycję, listę zadań, listę checklist oraz konfigurację widoku zadań. W projekcie przechowywana jest tablica \texttt{kanbanColumns}, opisująca kolumny tablicy kanban. Każda kolumna ma identyfikator, nazwę, kolor, pozycję oraz informację, czy oznacza stan zakończony. Domyślny zestaw kolumn obejmuje \texttt{backlog}, \texttt{todo}, \texttt{in\_progress}, \texttt{testing} oraz \texttt{done}. Pole \texttt{taskView} określa, czy zadania projektu są prezentowane jako lista, czy jako tablica kanban.
 
 Relacja pomiędzy projektami i zadaniami jest utrzymywana dwukierunkowo na poziomie aplikacji. Główne powiązanie znajduje się w zadaniu, w polu \texttt{projectId}. Projekt przechowuje dodatkowo tablicę \texttt{taskIds}, która zawiera identyfikatory powiązanych zadań. Podczas tworzenia zadania z przypisanym projektem backend sprawdza, czy projekt istnieje, nie jest zarchiwizowany i należy do aktualnego użytkownika. Następnie identyfikator zadania jest dopisywany do projektu. Przy zmianie projektu lub archiwizacji zadania identyfikator jest usuwany ze starego projektu.
 
@@ -733,7 +753,7 @@ Najważniejsze relacje logiczne w bazie danych można przedstawić następująco
 
 W bazie zastosowano indeksy wspierające najczęstsze operacje aplikacji. Większość kolekcji posiada indeks po polu właściciela, co przyspiesza pobieranie danych aktualnego użytkownika. Dodatkowe indeksy obejmują między innymi pozycję sortowania, tagi, termin wykonania, priorytet, status zadania oraz pola wykorzystywane do przypięć. Dzięki temu aplikacja może sprawnie filtrować zadania i projekty, sortować elementy dashboardu oraz szybko sprawdzać, czy dany element został już przypięty.
 
-Usuwanie większości elementów domenowych zostało zrealizowane jako archiwizacja. Zadania, projekty i checklisty otrzymują wartość w polu \texttt{archivedAt}, a zapytania listujące pobierają wyłącznie dokumenty aktywne. W przypadku projektu podczas archiwizacji ustawiany jest również status cyklu życia \texttt{archived}. Takie podejście pozwala zachować spójność powiązań i historię zmian bez fizycznego usuwania dokumentów. Model dokumentowy MongoDB jest w tym projekcie uzasadniony, ponieważ dane mają strukturę elastyczną, a część informacji, takich jak elementy checklisty i kolumny Kanban, jest naturalnie powiązana z dokumentem nadrzędnym i może być przechowywana bezpośrednio w jego strukturze.
+Usuwanie większości elementów domenowych zostało zrealizowane jako archiwizacja. Zadania, projekty i checklisty otrzymują wartość w polu \texttt{archivedAt}, a zapytania listujące pobierają wyłącznie dokumenty aktywne. W przypadku projektu podczas archiwizacji ustawiany jest również status cyklu życia \texttt{archived}. Takie podejście pozwala zachować spójność powiązań i historię zmian bez fizycznego usuwania dokumentów. Model dokumentowy MongoDB jest w tym projekcie uzasadniony, ponieważ dane mają strukturę elastyczną, a część informacji, takich jak elementy checklisty i kolumny kanban, jest naturalnie powiązana z dokumentem nadrzędnym i może być przechowywana bezpośrednio w jego strukturze.
 
 \chapter{Projekt interfejsu użytkownika}
 
@@ -1015,13 +1035,13 @@ a system może wyświetlać taski zarówno w formie listy jak i tablicy
 
 \chapter{Implementacja kodu frontendowego}
 
-W niniejszym rozdziale opisano wybrane elementy implementacji warstwy frontendowej aplikacji. Skupiono się na dwóch częściach systemu, które mają szczególne znaczenie dla ergonomii pracy użytkownika: widoku Kanban w projekcie oraz sekcji przypiętych elementów na dashboardzie. Oba fragmenty zostały zaimplementowane jako komponenty React działające w środowisku Next.js i komunikujące się z backendem za pomocą endpointów API.
+W niniejszym rozdziale opisano wybrane elementy implementacji warstwy frontendowej aplikacji. Skupiono się na dwóch częściach systemu, które mają szczególne znaczenie dla ergonomii pracy użytkownika: widoku kanban w projekcie oraz sekcji przypiętych elementów na dashboardzie. Oba fragmenty zostały zaimplementowane jako komponenty React działające w środowisku Next.js i komunikujące się z backendem za pomocą endpointów API.
 
-\section{Implementacja widoku Kanban}
+\section{Implementacja widoku kanban}
 
-Widok Kanban został zaimplementowany głównie w komponencie \texttt{ProjectKanbanBoard}, znajdującym się w pliku \texttt{project-kanban-board.tsx}. Komponent ten odpowiada za wyświetlanie tablicy projektu, kolumn statusów oraz kart zadań. Dane wejściowe przekazywane do komponentu obejmują identyfikator projektu, listę kolumn oraz listę zadań. Dzięki temu komponent nie pobiera danych samodzielnie, lecz otrzymuje je z warstwy strony projektu, co upraszcza jego odpowiedzialność i pozwala wykorzystać renderowanie po stronie serwera dla początkowego stanu widoku.
+Widok kanban został zaimplementowany głównie w komponencie \texttt{ProjectKanbanBoard}, znajdującym się w pliku \texttt{project-kanban-board.tsx}. Komponent ten odpowiada za wyświetlanie tablicy projektu, kolumn statusów oraz kart zadań. Dane wejściowe przekazywane do komponentu obejmują identyfikator projektu, listę kolumn oraz listę zadań. Dzięki temu komponent nie pobiera danych samodzielnie, lecz otrzymuje je z warstwy strony projektu, co upraszcza jego odpowiedzialność i pozwala wykorzystać renderowanie po stronie serwera dla początkowego stanu widoku.
 
-Każda kolumna Kanban jest reprezentowana przez obiekt zawierający identyfikator, nazwę, kolor oraz informację, czy dana kolumna oznacza zadanie zakończone. Zadanie zawiera między innymi identyfikator, tytuł, opis, priorytet, aktualny status, pozycję, termin oraz tagi. Relacja pomiędzy zadaniem i kolumną jest realizowana przez pole \texttt{statusId}. Jeżeli \texttt{statusId} zadania jest równe identyfikatorowi kolumny, karta zadania zostaje wyrenderowana właśnie w tej kolumnie.
+Każda kolumna kanban jest reprezentowana przez obiekt zawierający identyfikator, nazwę, kolor oraz informację, czy dana kolumna oznacza zadanie zakończone. Zadanie zawiera między innymi identyfikator, tytuł, opis, priorytet, aktualny status, pozycję, termin oraz tagi. Relacja pomiędzy zadaniem i kolumną jest realizowana przez pole \texttt{statusId}. Jeżeli \texttt{statusId} zadania jest równe identyfikatorowi kolumny, karta zadania zostaje wyrenderowana właśnie w tej kolumnie.
 
 Komponent utrzymuje lokalny stan tablicy za pomocą hooków \texttt{useState}. W stanie przechowywane są między innymi aktualne zadania, kolumny, identyfikator przenoszonego zadania, informacja o aktywnej kolumnie upuszczania oraz dane edytowanej kolumny. Dodatkowo zastosowano \texttt{useEffect}, aby synchronizować lokalny stan komponentu z danymi przekazanymi przez stronę projektu. Dzięki temu po odświeżeniu danych przez router widok zostaje zaktualizowany zgodnie ze stanem zapisanym w bazie.
 
@@ -1033,9 +1053,9 @@ Za właściwą zmianę statusu odpowiada funkcja \texttt{moveTask}. Po wybraniu 
 
 Istotnym elementem implementacji jest również edycja kolumn. Użytkownik może kliknąć nagłówek kolumny, zmienić jej nazwę, kolor oraz oznaczyć ją jako kolumnę końcową. Po zapisaniu zmian komponent wysyła żądanie \texttt{PATCH} do endpointu \texttt{/api/projects/\{projectId\}}, przekazując zaktualizowaną tablicę \texttt{kanbanColumns}. Każda kolumna otrzymuje także pozycję wynikającą z kolejności w tablicy. Po poprawnym zapisie wykonywane jest \texttt{router.refresh()}, co odświeża dane projektu.
 
-Widok Kanban jest osadzony w komponencie \texttt{ProjectTaskView}. Ten komponent pozwala przełączać sposób prezentacji zadań między widokiem \texttt{kanban} i widokiem \texttt{list}. Wybrany tryb jest zapisywany w projekcie przez żądanie \texttt{PATCH} do endpointu projektu, w polu \texttt{taskView}. Dzięki temu wybór użytkownika nie jest wyłącznie stanem tymczasowym w przeglądarce, ale częścią konfiguracji projektu przechowywaną w bazie danych. Dodatkowo dla tablicy Kanban dostępny jest tryb rozszerzony, który wyświetla tablicę na całym ekranie i ułatwia pracę z większą liczbą zadań.
+Widok kanban jest osadzony w komponencie \texttt{ProjectTaskView}. Ten komponent pozwala przełączać sposób prezentacji zadań między widokiem \texttt{kanban} i widokiem \texttt{list}. Wybrany tryb jest zapisywany w projekcie przez żądanie \texttt{PATCH} do endpointu projektu, w polu \texttt{taskView}. Dzięki temu wybór użytkownika nie jest wyłącznie stanem tymczasowym w przeglądarce, ale częścią konfiguracji projektu przechowywaną w bazie danych. Dodatkowo dla tablicy kanban dostępny jest tryb rozszerzony, który wyświetla tablicę na całym ekranie i ułatwia pracę z większą liczbą zadań.
 
-Karty zadań w widoku Kanban zawierają najważniejsze informacje potrzebne do szybkiej oceny pracy: tytuł, skrócony opis, priorytet, termin oraz tagi. Priorytety są wyróżnione kolorami, a termin jest prezentowany razem z ikoną kalendarza. Każda karta jest linkiem do szczegółów zadania, dzięki czemu użytkownik może szybko przejść z ogólnego widoku projektu do edycji konkretnego elementu.
+Karty zadań w widoku kanban zawierają najważniejsze informacje potrzebne do szybkiej oceny pracy: tytuł, skrócony opis, priorytet, termin oraz tagi. Priorytety są wyróżnione kolorami, a termin jest prezentowany razem z ikoną kalendarza. Każda karta jest linkiem do szczegółów zadania, dzięki czemu użytkownik może szybko przejść z ogólnego widoku projektu do edycji konkretnego elementu.
 
 \section{Implementacja sekcji przypiętych elementów dashboardu}
 
