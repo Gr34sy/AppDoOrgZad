@@ -69,6 +69,7 @@
 
 \renewcommand{\footnotelayout}{\setstretch{1}\fontsize{10}{12}\selectfont\setlength{\parindent}{0pt}}
 \renewcommand{\footnotesize}{\fontsize{10}{12}\selectfont}
+\interfootnotelinepenalty=10000
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -190,7 +191,7 @@ Tematem niniejszej pracy inżynierskiej jest opracowanie wraz z implementacją a
 
 Dynamiczny rozwój technologii internetowych oraz rosnąca liczba obowiązków zawodowych i prywatnych powodują, że efektywne zarządzanie czasem i zadaniami staje się istotnym elementem codziennego funkcjonowania użytkowników. W odpowiedzi na te potrzeby powstają liczne aplikacje, wspierające planowanie pracy, organizację projektów oraz monitorowanie postępów realizacji celów. Jednocześnie rozwój nowoczesnych narzędzi warstwy interfejsu i warstwy serwerowej pozwala na tworzenie wydajnych, skalowalnych i interaktywnych systemów dostępnych z poziomu przeglądarki internetowej.
 
-Inspiracją dla tematu są popularne aplikacje do zarządzania projektami, kładące duży nacisk na organizację pracy zespołowej. Narzędzia takie jak Trello, Asana czy ClickUp dostarczają szeroką gamę funkcji, umożliwiających organizację zadań, jednak wiele z nich jest niepotrzebne użytkownikowi indywidualnemu. Z kolei nadmiar zbędnych funkcji może utrudniać użytkownikowi korzystanie z aplikacji. Dlatego też
+Inspiracją dla tematu są popularne aplikacje do zarządzania projektami, kładące duży nacisk na organizację pracy zespołowej. Narzędzia takie jak Trello\footnote{Por. [1].}, Asana\footnote{Por. [2].} czy ClickUp\footnote{Por. [3].} dostarczają szeroką gamę funkcji, umożliwiających organizację zadań, jednak wiele z nich jest niepotrzebne użytkownikowi indywidualnemu. Z kolei nadmiar zbędnych funkcji może utrudniać użytkownikowi korzystanie z aplikacji. Dlatego też
 w projekcie zdecydowano się na zaadaptowanie najważniejszych funkcji z wcześniej wymienionych aplikacji, dla potrzeb użytkowników indywidualnych. Tak więc, w prezentowanym projekcie znajdują się uproszczone rozwiązania stosowane w komercyjnych aplikacjach tego typu.
 
 Strona internetowa powinna umożliwiać użytkownikom organizowanie pracy w sposób przejrzysty oraz intuicyjny, z wykorzystaniem funkcji takich jak na przykład przypinanie wybranych treści do widoku strony głównej. Istotnym założeniem projektu jest również zapewnienie bezpieczeństwa danych poprzez wdrożenie mechanizmów logowania, rejestracji oraz autoryzacji użytkowników.
@@ -227,7 +228,7 @@ Rozdział czwarty przedstawia zagadnienia związane z przechowywaniem danych. Om
 
 Rozdział piąty zawiera opis architektury systemu. Przedstawiono w nim podział aplikacji na warstwy, przepływ danych, najważniejsze elementy struktury projektu oraz aktualny opis bazy danych zgodny ze stanem implementacji aplikacji.
 
-Rozdział szósty prezentuje projekt interfejsu użytkownika oraz scenariusze przypadków użycia. Opisano w nim sposób korzystania z głównych funkcji systemu, takich jak obsługa konta użytkownika, praca z notatkami, checklistami, zadaniami i projektami oraz wykorzystanie widoku tablicowego.
+Rozdział szósty prezentuje projekt interfejsu użytkownika oraz scenariusze przypadków użycia. Opisano w nim sposób korzystania z głównych funkcji systemu, takich jak obsługa konta użytkownika, praca z notatkami, elementami kontrolnymi, zadaniami i projektami oraz wykorzystanie widoku tablicowego.
 
 
 Rozdział siódmy opisuje wybrane elementy implementacji kodu warstwy interfejsu użytkownika. Skupiono się w nim na realizacji widoku tablicy projektu oraz sekcji przypiętych elementów dashboardu, ponieważ są to części aplikacji istotne dla codziennej pracy użytkownika oraz wygody korzystania z aplikacji.
@@ -247,7 +248,7 @@ Narzędzie, takie powinno przede wszystkim:
 \item
   dopasować się do potrzeb indywidualnego użytkownika,
 \item
-  umożliwiać szybką organizację zadań różnego typu - od codziennych spraw, jak lista zakupów, po skomplikowane projekty,
+  umożliwiać szybką organizację zadań różnego typu - od codziennych spraw, jak checklista\footnote{Checklista - uporządkowany zestaw elementów do wykonania lub sprawdzenia, w którym poszczególne pozycje można oznaczać jako ukończone.} zakupów, po skomplikowane projekty,
 \item
   oferować prosty i motywujący do działania interfejs graficzny.
 \end{itemize}
@@ -295,7 +296,7 @@ Poniżej przedstawiono zestaw pięciu historii użytkownika dla projektowanej ap
 
 2. Jako pracownik biurowy, potrzebuję utworzyć kilka zadań wraz z opisami, określonymi priorytetami oraz czasem ich realizacji, w celu efektywniejszej pracy.
 
-3. Jako głowa rodziny, potrzebuję utworzyć check listę zakupów, aby w sklepie niczego nie zapomnieć.
+3. Jako głowa rodziny, potrzebuję utworzyć checklistę zakupów, aby w sklepie niczego nie zapomnieć.
 
 4. Jako pracownik nadzorujący dostawy w restauracji, potrzebuję utworzyć notatkę
 z informacją odnośnie przebiegu dostawy oraz ilości palet zwróconych przez restaurację.
@@ -357,7 +358,7 @@ Frontend\footnote{Frontend - termin pochodzący z języka angielskiego, będący
   Responsywność - automatyczne dostosowywanie się aplikacji do różnych wielkości ekranu
 \end{enumerate}
 
-Fundamentalne narzędzia używane do tworzenia frontendu to HTML\footnote{HTML - z jęz. ang. Hypertext Markup Language, czyli ``hipertekstowy język znaczników''.}, CSS\footnote{CSS - z jęz. ang. Cascading Style Sheets, oznaczające ``kaskadujące arkusze stylów''.} oraz JavaScript\footnote{JavaScript - język programowania wykorzystywany do tworzenia interaktywnych elementów stron internetowych.}. HTML to język znaczników, odpowiadający za strukturę strony internetowej. Określa on semantyczny układ treści, takich jak nagłówki, akapity, listy, obrazy czy formularze. HTML stanowi szkielet warstwy frontendowej aplikacji webowej, będąc interpretowanym przez przeglądarkę w celu prezentacji treści użytkownikowi. Odpowiednie ustawienie Poprawne i semantyczne rozmieszczenie znaczników HTML ma kluczowe znaczenie dla dostępności cyfrowej, ponieważ umożliwia prawidłową interpretację treści przez czytniki ekranu wykorzystywane przez osoby
+Fundamentalne narzędzia używane do tworzenia frontendu to HTML\footnote{HTML - z jęz. ang. Hypertext Markup Language, czyli ``hipertekstowy język znaczników''. Por. [4].}, CSS\footnote{CSS - z jęz. ang. Cascading Style Sheets, oznaczające ``kaskadujące arkusze stylów''. Por. [4].} oraz JavaScript\footnote{JavaScript - język programowania wykorzystywany do tworzenia interaktywnych elementów stron internetowych. Por. [4].}. HTML to język znaczników, odpowiadający za strukturę strony internetowej. Określa on semantyczny układ treści, takich jak nagłówki, akapity, listy, obrazy czy formularze. HTML stanowi szkielet warstwy frontendowej aplikacji webowej, będąc interpretowanym przez przeglądarkę w celu prezentacji treści użytkownikowi. Odpowiednie ustawienie Poprawne i semantyczne rozmieszczenie znaczników HTML ma kluczowe znaczenie dla dostępności cyfrowej, ponieważ umożliwia prawidłową interpretację treści przez czytniki ekranu wykorzystywane przez osoby
 z niepełnosprawnościami wzroku.
 
 \textbf{CSS} jest językiem służącym do definiowania warstwy prezentacji stron internetowych. Odpowiada za wygląd i układ elementów HTML, w tym kolory, czcionki, odstępy, pozycjonowanie oraz animacje. Dzięki określonemu mechanizmowi dziedziczenia, CSS umożliwia spójne oraz elastyczne zarządzanie stylem w obrębie całej aplikacji webowej, a jego poprawne zastosowanie wspiera czytelność interfejsu oraz dostępność treści dla użytkowników.
@@ -369,7 +370,7 @@ Wraz ze wzrostem złożoności współczesnych interfejsów użytkownika, wynik�
 Wczesne zastosowania HTML, CSS i JavaScript ograniczały się głównie do prostych, statycznych stron. Jednak wraz ze wzrostem ilości aplikacji interaktywnych, pojawiła się konieczność lepszej organizacji kodu, ponownego wykorzystania komponentów oraz efektywniejszego zarządzania stanem aplikacji. Dynamiczny rozwój stron internetowych względem ich funkcjonalności i użyteczności zmusił programistów do usprawnienia wcześniej wymienionych języków, w celu sprostania rosnącym oczekiwaniom użytkowników. Biblioteki powstały jako odpowiedź na te wyzwania, umożliwiając realizację dużo bardziej ambitnych i zaawansowanych aplikacji internetowych.
 
 Biblioteki programistyczne to zbiory gotowych funkcji, klas oraz komponentów, które rozszerzają możliwości języków programowania i ułatwiają realizację określonych zadań. Ich celem jest ponowne wykorzystanie sprawdzonych rozwiązań, by nie wymyślać koła na nowo. Pozwalają one na skrócenie czasu tworzenia oprogramowania oraz zwiększenie czytelności i niezawodności kodu. W kontekście technologii frontendowych biblioteki wspierają m.in. budowę interfejsu użytkownika, obsługę zdarzeń oraz zarządzanie danymi po stronie klienta.
-Najważniejszym przykładem jest tutaj React\footnote{\emph{React the library for web and native interfaces}, \url{https://react.dev} (dostęp: 28.01.2026).}, czyli biblioteka języka JavaScript.
+Najważniejszym przykładem jest tutaj React\footnote{Por. [5]: \emph{React the library for web and native interfaces}, \url{https://react.dev} (dostęp: 28.01.2026).}, czyli biblioteka języka JavaScript.
 
 Jak można wyczytać na oficjalnej stronie dokumentacji biblioteki, dostarcza ona narzędzia, pozwalająca między innymi na tworzenie komponentów nadających się do ponownego użycia w różnych sekcjach aplikacji. W ten sposób można stworzyć na przykład przycisk, bądź nagłówek, bez potrzeby kilkukrotnego przepisywania kodu, gdy chcemy by nasz dokument HTML zawierał kilka takich samych elementów. Takie podejście nie tylko oszczędza czas, ale również znacznie poprawia przejrzystość kodu. Właśnie z tego powodu w pracy zdecydowano się na skorzystanie z tej biblioteki.
 Obok bibliotek, rozwinęło się dużo narzędzi programistycznych zwanych frameworkami\footnote{Framework - z języka angielskiego, jest złożeniem słów ``frame'' (rama) oraz ``work'' (praca, struktura). Dosłownie oznacza "ramę konstrukcyjną" lub "szkielet".}. Różnica pomiędzy biblioteką a frameworkiem dotyczy przede wszystkim stopnia kontroli nad przepływem aplikacji. Biblioteka dostarcza zestaw narzędzi i funkcji, które są wywoływane bezpośrednio przez programistę w wybranym miejscu kodu. Framework natomiast narzuca określoną strukturę projektu oraz sposób działania aplikacji, przejmując kontrolę nad jej przepływem i wymuszając pewne ramy, których programista musi przestrzegać.
@@ -450,7 +451,7 @@ i utrzymanie aplikacji frontendowych.
 
 \section{TailwindCSS}
 
-TailwindCSS\footnote{\emph{Strona Tailwindcss}, \url{https://tailwindcss.com} (dostęp: 28.01.2026).} jest frameworkiem służącym do stylowania interfejsów użytkownika za pomocą gotowych klas CSS, używanych bezpośrednio
+TailwindCSS\footnote{Por. [6]: \emph{Strona Tailwindcss}, \url{https://tailwindcss.com} (dostęp: 28.01.2026).} jest frameworkiem służącym do stylowania interfejsów użytkownika za pomocą gotowych klas CSS, używanych bezpośrednio
 w znacznikach HTML lub komponentach Reactowych. Tailwind umożliwia szybkie budowanie spójnych i responsywnych layoutów bez konieczności pisania własnych arkuszy stylów dla każdego komponentu. Technologia ta jest stosowana w celu zwiększenia produktywności, ograniczenia duplikacji kodu CSS oraz łatwiejszego skalowania warstwy prezentacyjnej aplikacji frontendowej.
 
 \begin{figure}[H]
@@ -489,7 +490,7 @@ API natomiast to zestaw reguł, metod i struktur danych umożliwiających komuni
 
 \section{NextJS}
 
-Next.js\footnote{\emph{NextJS Docs,} \url{https://nextjs.org/docs} (dostęp 29.01.2026)} jest frameworkiem opartym na bibliotece React, przeznaczonym do tworzenia pełnostosowych\footnote{Pełnostosowy - Stos to określenie powszechnie stosowane w języku programistycznym jako właśnie narzędzi użytych do produkcji aplikacji. Full-stack to termin z języka angielskiego, oznaczający technologie zarówno frontendowe, jak i backendowe.} aplikacji webowych. Interfejs użytkownika budowany jest przy użyciu komponentów Reacta, natomiast Next.js dostarcza dodatkowe funkcje oraz mechanizmy optymalizacyjne. Framework automatycznie konfiguruje narzędzia niskiego poziomu, takie jak bundlery\footnote{Bundler - narzędzie programistyczne służące do łączenia wielu plików źródłowych w jeden lub kilka zoptymalizowanych pakietów, które mogą być uruchamiane w przeglądarce.}
+Next.js\footnote{Por. [7]: \emph{NextJS Docs,} \url{https://nextjs.org/docs} (dostęp 29.01.2026).} jest frameworkiem opartym na bibliotece React, przeznaczonym do tworzenia pełnostosowych\footnote{Pełnostosowy - Stos to określenie powszechnie stosowane w języku programistycznym jako właśnie narzędzi użytych do produkcji aplikacji. Full-stack to termin z języka angielskiego, oznaczający technologie zarówno frontendowe, jak i backendowe.} aplikacji webowych. Interfejs użytkownika budowany jest przy użyciu komponentów Reacta, natomiast Next.js dostarcza dodatkowe funkcje oraz mechanizmy optymalizacyjne. Framework automatycznie konfiguruje narzędzia niskiego poziomu, takie jak bundlery\footnote{Bundler - narzędzie programistyczne służące do łączenia wielu plików źródłowych w jeden lub kilka zoptymalizowanych pakietów, które mogą być uruchamiane w przeglądarce.}
 oraz kompilatory\footnote{Kompilator - program tłumaczący kod źródłowy napisany w jednym języku programowania na inną postać, umożliwiając jego uruchomienie w danym środowisku.}, dzięki czemu programista może skupić się na tworzeniu aplikacji
 i szybkim wdrażaniu jej do użytku.
 
@@ -538,7 +539,7 @@ Renderowanie po stronie serwera umożliwia dostarczenie kompletnego HTML już na
 Aplikacja do zarządzania zadaniami posiada ogromny potencjał do konsekwentnego rozwijania jej wraz z dodawaniem nowych funkcjonalności. Next.js sprzyja umożliwia skalowalność na kilku poziomach, lecz przede wszystkim zapewnia czytelną strukturę projektu, dzięki routingowi opartemu o system plików wraz z możliwościami wydzielania modułów. Next.js pozwala rozwijać aplikację etapami, utrzymując spójny model wytwarzania, natomiast wraz ze wzrostem złożoności projektu nie zachodzi potrzeba migracji na inne narzędzia.
 Kolejnym argumentem jest możliwość budowy zarówno warstwy prezentacji, jak
 i elementów backendowych w ramach jednego frameworka. Next.js dostarcza mechanizmy takie jak endpointy API, middleware\footnote{Middleware -- warstwa pośrednia oprogramowania działająca pomiędzy żądaniem użytkownika a właściwą logiką aplikacji, umożliwiająca przechwytywanie i modyfikację zapytań oraz odpowiedzi. Stosowana jest m.in. do realizacji takich zadań jak autentykacja, autoryzacja, logowanie zdarzeń, obsługa błędów czy przekierowania, bez ingerencji w główną logikę biznesową systemu.} oraz integrację z logiką serwerową, co jest szczególnie korzystne w wymagających aplikacjach. Takie podejście mocno skraca czas implementacji, ponieważ eliminuje konieczność utrzymywania osobnego projektu backendowego. Zmniejsza to również ryzyko niespójności kontraktów API oraz upraszcza jej wdrażanie, gdyż aplikacja może być publikowana jako całość.
-Istotną zaletą Nexta jest również integracja z biblioteką \href{https://authjs.dev}{Auth.js}. Pozwala to implementować zabezpieczenia zarówno po stronie klienta - jak warunkowe renderowanie widoków, oraz po stronie serwera - ochrona endpointów API, czy walidacja sesji
+Istotną zaletą Nexta jest również integracja z biblioteką Auth.js\footnote{Por. [8].}. Pozwala to implementować zabezpieczenia zarówno po stronie klienta - jak warunkowe renderowanie widoków, oraz po stronie serwera - ochrona endpointów API, czy walidacja sesji
 w middleware. Dzięki temu kontrola dostępu nie jest oparta wyłącznie o logikę frontendową, lecz może być egzekwowana na poziomie serwera, co zwiększa bezpieczeństwo rozwiązania.
 Zastosowanie Auth.js eliminuje również konieczność budowania całego mechanizmu logowania od podstaw. Stworzenie logiki, zajmującej się obsługiwaniem sesji, tokenów, odświeżania, błędów, integracji z dostawcami autentykacji i autoryzacji, zajmuje dużo czasu. Jednocześnie rozwiązania zastosowane w tej bibliotece pozostają elastyczne i możliwe do rozbudowy.
 
@@ -554,7 +555,7 @@ nie komunikuje się bezpośrednio z bazą. Takie rozdzielenie odpowiedzialności
 \begin{figure}[H]
   \centering
   \includegraphics[width=5.7792in,height=2.98542in]{imported-media/media/image10.png}
-  \caption[Przedstawienie procesu wyświetlania danych użytkownikowi aplikacji internetowej]{Przedstawienie procesu, umożliwiającego wyświetlenie danych użytkownikowi aplikacji internetowej. Źródło: \url{https://d1zruf9db62p8s.cloudfront.net/2025/08/Frontend-vs-Backend.webp} (dostęp: 02.02.2026)}
+  \caption[Przedstawienie procesu wyświetlania danych użytkownikowi aplikacji internetowej]{Przedstawienie procesu, umożliwiającego wyświetlenie danych użytkownikowi aplikacji internetowej. Źródło: [9].}
 \end{figure}
 
 \section{MySQL}
@@ -583,7 +584,7 @@ Dzięki swojej niezawodności oraz dobrej integracji z popularnymi technologiami
 
 \section{MongoDB}
 
-MongoDB\footnote{\emph{Welcome to the MongoDB docs}, \url{https://www.mongodb.com/docs/} (dostęp: 02.02.2026).} jest nierelacyjnym systemem zarządzania bazą danych, którego podstawową różnicą względem relacyjnych rozwiązań, jest sposób przechowywania informacji. MongoDB wykorzystuje model dokumentowy, w którym dane zapisywane są
+MongoDB\footnote{Por. [10]: \emph{Welcome to the MongoDB docs}, \url{https://www.mongodb.com/docs/} (dostęp: 02.02.2026).} jest nierelacyjnym systemem zarządzania bazą danych, którego podstawową różnicą względem relacyjnych rozwiązań, jest sposób przechowywania informacji. MongoDB wykorzystuje model dokumentowy, w którym dane zapisywane są
 w elastycznych strukturach przypominających format JSON\footnote{JSON - z jęz. ang JavaScript Object Notation,, tekstowy format zapisu i wymiany danych oparty na strukturze obiektów oraz tablic, wykorzystywany w komunikacji między aplikacjami.}. Oznacza to brak sztywno zdefiniowanego schematu tabel oraz większą swobodę w organizacji informacji.
 MongoDB przechowuje powiązane dane często w obrębie jednego dokumentu. Takie podejście redukuje potrzebę wykonywania złożonych połączeń między poszczególnymi tabelami, co przyspiesza operacje odczytu i upraszcza projektowanie aplikacji o dynamicznej strukturze danych.
 MongoDB zapisuje dane w kolekcjach składających się z dokumentów. Każdy dokument może posiadać inną strukturę oraz zestaw pól, co pozwala na łatwe rozszerzanie modelu danych bez konieczności modyfikowania schematu całej bazy. Komunikacja
@@ -637,7 +638,7 @@ Na poniżej przedstawionym schemacie zaprezentowano klasyczną, trójwarstwową 
 \begin{figure}[H]
   \centering
   \includegraphics[width=6.10236in,height=4.11111in]{imported-media/media/image3.png}
-  \caption[Diagram warstw aplikacji internetowej]{Diagram, przedstawiający warstwy aplikacji internetowej. Źródło: \url{https://www.albiorixtech.com/wp-content/uploads/2025/12/web-application-architecture-layers.jpg} (dostęp: 03.02.2026)}
+  \caption[Diagram warstw aplikacji internetowej]{Diagram, przedstawiający warstwy aplikacji internetowej. Źródło: [11].}
 \end{figure}
 
 Przeglądarka (browser) to środowisko uruchomieniowe po stronie klienta,
@@ -687,7 +688,7 @@ Najważniejsze idee architektoniczne:
   łatwa skalowalność.
 \end{itemize}
 
-Kolejne diagramy, powstałe na etapie projektowania architektury przygotowano, wykorzystując informacje z artykułu ``Canva: DFD''\footnote{Canva Team, \emph{Creating a data flow diagram: How-tos, templates, and tips,} \url{https://www.canva.com/online-whiteboard/data-flow-diagrams/} (dostęp: 03.02.2026)}. Pokazują jak dane przemieszczają się w systemie między źródłami, procesami oraz magazynami danych. Są to tak zwane jest ``diagramy przepływu danych''.
+Kolejne diagramy, powstałe na etapie projektowania architektury przygotowano, wykorzystując informacje z artykułu ``Canva: DFD''\footnote{Por. [12]: Canva Team, \emph{Creating a data flow diagram: How-tos, templates, and tips,} \url{https://www.canva.com/online-whiteboard/data-flow-diagrams/} (dostęp: 03.02.2026).}. Pokazują jak dane przemieszczają się w systemie między źródłami, procesami oraz magazynami danych. Są to tak zwane jest ``diagramy przepływu danych''.
 
 \begin{figure}[H]
   \centering
@@ -722,7 +723,7 @@ Checklisty są przechowywane w kolekcji \texttt{checklists}. Każda checklista p
 
 Zadania są zapisywane w kolekcji \texttt{tasks}. Dokument zadania zawiera tytuł, opis, priorytet, status, termin wykonania, tagi, pozycję, datę ukończenia oraz datę archiwizacji. Zadanie może być samodzielnym elementem listy zadań albo częścią projektu. W drugim przypadku pole \texttt{projectId} wskazuje projekt, do którego należy zadanie. Status zadania jest przechowywany w polu \texttt{statusId}; w widoku tablicy kanban odpowiada on identyfikatorowi jednej z kolumn projektu. Zadanie może mieć również powiązane checklisty, których identyfikatory są przechowywane w tablicy \texttt{checklistIds}.
 
-Projekty są przechowywane w kolekcji \texttt{projects}. Dokument projektu zawiera tytuł, opis, priorytet, status cyklu życia, termin, tagi, pozycję, listę zadań, listę checklist oraz konfigurację widoku zadań. W projekcie przechowywana jest tablica \texttt{kanbanColumns}, opisująca kolumny tablicy kanban. Każda kolumna ma identyfikator, nazwę, kolor, pozycję oraz informację, czy oznacza stan zakończony. Domyślny zestaw kolumn obejmuje \texttt{backlog}, \texttt{todo}, \texttt{in\_progress}, \texttt{testing} oraz \texttt{done}. Pole \texttt{taskView} określa, czy zadania projektu są prezentowane jako lista, czy jako tablica kanban.
+Projekty są przechowywane w kolekcji \texttt{projects}. Dokument projektu zawiera tytuł, opis, priorytet, status cyklu życia, termin, tagi, pozycję, listę zadań, checklisty oraz konfigurację widoku zadań. W projekcie przechowywana jest tablica \texttt{kanbanColumns}, opisująca kolumny tablicy kanban. Każda kolumna ma identyfikator, nazwę, kolor, pozycję oraz informację, czy oznacza stan zakończony. Domyślny zestaw kolumn obejmuje \texttt{backlog}, \texttt{todo}, \texttt{in\_progress}, \texttt{testing} oraz \texttt{done}. Pole \texttt{taskView} określa, czy zadania projektu są prezentowane jako lista, czy jako tablica kanban.
 
 Relacja pomiędzy projektami i zadaniami jest utrzymywana dwukierunkowo na poziomie aplikacji. Główne powiązanie znajduje się w zadaniu, w polu \texttt{projectId}. Projekt przechowuje dodatkowo tablicę \texttt{taskIds}, która zawiera identyfikatory powiązanych zadań. Podczas tworzenia zadania z przypisanym projektem backend sprawdza, czy projekt istnieje, nie jest zarchiwizowany i należy do aktualnego użytkownika. Następnie identyfikator zadania jest dopisywany do projektu. Przy zmianie projektu lub archiwizacji zadania identyfikator jest usuwany ze starego projektu.
 
@@ -765,7 +766,7 @@ Jak już wcześniej ustalono, projekt interfejsu użytkownika, jest jednym z naj
 
 \textbf{Aktor:} Użytkownik indywidualny
 
-\textbf{Cel:} Szybki dostęp do śledzonych tasków/notatek/list/projektów z poziomu strony głównej
+\textbf{Cel:} Szybki dostęp do śledzonych tasków/notatek/checklist/projektów z poziomu strony głównej
 
 \textbf{Warunki wstępne:} Użytkownik jest zalogowany; Element istnieje
 
@@ -774,7 +775,7 @@ Jak już wcześniej ustalono, projekt interfejsu użytkownika, jest jednym z naj
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  Użytkownik otwiera którąś z list elementów(taski/listy/projekty itd.)
+  Użytkownik otwiera którąś z list elementów (taski/checklisty/projekty itd.)
 \item
   Użytkownik wybiera konkretny element
 \item
@@ -856,7 +857,7 @@ Jak już wcześniej ustalono, projekt interfejsu użytkownika, jest jednym z naj
   \caption{Diagram UML, wizualizujący scenariusz przypięcia taska}
 \end{figure}
 
-3) Utworzenie listy zakupów z możliwością odhaczanie pozycji
+3) Utworzenie checklisty zakupów z możliwością odhaczanie pozycji
 
 \textbf{Aktor:} Głowa rodziny
 
@@ -877,17 +878,17 @@ Jak już wcześniej ustalono, projekt interfejsu użytkownika, jest jednym z naj
 \item
   System otwiera formularz tworzenia checklisty
 \item
-  Użytkownik ustawia nazwę listy
+  Użytkownik ustawia nazwę checklisty
 \item
-  Użytkownik dodaje pozycje w liście (np. mleko, chleb, warzywa)
+  Użytkownik dodaje pozycje w checkliście (np. mleko, chleb, warzywa)
 \item
-  System zapisuje listę i wyświetla ją użytkownikowi.
+  System zapisuje checklistę i wyświetla ją użytkownikowi.
 \item
-  W sklepie użytkownik otwiera listę
+  W sklepie użytkownik otwiera checklistę
 \item
   Użytkownik odhacza kolejne pozycje
 \item
-  System zapisuje, które przedmioty w liście zostały odhaczone
+  System zapisuje, które przedmioty w checkliście zostały odhaczone
 \end{enumerate}
 
 \textbf{Scenariusze alternatywne / wyjątki:}
@@ -897,10 +898,10 @@ Jak już wcześniej ustalono, projekt interfejsu użytkownika, jest jednym z naj
 \item
   \textbf{Dodanie pozycji w trakcie zakupów
   }7a. Użytkownik dodaje nową pozycję
-  8a. System aktualizuje listę.
+  8a. System aktualizuje checklistę.
 \end{enumerate}
 
-\textbf{Warunki końcowe:} Lista zakupów istnieje, a pozycje mogą być odhaczane i zapisywane.
+\textbf{Warunki końcowe:} Checklista zakupów istnieje, a pozycje mogą być odhaczane i zapisywane.
 
 \textbf{4) Tworzenie notatki}
 
@@ -1073,7 +1074,7 @@ Za właściwą listę przypiętych elementów odpowiada komponent \texttt{Pinned
 
 Sortowanie przypiętych elementów obsługuje stan \texttt{sortField} oraz \texttt{sortDirection}. Użytkownik może sortować elementy po dacie aktualizacji, dacie utworzenia, tytule lub opisie. Dla pól tekstowych domyślnym kierunkiem jest sortowanie rosnące, natomiast dla dat domyślnie pokazywane są najnowsze elementy. Wyniki po filtrowaniu są kopiowane do nowej tablicy i sortowane bez modyfikowania danych wejściowych przekazanych do komponentu.
 
-Każdy przypięty element jest renderowany jako karta \texttt{ObjectCard}. Ikona karty zależy od typu elementu: notatka, checklista, zadanie lub projekt. Dla zadań i projektów przekazywany jest status oraz priorytet, natomiast dla checklist możliwe jest pokazanie podglądu elementów listy. Link karty prowadzi bezpośrednio do szczegółowego widoku danego elementu.
+Każdy przypięty element jest renderowany jako karta \texttt{ObjectCard}. Ikona karty zależy od typu elementu: notatka, checklista, zadanie lub projekt. Dla zadań i projektów przekazywany jest status oraz priorytet, natomiast dla checklist możliwe jest pokazanie podglądu elementów checklisty. Link karty prowadzi bezpośrednio do szczegółowego widoku danego elementu.
 
 Za przypinanie i odpinanie odpowiada komponent przycisku pinezki, wydzielony w kodzie jako \texttt{PinEntityButton}. Komponent otrzymuje typ i identyfikator elementu oraz opcjonalny identyfikator istniejącego przypięcia. Jeżeli element nie jest przypięty, kliknięcie wysyła żądanie \texttt{POST} do endpointu \texttt{/api/pins}. Jeżeli element jest już przypięty, kliknięcie wysyła żądanie \texttt{DELETE} do endpointu \texttt{/api/pins/\{pinId\}}. Po poprawnym zakończeniu operacji komponent aktualizuje lokalny stan, zmienia wygląd ikony pinezki oraz wykonuje \texttt{router.refresh()}, aby odświeżyć dashboard i pozostałe widoki.
 
@@ -1084,30 +1085,34 @@ W efekcie sekcja przypiętych elementów pełni rolę spersonalizowanego skrótu
 \begingroup
 \sloppy
 
-Albiorix Technology, \emph{Web application architecture layers}, \url{https://www.albiorixtech.com/wp-content/uploads/2025/12/web-application-architecture-layers.jpg} (dostęp: 03.02.2026).
+\begin{enumerate}
+\renewcommand{\labelenumi}{[\arabic{enumi}]}
 
-Asana, Inc., \emph{Asana}, \url{https://asana.com} (dostęp: 17.07.2026).
+\item Atlassian, \emph{Trello}, \url{https://trello.com} (dostęp: 17.07.2026).
 
-Atlassian, \emph{Trello}, \url{https://trello.com} (dostęp: 17.07.2026).
+\item Asana, Inc., \emph{Asana}, \url{https://asana.com} (dostęp: 17.07.2026).
 
-Auth.js, \emph{Auth.js}, \url{https://authjs.dev} (dostęp: 17.07.2026).
+\item ClickUp, \emph{ClickUp}, \url{https://clickup.com} (dostęp: 17.07.2026).
 
-Canva, \emph{Creating a data flow diagram: How-tos, templates, and tips}, \url{https://www.canva.com/online-whiteboard/data-flow-diagrams/} (dostęp: 03.02.2026).
+\item Dean J., \emph{Web programming with HTML, CSS, and JavaScript}, Burlington 2017.
 
-ClickUp, \emph{ClickUp}, \url{https://clickup.com} (dostęp: 17.07.2026).
+\item React, \emph{React: The library for web and native interfaces}, \url{https://react.dev} (dostęp: 28.01.2026).
 
-Dean J., \emph{Web programming with HTML, CSS, and JavaScript}, Burlington 2017.
+\item Tailwind Labs, \emph{Tailwind CSS}, \url{https://tailwindcss.com} (dostęp: 28.01.2026).
 
-\emph{Frontend vs Backend}, \url{https://d1zruf9db62p8s.cloudfront.net/2025/08/Frontend-vs-Backend.webp} (dostęp: 02.02.2026).
+\item Vercel, \emph{Next.js Docs}, \url{https://nextjs.org/docs} (dostęp: 29.01.2026).
 
+\item Auth.js, \emph{Auth.js}, \url{https://authjs.dev} (dostęp: 17.07.2026).
 
-MongoDB, Inc., \emph{Welcome to the MongoDB docs}, \url{https://www.mongodb.com/docs/} (dostęp: 02.02.2026).
+\item \emph{Frontend vs Backend}, \url{https://d1zruf9db62p8s.cloudfront.net/2025/08/Frontend-vs-Backend.webp} (dostęp: 02.02.2026).
 
-React, \emph{React: The library for web and native interfaces}, \url{https://react.dev} (dostęp: 28.01.2026).
+\item MongoDB, Inc., \emph{Welcome to the MongoDB docs}, \url{https://www.mongodb.com/docs/} (dostęp: 02.02.2026).
 
-Tailwind Labs, \emph{Tailwind CSS}, \url{https://tailwindcss.com} (dostęp: 28.01.2026).
+\item Albiorix Technology, \emph{Web application architecture layers}, \url{https://www.albiorixtech.com/wp-content/uploads/2025/12/web-application-architecture-layers.jpg} (dostęp: 03.02.2026).
 
-Vercel, \emph{Next.js Docs}, \url{https://nextjs.org/docs} (dostęp: 29.01.2026).
+\item Canva, \emph{Creating a data flow diagram: How-tos, templates, and tips}, \url{https://www.canva.com/online-whiteboard/data-flow-diagrams/} (dostęp: 03.02.2026).
+
+\end{enumerate}
 
 \endgroup
 
