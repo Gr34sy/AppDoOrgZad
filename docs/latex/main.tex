@@ -188,7 +188,7 @@
 
 Tematem niniejszej pracy inżynierskiej jest opracowanie wraz z implementacją aplikacji internetowej, służącej do organizacji zadań. Zaprojektowane narzędzie skierowane jest do użytkowników indywidualnych, potrzebujących pomocy w sprawnym zarządzaniu zarówno obowiązkami dnia codziennego jak i projektami.
 
-Dynamiczny rozwój technologii internetowych oraz rosnąca liczba obowiązków zawodowych i prywatnych powodują, że efektywne zarządzanie czasem i zadaniami staje się istotnym elementem codziennego funkcjonowania użytkowników. W odpowiedzi na te potrzeby powstają liczne aplikacje, wspierające planowanie pracy, organizację projektów oraz monitorowanie postępów realizacji celów. Jednocześnie rozwój nowoczesnych frameworków frontendowych i backendowych pozwala na tworzenie wydajnych, skalowalnych i interaktywnych systemów dostępnych z poziomu przeglądarki internetowej.
+Dynamiczny rozwój technologii internetowych oraz rosnąca liczba obowiązków zawodowych i prywatnych powodują, że efektywne zarządzanie czasem i zadaniami staje się istotnym elementem codziennego funkcjonowania użytkowników. W odpowiedzi na te potrzeby powstają liczne aplikacje, wspierające planowanie pracy, organizację projektów oraz monitorowanie postępów realizacji celów. Jednocześnie rozwój nowoczesnych narzędzi warstwy interfejsu i warstwy serwerowej pozwala na tworzenie wydajnych, skalowalnych i interaktywnych systemów dostępnych z poziomu przeglądarki internetowej.
 
 Inspiracją dla tematu są popularne aplikacje do zarządzania projektami, kładące duży nacisk na organizację pracy zespołowej. Narzędzia takie jak Trello, Asana czy ClickUp dostarczają szeroką gamę funkcji, umożliwiających organizację zadań, jednak wiele z nich jest niepotrzebne użytkownikowi indywidualnemu. Z kolei nadmiar zbędnych funkcji może utrudniać użytkownikowi korzystanie z aplikacji. Dlatego też
 w projekcie zdecydowano się na zaadaptowanie najważniejszych funkcji z wcześniej wymienionych aplikacji, dla potrzeb użytkowników indywidualnych. Tak więc, w prezentowanym projekcie znajdują się uproszczone rozwiązania stosowane w komercyjnych aplikacjach tego typu.
@@ -199,7 +199,7 @@ Do celów szczegółowych pracy należy zaprojektowanie graficznego wyglądu int
 i serwerowej, zaprojektowanie struktury bazy danych oraz implementacja mechanizmów obsługi kont użytkowników. Projekt zakłada wykorzystanie współczesnych technologii webowych\footnote{Webowy - z języka angielskiego oznaczający dosłownie ``sieciowy''. Termin używany powszechnie jako synonim słowa ``internetowy''.}, umożliwiających budowę aplikacji działającej w architekturze klient--serwer\footnote{Architektura klient-serwer - model działania systemu, w którym klient wysyła żądania, a serwer je przetwarza i zwraca odpowiedź.}, z rozdzieleniem warstwy prezentacji, logiki biznesowej\footnote{Logika biznesowa - zbiór reguł i mechanizmów aplikacji określających sposób przetwarzania danych oraz realizacji operacji zgodnie z wymaganiami systemu.} oraz przechowywania danych.
 
 Zakres realizowanych prac obejmuje analizę dostępnych na rynku rozwiązań, opis odpowiednich narzędzi programistycznych, przygotowanie widoków interfejsu użytkownika oraz przedstawienie implementacji kodu aplikacji. Zakres pracy nie obejmuje publikacji aplikacji w domenie publicznej ani jej komercyjnego wdrożenia.
-Rezultatem pracy jest funkcjonalna aplikacja internetowa, stanowiąca przykład zastosowania nowoczesnych technologii frontendowych i backendowych w praktycznej realizacji systemu wspierającego zarządzanie zadaniami.
+Rezultatem pracy jest funkcjonalna aplikacja internetowa, stanowiąca przykład zastosowania nowoczesnych technologii tworzenia interfejsu i obsługi serwerowej w praktycznej realizacji systemu wspierającego zarządzanie zadaniami.
 Cele szczegółowe niniejszej pracy obejmują:
 
 \begin{itemize}
@@ -217,20 +217,20 @@ Cele szczegółowe niniejszej pracy obejmują:
 
 \section*{Streszczenie rozdziałów}
 
-Rozdział pierwszy przedstawia analizę wymagań projektowanej aplikacji. Omówiono w nim potrzeby użytkownika indywidualnego, porównano podobne narzędzia do organizacji zadań oraz wskazano wymagania funkcjonalne i niefunkcjonalne systemu. W rozdziale opisano również historie użytkownika oraz podstawy metody kanban\footnote{Kanban - metoda wizualnego zarządzania pracą, w której zadania przedstawiane są na tablicy podzielonej na etapy realizacji.}, która została wykorzystana jako jeden ze sposobów organizacji zadań w projektach.
+Rozdział pierwszy przedstawia analizę wymagań projektowanej aplikacji. Omówiono w nim potrzeby użytkownika indywidualnego, porównano podobne narzędzia do organizacji zadań oraz wskazano wymagania funkcjonalne i niefunkcjonalne systemu. W rozdziale opisano również historie użytkownika oraz podstawy wizualnej organizacji zadań w projektach.
 
-Rozdział drugi dotyczy technologii frontendowych zastosowanych podczas realizacji aplikacji. Przedstawiono w nim rolę języków HTML, CSS i JavaScript\footnote{JavaScript - język programowania wykorzystywany do tworzenia interaktywnych elementów stron internetowych.}, a także opisano wykorzystanie biblioteki React, mechanizmu React Hooks, frameworka TailwindCSS oraz języka TypeScript. Rozdział ten wyjaśnia, w jaki sposób wskazane technologie wspierają budowę interaktywnego i responsywnego interfejsu użytkownika.
+Rozdział drugi dotyczy technologii warstwy interfejsu użytkownika zastosowanych podczas realizacji aplikacji. Przedstawiono w nim rolę podstawowych języków używanych do budowy interfejsu, a także opisano wykorzystanie biblioteki komponentowej, mechanizmów pracy ze stanem, narzędzia do stylowania oraz statycznego typowania. Rozdział ten wyjaśnia, w jaki sposób wskazane technologie wspierają budowę interaktywnego i responsywnego interfejsu użytkownika.
 
-Rozdział trzeci opisuje technologie backendowe oraz mechanizmy odpowiedzialne za działanie aplikacji po stronie serwera. Szczególną uwagę poświęcono frameworkowi NextJS, routingowi, generowaniu zawartości strony, obsłudze endpointów API oraz procesom autoryzacji i autentykacji użytkowników.
+Rozdział trzeci opisuje technologie warstwy serwerowej oraz mechanizmy odpowiedzialne za działanie aplikacji po stronie serwera. Szczególną uwagę poświęcono zastosowanemu narzędziu projektowemu, sposobowi obsługi adresów aplikacji, generowaniu zawartości strony, komunikacji między częściami systemu oraz procesom autoryzacji i autentykacji użytkowników.
 
-Rozdział czwarty przedstawia zagadnienia związane z przechowywaniem danych. Omówiono w nim podstawowe cechy baz danych oraz uzasadniono wybór MongoDB jako rozwiązania dopasowanego do dokumentowego charakteru danych przetwarzanych przez aplikację.
+Rozdział czwarty przedstawia zagadnienia związane z przechowywaniem danych. Omówiono w nim podstawowe cechy baz danych oraz uzasadniono wybór dokumentowego rozwiązania dopasowanego do charakteru danych przetwarzanych przez aplikację.
 
 Rozdział piąty zawiera opis architektury systemu. Przedstawiono w nim podział aplikacji na warstwy, przepływ danych, najważniejsze elementy struktury projektu oraz aktualny opis bazy danych zgodny ze stanem implementacji aplikacji.
 
-Rozdział szósty prezentuje projekt interfejsu użytkownika oraz scenariusze przypadków użycia. Opisano w nim sposób korzystania z głównych funkcji systemu, takich jak obsługa konta użytkownika, praca z notatkami, checklistami, zadaniami i projektami oraz wykorzystanie widoku kanban.
+Rozdział szósty prezentuje projekt interfejsu użytkownika oraz scenariusze przypadków użycia. Opisano w nim sposób korzystania z głównych funkcji systemu, takich jak obsługa konta użytkownika, praca z notatkami, checklistami, zadaniami i projektami oraz wykorzystanie widoku tablicowego.
 
 
-Rozdział siódmy opisuje wybrane elementy implementacji kodu frontendowego. Skupiono się w nim na realizacji widoku kanban oraz sekcji przypiętych elementów dashboardu, ponieważ są to części aplikacji istotne dla codziennej pracy użytkownika oraz wygody korzystania z aplikacji.
+Rozdział siódmy opisuje wybrane elementy implementacji kodu warstwy interfejsu użytkownika. Skupiono się w nim na realizacji widoku tablicy projektu oraz sekcji przypiętych elementów dashboardu, ponieważ są to części aplikacji istotne dla codziennej pracy użytkownika oraz wygody korzystania z aplikacji.
 
 \chapter{Analiza wymagań}
 
@@ -260,7 +260,7 @@ ceni sobie najbardziej prostotę. Aplikacja dla niego skierowana powinna przede 
 Asana, ClickUp oraz Trello to przykładowe, popularne narzędzia do zarządzania projektami. Z perspektywy pojedynczego użytkownika ich przydatność zależy od złożoności potrzeb oraz preferowanego stylu pracy. \textbf{Trello} uchodzi za najprostsze, intuicyjne narzędzie, posiadające najbardziej przejrzysty interfejs. \textbf{Asana} natomiast, jest dużo bardziej rozbudowana. Korzystają z niej głównie duże zespoły oraz korporacje. Używa się jej do nadzoru bardziej złożonych projektów. Z kolei \textbf{ClickUp,} oferuje za darmo podobny zakres funkcji co płatny plan Asany, będąc przez to wyborem bardziej atrakcyjnym dla wymagających, indywidualnych użytkowników niż \textbf{Trello}. Liczne zaawansowane funkcje dostarczane przez ClickUp czynią jednak tą aplikację dość złożoną w obsłudze.
 
 \textbf{Trello} wyróżnia się \textbf{prostotą i intuicyjnością} -- jest łatwe do opanowania
-dla początkujących, dzięki czemu idealnie nadaje się do podstawowego porządkowania. Jego jedyna forma prezentacji - kanban sprzyja szybkiemu organizowaniu prostych projektów. Jednocześnie Trello pozostawia dużo przestrzeni użytkownikom bardziej wymagającym, poprzez możliwość integracji przeróżnych narzędzi zewnętrznych, tak zwanych Power-Upów.
+dla początkujących, dzięki czemu idealnie nadaje się do podstawowego porządkowania. Jego jedyna forma prezentacji - kanban\footnote{Kanban - metoda wizualnego zarządzania pracą, w której zadania przedstawiane są na tablicy podzielonej na etapy realizacji.} sprzyja szybkiemu organizowaniu prostych projektów. Jednocześnie Trello pozostawia dużo przestrzeni użytkownikom bardziej wymagającym, poprzez możliwość integracji przeróżnych narzędzi zewnętrznych, tak zwanych Power-Upów.
 
 \textbf{Asana}, zaprojektowana została z myślą o pracy zespołowej, dostarczając bardziej ustrukturyzowane podejście do zarządzania zadaniami i projektem.
 W darmowej wersji obcięte zostały niektóre funkcjonalności, jednak nie posiada ona limitów na ilość zadań, czy projektów. Wiele istotnych funkcji oferowanych przez tę aplikację nie jest przydatne dla użytkownika pojedynczego. Plusem Asany jest stosunkowa prostota w obsłudze oraz czytelność interfejsu, w zestawieniu z ilością oferowanych funkcji.
@@ -304,7 +304,7 @@ z informacją odnośnie przebiegu dostawy oraz ilości palet zwróconych przez r
 
 Na podstawie powyższych historii użytkownika opracowano szczegółowe scenariusze przypadków użycia, opisujące sposób interakcji użytkownika z systemem w konkretnych sytuacjach. Znajdują się one w szóstym rozdziale pracy.
 
-\section{Kanban}
+\section{kanban}
 
 Kanban jest metodą organizacji pracy opartą na wizualnym przedstawianiu zadań oraz etapów ich realizacji. W aplikacjach do zarządzania zadaniami przyjmuje najczęściej postać tablicy podzielonej na kolumny, które odpowiadają kolejnym stanom pracy. Zadania są przedstawiane jako karty, a ich przenoszenie pomiędzy kolumnami pozwala szybko ocenić, które elementy są dopiero planowane, które są aktualnie wykonywane, a które zostały już zakończone.
 
@@ -319,7 +319,7 @@ Przykładowa tablica kanban może wyglądać następująco:
     \hline
     \textbf{Backlog} & \textbf{Do zrobienia} & \textbf{W trakcie} & \textbf{Testowanie} & \textbf{Zrobione} \\
     \hline
-    Pomysły na nowe funkcje & Przygotowanie formularza zadania & Implementacja widoku projektu & Sprawdzenie walidacji formularza & Konfiguracja logowania \\
+    Pomysły na nowe funkcje & Przygotowanie formularza zadania & Implementacja widoku projektu & Sprawdzenie formularza & Konfiguracja logowania \\
     \hline
     Analiza podobnych aplikacji & Dodanie filtrowania zadań & Połączenie z bazą danych & Test działania checklist & Utworzenie modelu użytkownika \\
     \hline
@@ -357,7 +357,7 @@ Frontend\footnote{Frontend - termin pochodzący z języka angielskiego, będący
   Responsywność - automatyczne dostosowywanie się aplikacji do różnych wielkości ekranu
 \end{enumerate}
 
-Fundamentalne narzędzia używane do tworzenia frontendu to HTML\footnote{HTML - z jęz. ang. Hypertext Markup Language, czyli ``hipertekstowy język znaczników''.}, CSS\footnote{CSS - z jęz. ang. Cascading Style Sheets, oznaczające ``kaskadujące arkusze stylów''.} oraz JavaScript. HTML to język znaczników, odpowiadający za strukturę strony internetowej. Określa on semantyczny układ treści, takich jak nagłówki, akapity, listy, obrazy czy formularze. HTML stanowi szkielet warstwy frontendowej aplikacji webowej, będąc interpretowanym przez przeglądarkę w celu prezentacji treści użytkownikowi. Odpowiednie ustawienie Poprawne i semantyczne rozmieszczenie znaczników HTML ma kluczowe znaczenie dla dostępności cyfrowej, ponieważ umożliwia prawidłową interpretację treści przez czytniki ekranu wykorzystywane przez osoby
+Fundamentalne narzędzia używane do tworzenia frontendu to HTML\footnote{HTML - z jęz. ang. Hypertext Markup Language, czyli ``hipertekstowy język znaczników''.}, CSS\footnote{CSS - z jęz. ang. Cascading Style Sheets, oznaczające ``kaskadujące arkusze stylów''.} oraz JavaScript\footnote{JavaScript - język programowania wykorzystywany do tworzenia interaktywnych elementów stron internetowych.}. HTML to język znaczników, odpowiadający za strukturę strony internetowej. Określa on semantyczny układ treści, takich jak nagłówki, akapity, listy, obrazy czy formularze. HTML stanowi szkielet warstwy frontendowej aplikacji webowej, będąc interpretowanym przez przeglądarkę w celu prezentacji treści użytkownikowi. Odpowiednie ustawienie Poprawne i semantyczne rozmieszczenie znaczników HTML ma kluczowe znaczenie dla dostępności cyfrowej, ponieważ umożliwia prawidłową interpretację treści przez czytniki ekranu wykorzystywane przez osoby
 z niepełnosprawnościami wzroku.
 
 \textbf{CSS} jest językiem służącym do definiowania warstwy prezentacji stron internetowych. Odpowiada za wygląd i układ elementów HTML, w tym kolory, czcionki, odstępy, pozycjonowanie oraz animacje. Dzięki określonemu mechanizmowi dziedziczenia, CSS umożliwia spójne oraz elastyczne zarządzanie stylem w obrębie całej aplikacji webowej, a jego poprawne zastosowanie wspiera czytelność interfejsu oraz dostępność treści dla użytkowników.
@@ -369,9 +369,9 @@ Wraz ze wzrostem złożoności współczesnych interfejsów użytkownika, wynik�
 Wczesne zastosowania HTML, CSS i JavaScript ograniczały się głównie do prostych, statycznych stron. Jednak wraz ze wzrostem ilości aplikacji interaktywnych, pojawiła się konieczność lepszej organizacji kodu, ponownego wykorzystania komponentów oraz efektywniejszego zarządzania stanem aplikacji. Dynamiczny rozwój stron internetowych względem ich funkcjonalności i użyteczności zmusił programistów do usprawnienia wcześniej wymienionych języków, w celu sprostania rosnącym oczekiwaniom użytkowników. Biblioteki powstały jako odpowiedź na te wyzwania, umożliwiając realizację dużo bardziej ambitnych i zaawansowanych aplikacji internetowych.
 
 Biblioteki programistyczne to zbiory gotowych funkcji, klas oraz komponentów, które rozszerzają możliwości języków programowania i ułatwiają realizację określonych zadań. Ich celem jest ponowne wykorzystanie sprawdzonych rozwiązań, by nie wymyślać koła na nowo. Pozwalają one na skrócenie czasu tworzenia oprogramowania oraz zwiększenie czytelności i niezawodności kodu. W kontekście technologii frontendowych biblioteki wspierają m.in. budowę interfejsu użytkownika, obsługę zdarzeń oraz zarządzanie danymi po stronie klienta.
-Najważniejszym przykładem jest tutaj React, czyli biblioteka języka JavaScript.
+Najważniejszym przykładem jest tutaj React\footnote{\emph{React the library for web and native interfaces}, \url{https://react.dev} (dostęp: 28.01.2026).}, czyli biblioteka języka JavaScript.
 
-Jak można wyczytać na oficjalnej stronie dokumentacji biblioteki\footnote{\emph{React the library for web and native interfaces}, \url{https://react.dev} (dostęp: 28.01.2026).} dostarcza ona narzędzia, pozwalająca między innymi na tworzenie komponentów nadających się do ponownego użycia w różnych sekcjach aplikacji. W ten sposób można stworzyć na przykład przycisk, bądź nagłówek, bez potrzeby kilkukrotnego przepisywania kodu, gdy chcemy by nasz dokument HTML zawierał kilka takich samych elementów. Takie podejście nie tylko oszczędza czas, ale również znacznie poprawia przejrzystość kodu. Właśnie z tego powodu w pracy zdecydowano się na skorzystanie z tej biblioteki.
+Jak można wyczytać na oficjalnej stronie dokumentacji biblioteki, dostarcza ona narzędzia, pozwalająca między innymi na tworzenie komponentów nadających się do ponownego użycia w różnych sekcjach aplikacji. W ten sposób można stworzyć na przykład przycisk, bądź nagłówek, bez potrzeby kilkukrotnego przepisywania kodu, gdy chcemy by nasz dokument HTML zawierał kilka takich samych elementów. Takie podejście nie tylko oszczędza czas, ale również znacznie poprawia przejrzystość kodu. Właśnie z tego powodu w pracy zdecydowano się na skorzystanie z tej biblioteki.
 Obok bibliotek, rozwinęło się dużo narzędzi programistycznych zwanych frameworkami\footnote{Framework - z języka angielskiego, jest złożeniem słów ``frame'' (rama) oraz ``work'' (praca, struktura). Dosłownie oznacza "ramę konstrukcyjną" lub "szkielet".}. Różnica pomiędzy biblioteką a frameworkiem dotyczy przede wszystkim stopnia kontroli nad przepływem aplikacji. Biblioteka dostarcza zestaw narzędzi i funkcji, które są wywoływane bezpośrednio przez programistę w wybranym miejscu kodu. Framework natomiast narzuca określoną strukturę projektu oraz sposób działania aplikacji, przejmując kontrolę nad jej przepływem i wymuszając pewne ramy, których programista musi przestrzegać.
 
 \section{Komponenty w React}
@@ -450,7 +450,7 @@ i utrzymanie aplikacji frontendowych.
 
 \section{TailwindCSS}
 
-Z oficjalnej strony\footnote{\emph{Strona Tailwindcss}, \url{https://tailwindcss.com} (dostęp: 28.01.2026).} możemy się dowiedzieć, że jest to framework, służący do stylowania interfejsów użytkownika za pomocą gotowych klas CSS, używanych bezpośrednio
+TailwindCSS\footnote{\emph{Strona Tailwindcss}, \url{https://tailwindcss.com} (dostęp: 28.01.2026).} jest frameworkiem służącym do stylowania interfejsów użytkownika za pomocą gotowych klas CSS, używanych bezpośrednio
 w znacznikach HTML lub komponentach Reactowych. Tailwind umożliwia szybkie budowanie spójnych i responsywnych layoutów bez konieczności pisania własnych arkuszy stylów dla każdego komponentu. Technologia ta jest stosowana w celu zwiększenia produktywności, ograniczenia duplikacji kodu CSS oraz łatwiejszego skalowania warstwy prezentacyjnej aplikacji frontendowej.
 
 \begin{figure}[H]
@@ -483,13 +483,13 @@ a wiek - ``number''. Następnie komponent lub funkcja przyjmująca dane użytkow
 
 \chapter{Backend}
 
-Backend\footnote{Backend -termin pochodzący z języka angielskiego, będący złożeniem słów ''back'' ( tył, zaplecze) oraz end (część, warstwa), odnoszący się do części aplikacji niedostępnej dla użytkownika.} to warstwa aplikacji działająca po stronie serwera i odpowiedzialna za przetwarzanie danych oraz komunikację z bazą danych lub innymi systemami. Backend nie jest bezpośrednio widoczny dla użytkownika końcowego. Obsługuje m.in. autoryzację, walidację danych, realizację reguł biznesowych oraz udostępnianie danych frontendowi za pomocą API\footnote{API - skrót z języka angielskiego, oznaczający Application Programming Interface.}.
+Backend\footnote{Backend -termin pochodzący z języka angielskiego, będący złożeniem słów ''back'' ( tył, zaplecze) oraz end (część, warstwa), odnoszący się do części aplikacji niedostępnej dla użytkownika.} to warstwa aplikacji działająca po stronie serwera i odpowiedzialna za przetwarzanie danych oraz komunikację z bazą danych lub innymi systemami. Backend nie jest bezpośrednio widoczny dla użytkownika końcowego. Obsługuje m.in. autoryzację, walidację\footnote{Walidacja - proces sprawdzania poprawności, kompletności oraz zgodności danych wejściowych z określonymi regułami i wymaganiami systemu.} danych, realizację reguł biznesowych oraz udostępnianie danych frontendowi za pomocą API\footnote{API - skrót z języka angielskiego, oznaczający Application Programming Interface.}.
 
 API natomiast to zestaw reguł, metod i struktur danych umożliwiających komunikację pomiędzy różnymi systemami informatycznymi lub ich częściami. Określa, w jaki sposób aplikacje mogą wymieniać dane oraz wywoływać określone funkcje, bez konieczności znajomości wewnętrznej implementacji drugiej strony. API pełni rolę pośrednika pomiędzy frontendem a backendem. Frontend wysyła żądania lub zapytania, natomiast backend przetwarza je, zwracając później odpowiedź.
 
 \section{NextJS}
 
-Z angielskiej dokumentacji\footnote{\emph{NextJS Docs,} https://nextjs.org/docs (dostęp 29.01.2026)} można wyczytać, że Next.js jest frameworkiem opartym na bibliotece React, przeznaczonym do tworzenia pełnostosowych\footnote{Pełnostosowy - Stos to określenie powszechnie stosowane w języku programistycznym jako właśnie narzędzi użytych do produkcji aplikacji. Full-stack to termin z języka angielskiego, oznaczający technologie zarówno frontendowe, jak i backendowe.} aplikacji webowych. Interfejs użytkownika budowany jest przy użyciu komponentów Reacta, natomiast Next.js dostarcza dodatkowe funkcje oraz mechanizmy optymalizacyjne. Framework automatycznie konfiguruje narzędzia niskiego poziomu, takie jak bundlery\footnote{Bundler - narzędzie programistyczne służące do łączenia wielu plików źródłowych w jeden lub kilka zoptymalizowanych pakietów, które mogą być uruchamiane w przeglądarce.}
+Next.js\footnote{\emph{NextJS Docs,} \url{https://nextjs.org/docs} (dostęp 29.01.2026)} jest frameworkiem opartym na bibliotece React, przeznaczonym do tworzenia pełnostosowych\footnote{Pełnostosowy - Stos to określenie powszechnie stosowane w języku programistycznym jako właśnie narzędzi użytych do produkcji aplikacji. Full-stack to termin z języka angielskiego, oznaczający technologie zarówno frontendowe, jak i backendowe.} aplikacji webowych. Interfejs użytkownika budowany jest przy użyciu komponentów Reacta, natomiast Next.js dostarcza dodatkowe funkcje oraz mechanizmy optymalizacyjne. Framework automatycznie konfiguruje narzędzia niskiego poziomu, takie jak bundlery\footnote{Bundler - narzędzie programistyczne służące do łączenia wielu plików źródłowych w jeden lub kilka zoptymalizowanych pakietów, które mogą być uruchamiane w przeglądarce.}
 oraz kompilatory\footnote{Kompilator - program tłumaczący kod źródłowy napisany w jednym języku programowania na inną postać, umożliwiając jego uruchomienie w danym środowisku.}, dzięki czemu programista może skupić się na tworzeniu aplikacji
 i szybkim wdrażaniu jej do użytku.
 
@@ -522,7 +522,7 @@ Równie istotnym elementem optymalizacji w NextJS, jest deduplikacja zapytań, c
 
 Ścieżki API w NextJS to mechanizm, umożliwiający definiowanie punktów końcowych\footnote{Punkt końcowy - reprezentowany jest przez określony adres URL oraz metodę HTTP, udostępniając konkretną funkcjonalność lub zasób systemu. Umożliwia komunikację pomiędzy klientem a serwerem.} API bezpośrednio w projekcie Next.js. Endpointy (z jęz. ang. punkty końcowe) można tworzyć poprzez umieszczenie plików w katalogu ``pages/api'', a każda taka funkcja obsługuje żądania HTTP i zwraca odpowiedź w modelu ``request/response''\footnote{Interfejs typu request/response -- model komunikacji pomiędzy klientem a serwerem, w którym klient wysyła żądanie (request) zawierające określone dane lub operację, a serwer przetwarza je i zwraca odpowiedź (response) z wynikiem działania, danymi lub informacją o błędzie.}.
 W nowszym podejściu, odpowiednikiem ścieżek API są tzw. Route Handlers (z jęz. ang. obsługa ścieżek), definiowane w katalogu ``app'' i pliku ``route.js''. W tym modelu obsługa metod HTTP realizowana jest przez eksport funkcji takich jak ``GET'', ``POST'', ``PUT'' czy ``DELETE'', co pozwala tworzyć endpointy w sposób bardziej zbliżony do standardowych interfejsów typu ``request/response''.
-Zastosowanie API Routes obejmuje m.in. obsługę formularzy, operacje CRUD\footnote{CRUD - z jęz. ang. skrót odnoszący się do wyrazów: Create, Read, Update, Delete. Oznacza możliwość tworzenia, odczytu, aktualizacji oraz usuwania danych.}, integracje z usługami zewnętrznymi, czy realizację logiki po stronie serwera, która nie powinna być wykonywana w przeglądarce. Istotną zaletą jest fakt, że kod endpointów nie trafia do klienta, dzięki czemu możliwe jest bezpieczniejsze przetwarzanie danych oraz użycie zmiennych środowiskowych po stronie serwera.
+Zastosowanie API Routes obejmuje m.in. obsługę formularzy, operacje CRUD, integracje z usługami zewnętrznymi, czy realizację logiki po stronie serwera, która nie powinna być wykonywana w przeglądarce. Istotną zaletą jest fakt, że kod endpointów nie trafia do klienta, dzięki czemu możliwe jest bezpieczniejsze przetwarzanie danych oraz użycie zmiennych środowiskowych po stronie serwera.
 
 \section{Autoryzacja i autentykacja}
 
@@ -538,7 +538,7 @@ Renderowanie po stronie serwera umożliwia dostarczenie kompletnego HTML już na
 Aplikacja do zarządzania zadaniami posiada ogromny potencjał do konsekwentnego rozwijania jej wraz z dodawaniem nowych funkcjonalności. Next.js sprzyja umożliwia skalowalność na kilku poziomach, lecz przede wszystkim zapewnia czytelną strukturę projektu, dzięki routingowi opartemu o system plików wraz z możliwościami wydzielania modułów. Next.js pozwala rozwijać aplikację etapami, utrzymując spójny model wytwarzania, natomiast wraz ze wzrostem złożoności projektu nie zachodzi potrzeba migracji na inne narzędzia.
 Kolejnym argumentem jest możliwość budowy zarówno warstwy prezentacji, jak
 i elementów backendowych w ramach jednego frameworka. Next.js dostarcza mechanizmy takie jak endpointy API, middleware\footnote{Middleware -- warstwa pośrednia oprogramowania działająca pomiędzy żądaniem użytkownika a właściwą logiką aplikacji, umożliwiająca przechwytywanie i modyfikację zapytań oraz odpowiedzi. Stosowana jest m.in. do realizacji takich zadań jak autentykacja, autoryzacja, logowanie zdarzeń, obsługa błędów czy przekierowania, bez ingerencji w główną logikę biznesową systemu.} oraz integrację z logiką serwerową, co jest szczególnie korzystne w wymagających aplikacjach. Takie podejście mocno skraca czas implementacji, ponieważ eliminuje konieczność utrzymywania osobnego projektu backendowego. Zmniejsza to również ryzyko niespójności kontraktów API oraz upraszcza jej wdrażanie, gdyż aplikacja może być publikowana jako całość.
-Istotną zaletą Nexta jest również integracja z biblioteką \href{http://auth.js}{Auth.js}. Pozwala to implementować zabezpieczenia zarówno po stronie klienta - jak warunkowe renderowanie widoków, oraz po stronie serwera - ochrona endpointów API, czy walidacja sesji
+Istotną zaletą Nexta jest również integracja z biblioteką \href{https://authjs.dev}{Auth.js}. Pozwala to implementować zabezpieczenia zarówno po stronie klienta - jak warunkowe renderowanie widoków, oraz po stronie serwera - ochrona endpointów API, czy walidacja sesji
 w middleware. Dzięki temu kontrola dostępu nie jest oparta wyłącznie o logikę frontendową, lecz może być egzekwowana na poziomie serwera, co zwiększa bezpieczeństwo rozwiązania.
 Zastosowanie Auth.js eliminuje również konieczność budowania całego mechanizmu logowania od podstaw. Stworzenie logiki, zajmującej się obsługiwaniem sesji, tokenów, odświeżania, błędów, integracji z dostawcami autentykacji i autoryzacji, zajmuje dużo czasu. Jednocześnie rozwiązania zastosowane w tej bibliotece pozostają elastyczne i możliwe do rozbudowy.
 
@@ -583,7 +583,7 @@ Dzięki swojej niezawodności oraz dobrej integracji z popularnymi technologiami
 
 \section{MongoDB}
 
-MongoDB\footnote{\emph{Welcome to the MongoDB docs}, https://www.mongodb.com/docs/ (dostęp: 02.02.2026).} jest nierelacyjnym systemem zarządzania bazą danych, którego podstawową różnicą względem relacyjnych rozwiązań, jest sposób przechowywania informacji. MongoDB wykorzystuje model dokumentowy, w którym dane zapisywane są
+MongoDB\footnote{\emph{Welcome to the MongoDB docs}, \url{https://www.mongodb.com/docs/} (dostęp: 02.02.2026).} jest nierelacyjnym systemem zarządzania bazą danych, którego podstawową różnicą względem relacyjnych rozwiązań, jest sposób przechowywania informacji. MongoDB wykorzystuje model dokumentowy, w którym dane zapisywane są
 w elastycznych strukturach przypominających format JSON\footnote{JSON - z jęz. ang JavaScript Object Notation,, tekstowy format zapisu i wymiany danych oparty na strukturze obiektów oraz tablic, wykorzystywany w komunikacji między aplikacjami.}. Oznacza to brak sztywno zdefiniowanego schematu tabel oraz większą swobodę w organizacji informacji.
 MongoDB przechowuje powiązane dane często w obrębie jednego dokumentu. Takie podejście redukuje potrzebę wykonywania złożonych połączeń między poszczególnymi tabelami, co przyspiesza operacje odczytu i upraszcza projektowanie aplikacji o dynamicznej strukturze danych.
 MongoDB zapisuje dane w kolekcjach składających się z dokumentów. Każdy dokument może posiadać inną strukturę oraz zestaw pól, co pozwala na łatwe rozszerzanie modelu danych bez konieczności modyfikowania schematu całej bazy. Komunikacja
@@ -642,7 +642,7 @@ Na poniżej przedstawionym schemacie zaprezentowano klasyczną, trójwarstwową 
 
 Przeglądarka (browser) to środowisko uruchomieniowe po stronie klienta,
 w którym działa aplikacja frontendowa. Użytkownik korzysta z systemu poprzez przeglądarkę, która renderuje interfejs i wysyła żądania do serwera. Ponadto umożliwia wykonywanie kodu JavaScripta, obsługuje interakcje z systemem, wyświetla interfejs użytkownika oraz może komunikować się z backendem za pomocą protokołów HTTP lub HTTPS\footnote{HTTP (HyperText Transfer Protocol) -- protokół komunikacyjny warstwy aplikacji wykorzystywany do przesyłania danych pomiędzy klientem a serwerem w sieci WWW. Jego rozszerzona, bardziej bezpieczna wersja, wykorzystująca mechanizmy szyfrowania to protokół HTTPS (HyperText Transfer Protocol Secure).}.
-Warstwa prezentacji odpowiada za interfejs użytkownika (UI) oraz sposób prezentacji danych. Wyświetla widoki formularzy, zbiera dane wejściowe, które potem mogą zostać przesłane w postaci zapytań do bazy danych oraz zajmuje się podstawową walidacją\footnote{Walidacja - proces sprawdzania poprawności, kompletności oraz zgodności danych wejściowych z określonymi regułami i wymaganiami systemu.} formularzy. Odpowiada również za wysyłanie zapytań do backendu.
+Warstwa prezentacji odpowiada za interfejs użytkownika (UI) oraz sposób prezentacji danych. Wyświetla widoki formularzy, zbiera dane wejściowe, które potem mogą zostać przesłane w postaci zapytań do bazy danych oraz zajmuje się podstawową walidacją formularzy. Odpowiada również za wysyłanie zapytań do backendu.
 Warstwa logiki biznesowej stanowi rdzeń aplikacji, odpowiadając za przetwarzanie danych. Realizuje operacje CRUD, dbając też o szczegółową walidację danych. Realizuje autentykację i autoryzację użytkowników.
 Za magazynowanie danych w sposób trwały odpowiada warstwa przechowywania danych (na rysunku opisana jako persistent storage layer), będąca zazwyczaj bazą danych. Ta część aplikacji odczytuje, przechowywuje i zapewnia integralność danych.
 Źródła zewnętrze z kolei to zewnętrzne systemy i usługi, z którymi aplikacja się integruje. Mogą to być zewnętrzne bazy lub pliki z danymi (data sources), integracje
@@ -1081,12 +1081,38 @@ W efekcie sekcja przypiętych elementów pełni rolę spersonalizowanego skrótu
 
 \chapter*{Bibliografia}
 \addcontentsline{toc}{chapter}{Bibliografia}
+\begingroup
+\sloppy
 
-{Dean J., \emph{Web programming with HTML, CSS, and JavaScript}, Burlington 2017}
+Albiorix Technology, \emph{Web application architecture layers}, \url{https://www.albiorixtech.com/wp-content/uploads/2025/12/web-application-architecture-layers.jpg} (dostęp: 03.02.2026).
+
+Asana, Inc., \emph{Asana}, \url{https://asana.com} (dostęp: 17.07.2026).
+
+Atlassian, \emph{Trello}, \url{https://trello.com} (dostęp: 17.07.2026).
+
+Auth.js, \emph{Auth.js}, \url{https://authjs.dev} (dostęp: 17.07.2026).
+
+Canva, \emph{Creating a data flow diagram: How-tos, templates, and tips}, \url{https://www.canva.com/online-whiteboard/data-flow-diagrams/} (dostęp: 03.02.2026).
+
+ClickUp, \emph{ClickUp}, \url{https://clickup.com} (dostęp: 17.07.2026).
+
+Dean J., \emph{Web programming with HTML, CSS, and JavaScript}, Burlington 2017.
+
+\emph{Frontend vs Backend}, \url{https://d1zruf9db62p8s.cloudfront.net/2025/08/Frontend-vs-Backend.webp} (dostęp: 02.02.2026).
 
 Hasan Imam M., Chowdhury M., \emph{International Journal of Scientific Interdisciplinary Research}, „\emph{To what extent does the use of project management - oriented digital collaboration tools affect delivery timelines in remote tech teams?}'' 2025, tom 1, nr 1, s. 163--184.
 
-{Mushaf, Nur M., Ilmi N., Nurfadilah, \& Shiddiq A., \emph{Journal of Embedded Systems, Security and Intelligent Systems}, ``Development of a Web-Based Scheduling Information System with Agile Methodology Using Next.js and Supabase'', 2025, tom \emph{6}, nr 2, s. 279--298}
+MongoDB, Inc., \emph{Welcome to the MongoDB docs}, \url{https://www.mongodb.com/docs/} (dostęp: 02.02.2026).
+
+Mushaf, Nur M., Ilmi N., Nurfadilah, \& Shiddiq A., \emph{Journal of Embedded Systems, Security and Intelligent Systems}, ``Development of a Web-Based Scheduling Information System with Agile Methodology Using Next.js and Supabase'', 2025, tom \emph{6}, nr 2, s. 279--298.
+
+React, \emph{React: The library for web and native interfaces}, \url{https://react.dev} (dostęp: 28.01.2026).
+
+Tailwind Labs, \emph{Tailwind CSS}, \url{https://tailwindcss.com} (dostęp: 28.01.2026).
+
+Vercel, \emph{Next.js Docs}, \url{https://nextjs.org/docs} (dostęp: 29.01.2026).
+
+\endgroup
 
 \clearpage
 \addcontentsline{toc}{chapter}{Spis rysunków}
