@@ -721,7 +721,24 @@ W aplikacji zastosowano bazę danych MongoDB oraz bibliotekę Mongoose, która z
 
 Podstawową zasadą modelu danych jest przypisanie dokumentów do konkretnego użytkownika. Notatki, checklisty, zadania, projekty, przypięcia oraz zdarzenia aktywności zawierają pole \texttt{ownerId}, które wskazuje właściciela dokumentu. Preferencje interfejsu użytkownika korzystają z pola \texttt{userId}. Każda operacja pobierania, aktualizacji lub archiwizacji danych wykonywana jest z uwzględnieniem identyfikatora aktualnie zalogowanego użytkownika, co zabezpiecza aplikację przed dostępem do cudzych zasobów.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.82\textheight,keepaspectratio]{assets/schemat-bazy-danych.png}
+  \caption{Schemat struktury bazy danych aplikacji.}
+  \label{fig:schemat-bazy-danych-aplikacji}
+\end{figure}
+
+Na rysunku \ref{fig:schemat-bazy-danych-aplikacji} przedstawiono graficzny schemat struktury bazy danych aplikacji. Diagram został podzielony na cztery grupy: kolekcje autoryzacyjne, kolekcje przechowujące dane użytkownika, kolekcje pomocnicze oraz pola osadzone. Taki podział pokazuje, że dane odpowiedzialne za logowanie użytkownika są odseparowane od danych domenowych aplikacji, takich jak zadania, projekty, checklisty i notatki.
+
+W schemacie zastosowano oznaczenie \texttt{ObjectId}, które oznacza specjalny typ identyfikatora używany w MongoDB. Każdy dokument zapisany w kolekcji otrzymuje pole \texttt{\_id} tego typu, a inne pola, takie jak \texttt{ownerId}, \texttt{projectId}, \texttt{targetId} albo \texttt{userId}, mogą przechowywać identyfikator innego dokumentu. Dzięki temu aplikacja może wskazywać powiązania pomiędzy dokumentami bez stosowania klasycznych kluczy obcych znanych z relacyjnych baz danych.
+
+Typ \texttt{Date} zapisano wielką literą, ponieważ w kontekście MongoDB, Mongoose oraz JavaScriptu jest to nazwa typu obiektowego reprezentującego datę i czas. Zapis ma więc charakter techniczny i odpowiada nazwie typu, a nie zwykłemu słowu opisowemu. Z tego samego powodu na diagramie widoczne są zapisy takie jak \texttt{Date | null}, które oznaczają, że pole może zawierać datę albo wartość pustą. Przykładem jest \texttt{archivedAt}, które pozostaje puste dla aktywnego dokumentu, a po archiwizacji otrzymuje datę wykonania tej operacji.
+
+Zapisy z nawiasami kwadratowymi, takie jak \texttt{string[]}, \texttt{ObjectId[]} albo \texttt{object[]}, oznaczają tablice wartości danego typu. Przykładowo \texttt{string[]} oznacza tablicę tekstów, czyli wiele wartości typu \texttt{string}. Pole \texttt{tags} może więc przechowywać kilka tagów, pole \texttt{checklistIds} może przechowywać wiele identyfikatorów checklist, a pole \texttt{kanbanColumns} zawiera tablicę obiektów opisujących kolumny tablicy kanban.
+
 Warstwa autoryzacji tworzy kolekcje \texttt{users}, \texttt{accounts}, \texttt{sessions} oraz \texttt{verification\_tokens}. Najważniejsze z punktu widzenia działania aplikacji są kolekcje \texttt{users} i \texttt{accounts}, ponieważ przechowują użytkowników oraz powiązania z zewnętrznymi dostawcami logowania, takimi jak Google i GitHub. Sesja użytkownika jest obsługiwana z użyciem strategii JWT, jednak identyfikator użytkownika pochodzący z NextAuth stanowi podstawę powiązań z dokumentami domenowymi.
+
+Kolekcja \texttt{accounts} pełni funkcję technicznego powiązania pomiędzy użytkownikiem zapisanym w kolekcji \texttt{users} a kontem pochodzącym od zewnętrznego dostawcy logowania. Pole \texttt{userId} wskazuje dokument użytkownika, natomiast pola \texttt{provider} i \texttt{providerAccountId} określają, z jakiego dostawcy OAuth pochodzi dane konto oraz jaki identyfikator użytkownik posiada u tego dostawcy. Dzięki temu jedna osoba może być poprawnie rozpoznawana przez system po zalogowaniu z użyciem zewnętrznej usługi.
 
 Główne dane aplikacji zostały podzielone na kolekcje \texttt{notes}, \texttt{checklists}, \texttt{tasks}, \texttt{projects}, \texttt{pins}, \texttt{userpreferences} oraz \texttt{activityevents}. Kolekcja \texttt{notes} przechowuje notatki użytkownika, zawierające tytuł, treść, tagi, pozycję sortowania oraz listę powiązanych elementów. Powiązania notatki są przechowywane w tablicy \texttt{linkedItems}, gdzie każdy wpis składa się z typu obiektu oraz jego identyfikatora. Dzięki temu notatka może odnosić się do innej notatki, checklisty, zadania albo projektu.
 
@@ -731,9 +748,13 @@ Zadania są zapisywane w kolekcji \texttt{tasks}. Dokument zadania zawiera tytu�
 
 Projekty są przechowywane w kolekcji \texttt{projects}. Dokument projektu zawiera tytuł, opis, priorytet, status cyklu życia, termin, tagi, pozycję, listę zadań, checklisty oraz konfigurację widoku zadań. W projekcie przechowywana jest tablica \texttt{kanbanColumns}, opisująca kolumny tablicy kanban. Każda kolumna ma identyfikator, nazwę, kolor, pozycję oraz informację, czy oznacza stan zakończony. Domyślny zestaw kolumn obejmuje \texttt{backlog}, \texttt{todo}, \texttt{in\_progress}, \texttt{testing} oraz \texttt{done}. Pole \texttt{taskView} określa, czy zadania projektu są prezentowane jako lista, czy jako tablica kanban.
 
+Kolekcja \texttt{projects} jest jedną z najważniejszych kolekcji domenowych przedstawionych na schemacie, ponieważ łączy informacje opisowe projektu z jego strukturą roboczą. Oprócz podstawowych pól, takich jak \texttt{title}, \texttt{priority} i \texttt{dueDate}, dokument projektu przechowuje identyfikatory powiązanych tasków i checklist oraz osadzoną tablicę \texttt{kanbanColumns}. Dzięki temu projekt zawiera nie tylko dane opisowe, ale również konfigurację sposobu prezentacji pracy użytkownikowi.
+
 Relacja pomiędzy projektami i zadaniami jest utrzymywana dwukierunkowo na poziomie aplikacji. Główne powiązanie znajduje się w zadaniu, w polu \texttt{projectId}. Projekt przechowuje dodatkowo tablicę \texttt{taskIds}, która zawiera identyfikatory powiązanych zadań. Podczas tworzenia zadania z przypisanym projektem backend sprawdza, czy projekt istnieje, nie jest zarchiwizowany i należy do aktualnego użytkownika. Następnie identyfikator zadania jest dopisywany do projektu. Przy zmianie projektu lub archiwizacji zadania identyfikator jest usuwany ze starego projektu.
 
 Kolekcja \texttt{pins} przechowuje elementy przypięte na ekranie głównym aplikacji. Dokument przypięcia zawiera typ wskazywanego obiektu, jego identyfikator oraz pozycję na dashboardzie. Dzięki parze pól \texttt{targetType} i \texttt{targetId} możliwe jest przypięcie notatki, checklisty, zadania albo projektu bez tworzenia osobnych kolekcji dla każdego typu przypięcia. W modelu zastosowano unikalny indeks obejmujący właściciela, typ celu i identyfikator celu, co zapobiega wielokrotnemu przypięciu tego samego elementu przez jednego użytkownika.
+
+Na schemacie kolekcja \texttt{pins} została umieszczona w grupie danych pomocniczych, ponieważ sama nie przechowuje pełnej treści notatki, taska, checklisty ani projektu. Jest dokumentem pośrednim, który zapamiętuje, jaki element użytkownik chce widzieć na dashboardzie. Pole \texttt{targetType} określa typ przypiętego obiektu, a \texttt{targetId} przechowuje jego identyfikator. Taki układ upraszcza model danych, ponieważ jeden mechanizm przypinania obsługuje kilka typów zasobów.
 
 Preferencje interfejsu zapisano w kolekcji \texttt{userpreferences}. Dokument preferencji zawiera tryb kolorystyczny, układ dashboardu, zestaw kolorów używanych w aplikacji oraz zapisane własne motywy. Pole \texttt{userId} jest unikalne, dlatego jeden użytkownik ma jeden dokument preferencji. Takie rozwiązanie upraszcza pobieranie ustawień podczas renderowania interfejsu.
 
