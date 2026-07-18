@@ -258,6 +258,310 @@ users
   |-- activityevents -------------> notes / checklists / tasks / projects
 ```
 
+## Schemat do wykonania w Lucidchart
+
+Poniższy opis można wykorzystać jako instrukcję wykonania graficznej wizualizacji bazy danych w narzędziu Lucidchart. Diagram powinien przedstawiać strukturę dokumentowej bazy MongoDB, dlatego najlepiej użyć stylu zbliżonego do diagramu ERD, ale z dodatkowymi oznaczeniami pól osadzonych oraz relacji polimorficznych.
+
+### 1. Przygotowanie diagramu
+
+W Lucidchart należy utworzyć nowy diagram i wybrać kształty typu Entity Relationship albo Database. Każdą kolekcję warto przedstawić jako osobny prostokąt z trzema częściami:
+
+1. Nazwa kolekcji.
+2. Najważniejsze pola dokumentu.
+3. Krótka informacja o polach osadzonych lub indeksach, jeżeli są istotne dla zrozumienia relacji.
+
+Kolekcje aplikacyjne i kolekcje autoryzacji powinny zostać rozróżnione kolorami. Proponowany podział:
+
+| Grupa | Kolekcje | Kolor w diagramie |
+| --- | --- | --- |
+| Autoryzacja | `users`, `accounts`, `sessions`, `verification_tokens` | jasny niebieski |
+| Dane użytkownika | `notes`, `checklists`, `tasks`, `projects` | jasny zielony |
+| Dane pomocnicze | `pins`, `userpreferences`, `activityevents` | jasny fioletowy |
+| Pola osadzone | `linkedItems`, `items`, `kanbanColumns`, `savedThemes` | jasny szary albo osobna sekcja w obrębie kolekcji |
+
+### 2. Kolekcje do umieszczenia na diagramie
+
+Na diagramie należy umieścić następujące kolekcje:
+
+```txt
+users
+accounts
+sessions
+verification_tokens
+notes
+checklists
+tasks
+projects
+pins
+userpreferences
+activityevents
+```
+
+Kolekcję `users` należy umieścić centralnie po lewej stronie, ponieważ stanowi punkt wyjścia dla większości relacji właścicielskich. Kolekcje domenowe (`notes`, `checklists`, `tasks`, `projects`) najlepiej umieścić w środkowej części diagramu. Kolekcje pomocnicze (`pins`, `userpreferences`, `activityevents`) powinny znaleźć się po prawej stronie lub poniżej kolekcji domenowych.
+
+### 3. Zawartość prostokątów kolekcji
+
+W prostokątach nie trzeba umieszczać wszystkich pól opisowych, jeśli diagram ma pozostać czytelny. Najważniejsze są pola identyfikujące dokument, relacje i status dokumentu.
+
+```txt
+users
+- _id: ObjectId
+- name: string
+- email: string
+- image: string
+```
+
+```txt
+accounts
+- _id: ObjectId
+- userId: ObjectId
+- provider: string
+- providerAccountId: string
+```
+
+```txt
+notes
+- _id: ObjectId
+- ownerId: ObjectId
+- title: string
+- content: string
+- linkedItems[]: object[]
+- tags[]: string[]
+- position: number
+- archivedAt: Date | null
+- createdAt: Date
+- updatedAt: Date
+```
+
+```txt
+checklists
+- _id: ObjectId
+- ownerId: ObjectId
+- title: string
+- items[]: object[]
+- parentType: string | null
+- parentId: ObjectId | null
+- position: number
+- archivedAt: Date | null
+- createdAt: Date
+- updatedAt: Date
+```
+
+```txt
+tasks
+- _id: ObjectId
+- ownerId: ObjectId
+- projectId: ObjectId | null
+- title: string
+- priority: string
+- statusId: string
+- dueDate: Date | null
+- tags[]: string[]
+- checklistIds[]: ObjectId[]
+- position: number
+- completedAt: Date | null
+- archivedAt: Date | null
+- createdAt: Date
+- updatedAt: Date
+```
+
+```txt
+projects
+- _id: ObjectId
+- ownerId: ObjectId
+- title: string
+- priority: string
+- lifecycleStatus: string
+- dueDate: Date | null
+- tags[]: string[]
+- checklistIds[]: ObjectId[]
+- taskIds[]: ObjectId[]
+- kanbanColumns[]: object[]
+- taskView: string
+- completedAt: Date | null
+- archivedAt: Date | null
+- createdAt: Date
+- updatedAt: Date
+```
+
+```txt
+pins
+- _id: ObjectId
+- ownerId: ObjectId
+- targetType: string
+- targetId: ObjectId
+- position: number
+- createdAt: Date
+- updatedAt: Date
+```
+
+```txt
+userpreferences
+- _id: ObjectId
+- userId: ObjectId
+- colorMode: string
+- dashboardLayout: string
+- colors: object
+- savedThemes[]: object[]
+- createdAt: Date
+- updatedAt: Date
+```
+
+```txt
+activityevents
+- _id: ObjectId
+- ownerId: ObjectId
+- entityType: string
+- entityId: ObjectId
+- action: string
+- metadata: object
+- occurredAt: Date
+- createdAt: Date
+- updatedAt: Date
+```
+
+### 4. Pola osadzone do pokazania na diagramie
+
+W MongoDB część danych nie jest przechowywana jako osobne kolekcje, lecz jako tablice obiektów osadzone w dokumencie. W Lucidchart można pokazać je jako mniejsze prostokąty wewnątrz kolekcji albo jako szare prostokąty połączone linią kompozycji.
+
+```txt
+notes.linkedItems[]
+- targetType: note | checklist | task | project
+- targetId: ObjectId
+```
+
+```txt
+checklists.items[]
+- _id
+- title
+- isCompleted
+- completedAt
+- position
+```
+
+```txt
+projects.kanbanColumns[]
+- id
+- title
+- position
+- color
+- isDone
+```
+
+```txt
+userpreferences.savedThemes[]
+- name
+- colors
+- createdAt
+```
+
+Najważniejsze pola osadzone z punktu widzenia diagramu to `checklists.items[]` i `projects.kanbanColumns[]`. Pierwsze pokazuje, że elementy checklisty nie są osobną kolekcją, a drugie wyjaśnia, skąd pochodzą kolumny widoku kanban.
+
+### 5. Relacje do narysowania
+
+Relacje należy narysować liniami z podpisami pól, które tworzą powiązanie. Przy relacjach właścicielskich można użyć linii ciągłej, a przy relacjach polimorficznych linii przerywanej.
+
+| Relacja w diagramie | Typ linii | Opis podpisu na linii |
+| --- | --- | --- |
+| `users._id -> accounts.userId` | ciągła | użytkownik ma konta OAuth |
+| `users._id -> userpreferences.userId` | ciągła | użytkownik ma jedne preferencje |
+| `users._id -> notes.ownerId` | ciągła | właściciel notatki |
+| `users._id -> checklists.ownerId` | ciągła | właściciel checklisty |
+| `users._id -> tasks.ownerId` | ciągła | właściciel taska |
+| `users._id -> projects.ownerId` | ciągła | właściciel projektu |
+| `users._id -> pins.ownerId` | ciągła | właściciel przypięcia |
+| `users._id -> activityevents.ownerId` | ciągła | właściciel zdarzenia |
+| `projects._id -> tasks.projectId` | ciągła | task należy do projektu |
+| `tasks._id -> projects.taskIds[]` | ciągła | projekt przechowuje identyfikatory tasków |
+| `checklists._id -> tasks.checklistIds[]` | ciągła | task ma powiązane checklisty |
+| `checklists._id -> projects.checklistIds[]` | ciągła | projekt ma powiązane checklisty |
+| `tasks._id / projects._id -> checklists.parentId` | przerywana | checklista może mieć rodzica |
+| `projects.kanbanColumns.id -> tasks.statusId` | przerywana | status taska odpowiada kolumnie kanban |
+| `notes.linkedItems.targetId -> notes/checklists/tasks/projects._id` | przerywana | notatka wskazuje różne typy elementów |
+| `pins.targetId -> notes/checklists/tasks/projects._id` | przerywana | przypięcie wskazuje różne typy elementów |
+| `activityevents.entityId -> notes/checklists/tasks/projects._id` | przerywana | zdarzenie dotyczy różnych typów elementów |
+
+Relacje `pins`, `activityevents` i `notes.linkedItems` są polimorficzne, ponieważ pole `targetId` albo `entityId` może wskazywać dokument z różnych kolekcji. Na diagramie należy podpisać te linie również polem typu:
+
+```txt
+targetType / entityType:
+note | checklist | task | project
+```
+
+### 6. Proponowany układ diagramu
+
+Najczytelniejszy układ diagramu:
+
+```txt
+                accounts
+                   ^
+                   |
+sessions      users      verification_tokens
+                   |
+                   v
+          userpreferences
+
+notes        checklists        tasks        projects
+  |              ^   ^           ^  \          ^  |
+  |              |   |           |   \         |  |
+  |              |   +-----------+    \--------+  |
+  |              | checklistIds[]       taskIds[] |
+  |              |                                |
+  +---- linkedItems[] ----------------------------+
+
+pins -----------------------> notes / checklists / tasks / projects
+activityevents -------------> notes / checklists / tasks / projects
+projects.kanbanColumns.id --> tasks.statusId
+```
+
+W praktyce warto narysować `users` jako główną kolekcję u góry, a pod nią cztery główne kolekcje domenowe: `notes`, `checklists`, `tasks` i `projects`. Połączenia właścicielskie z `users` można poprowadzić pionowo w dół. Połączenia między kolekcjami domenowymi powinny znajdować się w środkowej części diagramu, ponieważ to one opisują właściwą strukturę aplikacji.
+
+### 7. Oznaczenia kardynalności
+
+W Lucidchart można dodać oznaczenia kardynalności przy liniach relacji. Dla tej bazy danych należy zastosować następujące oznaczenia:
+
+| Relacja | Kardynalność |
+| --- | --- |
+| `users -> notes` | 1:N |
+| `users -> checklists` | 1:N |
+| `users -> tasks` | 1:N |
+| `users -> projects` | 1:N |
+| `users -> pins` | 1:N |
+| `users -> activityevents` | 1:N |
+| `users -> userpreferences` | 1:1 |
+| `users -> accounts` | 1:N |
+| `projects -> tasks` | 1:N |
+| `tasks -> checklists` | N:N logiczne, realizowane przez `checklistIds[]` i `parentId` |
+| `projects -> checklists` | N:N logiczne, realizowane przez `checklistIds[]` i `parentId` |
+| `notes -> notes/checklists/tasks/projects` | N:N polimorficzne |
+| `pins -> notes/checklists/tasks/projects` | N:1 polimorficzne |
+| `activityevents -> notes/checklists/tasks/projects` | N:1 polimorficzne |
+
+### 8. Elementy, które warto wyróżnić na diagramie
+
+Na gotowej wizualizacji powinny być szczególnie widoczne trzy decyzje projektowe:
+
+1. Wszystkie główne dokumenty aplikacji są przypisane do użytkownika przez `ownerId`.
+2. Elementy checklisty i kolumny kanban są osadzone w dokumentach, a nie przechowywane w osobnych kolekcjach.
+3. Przypięcia, zdarzenia aktywności i powiązania notatek korzystają z relacji polimorficznych, czyli wskazują różne typy dokumentów za pomocą pary `targetType`/`targetId` albo `entityType`/`entityId`.
+
+### 9. Minimalna wersja diagramu do pracy inżynierskiej
+
+Jeżeli diagram ma być prosty i czytelny w pracy inżynierskiej, wystarczy pokazać następujące elementy:
+
+```txt
+users
+notes
+checklists
+tasks
+projects
+pins
+userpreferences
+activityevents
+```
+
+W wersji uproszczonej można pominąć `sessions`, `accounts` i `verification_tokens`, a kolekcje NextAuth opisać krótką adnotacją obok `users`. Na samym diagramie należy wtedy zostawić tylko relacje aplikacyjne, czyli właścicielstwo przez `ownerId`, powiązania tasków z projektami, checklist z taskami i projektami, kolumn kanban ze statusem taska oraz polimorficzne powiązania `pins`, `activityevents` i `notes.linkedItems`.
+
 ## Archiwizacja i usuwanie
 
 Zadania, projekty i checklisty są archiwizowane przez ustawienie `archivedAt`. Projekt przy usunięciu otrzymuje również `lifecycleStatus: "archived"`. Widoki i endpointy listujące pobierają tylko dokumenty z `archivedAt: null`.
