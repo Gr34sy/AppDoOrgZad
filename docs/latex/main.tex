@@ -888,6 +888,8 @@ Jak już wcześniej ustalono, projekt interfejsu użytkownika, jest jednym z naj
   \caption{Diagram UML, wizualizujący scenariusz przypięcia taska}
 \end{figure}
 
+Diagram przedstawia sekwencję działań wykonywanych podczas przypinania taska do strony głównej aplikacji. Widoczny jest podział odpowiedzialności pomiędzy użytkownika, interfejs aplikacji oraz system zapisujący zmianę. Rysunek pokazuje, że po wybraniu elementu użytkownik otrzymuje informację o aktualnym stanie przypięcia, a następnie może zmienić ten stan za pomocą ikony pinezki.
+
 \vspace{\baselineskip}
 
 \textbf{3) Utworzenie checklisty zakupów z możliwością odhaczanie pozycji}
@@ -1081,12 +1083,16 @@ W niniejszym podrozdziale przedstawiono wybrane widoki aplikacji, które odpowia
   \label{fig:scenariusz-1-checklista-przypiecie}
 \end{figure}
 
+Rysunek przedstawia widok szczegółów checklisty, w którym centralnym elementem jest panel z tytułem, datami utworzenia i aktualizacji oraz listą pozycji do odhaczenia. Po prawej stronie umieszczono przyciski akcji, w tym ikonę pinezki służącą do przypięcia checklisty do ekranu głównego. Wykonane elementy checklisty są wyróżnione kolorem oraz przekreśleniem, co pozwala szybko rozpoznać postęp realizacji.
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/Scenariusz 1 SS 2.png}
   \caption{Widok przedstawiający zachowanie przycisku ``Przypnij'' po przypięciu checklisty do ekranu głównego.}
   \label{fig:scenariusz-1-przycisk-przypnij}
 \end{figure}
+
+Rysunek pokazuje zmianę wizualną przycisku przypięcia po wykonaniu akcji przez użytkownika. Ikona pinezki zostaje wypełniona kolorem akcentu, dzięki czemu interfejs natychmiast informuje, że checklista jest już przypięta. Takie rozwiązanie ogranicza potrzebę dodatkowych komunikatów tekstowych, ponieważ sam stan przycisku staje się informacją zwrotną.
 
 \begin{figure}[H]
   \centering
@@ -1095,7 +1101,7 @@ W niniejszym podrozdziale przedstawiono wybrane widoki aplikacji, które odpowia
   \label{fig:scenariusz-1-przypiete-elementy}
 \end{figure}
 
-Rysunki \ref{fig:scenariusz-1-checklista-przypiecie}--\ref{fig:scenariusz-1-przypiete-elementy} przedstawiają przebieg scenariusza przypięcia checklisty do ekranu głównego. Widok szczegółów checklisty został zaprojektowany jako centralny panel z wyraźnym tytułem, ikoną typu obiektu oraz listą pozycji oznaczanych kwadratowymi polami wyboru. Wykonane elementy checklisty są odróżnione kolorem akcentu i przekreśleniem tekstu, dzięki czemu użytkownik może szybko ocenić postęp realizacji. Przycisk przypięcia został umieszczony przy prawej krawędzi panelu, w pobliżu pozostałych akcji na obiekcie. Po przypięciu zmienia się jego wypełnienie oraz kolorystyka, co daje czytelną informację zwrotną bez konieczności opuszczania aktualnego ekranu. Na dashboardzie przypięte elementy są prezentowane jako karty z ikonami typów, tytułami, tagami i krótkim podglądem zawartości, a ich rozmieszczenie w siatce pozwala skanować najważniejsze obiekty bez przechodzenia do osobnych modułów aplikacji.
+Rysunek przedstawia sekcję przypiętych elementów na dashboardzie. Elementy zostały pokazane jako karty z ikonami typów, tytułami, tagami oraz skróconym podglądem zawartości. Nad kartami znajdują się mechanizmy wyszukiwania, filtrowania i sortowania, dzięki czemu użytkownik może szybko odnaleźć przypiętą checklistę, task, notatkę albo projekt bez przechodzenia do osobnych modułów aplikacji.
 
 \begin{figure}[H]
   \centering
@@ -1104,6 +1110,8 @@ Rysunki \ref{fig:scenariusz-1-checklista-przypiecie}--\ref{fig:scenariusz-1-przy
   \label{fig:scenariusz-2-taski}
 \end{figure}
 
+Rysunek przedstawia główną stronę tasków użytkownika. Lewy panel nawigacyjny wskazuje aktywną sekcję aplikacji, a w części roboczej widoczne są nagłówek, opis modułu, pasek filtrowania i sortowania oraz karty tasków. Przycisk utworzenia nowego taska został wyróżniony kolorem akcentu i umieszczony w prawym górnym rogu, co ułatwia rozpoczęcie scenariusza dodawania zadania.
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/Scenariusz 2 SS 2.png}
@@ -1111,7 +1119,7 @@ Rysunki \ref{fig:scenariusz-1-checklista-przypiecie}--\ref{fig:scenariusz-1-przy
   \label{fig:scenariusz-2-formularz-taska}
 \end{figure}
 
-Rysunki \ref{fig:scenariusz-2-taski}--\ref{fig:scenariusz-2-formularz-taska} odnoszą się do scenariusza utworzenia taska. Lista tasków wykorzystuje stały układ aplikacji z bocznym menu nawigacyjnym i nagłówkiem sekcji, dzięki czemu użytkownik od razu widzi, w którym module pracuje. Nad kartami z taskami umieszczono pasek filtrów, sortowania i wyszukiwania, a przycisk utworzenia nowego taska wyróżniono kolorem akcentu w prawym górnym rogu widoku. Same taski zostały przedstawione w formie kart zawierających nazwę, status, priorytet, tagi oraz krótki opis. Formularz tworzenia taska zachowuje tę samą hierarchię wizualną: najpierw eksponowane są pola tytułu i opisu, następnie parametry organizacyjne, takie jak priorytet, status, projekt i termin realizacji. Niżej znajdują się tagi, powiązane checklisty oraz notatki, co porządkuje dane od najważniejszych informacji opisowych do relacji z innymi elementami systemu.
+Rysunek pokazuje formularz tworzenia taska. Najwyżej umieszczono pola tytułu i opisu, ponieważ są one najważniejsze dla identyfikacji zadania. Niżej znajdują się parametry organizacyjne, takie jak priorytet, status, projekt, termin realizacji, tagi, checklisty oraz powiązane notatki. Formularz zachowuje jednolity układ pól i odstępów, co zwiększa czytelność nawet przy większej liczbie ustawień.
 
 \begin{figure}[H]
   \centering
@@ -1120,12 +1128,16 @@ Rysunki \ref{fig:scenariusz-2-taski}--\ref{fig:scenariusz-2-formularz-taska} odn
   \label{fig:scenariusz-5-formularz-projektu-pierwsza-czesc}
 \end{figure}
 
+Rysunek przedstawia pierwszą część formularza tworzenia projektu. Widoczne są pola podstawowe, takie jak tytuł, opis, priorytet, status, termin realizacji oraz tagi. W dalszej części ekranu znajdują się również powiązania z checklistami i notatkami, co pokazuje, że projekt może grupować różne typy informacji potrzebnych do organizacji pracy.
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/Scenariusz 5 SS 2.png}
   \caption{Widok przedstawiający drugą część formularza kreacji projektu.}
   \label{fig:scenariusz-5-formularz-projektu-druga-czesc}
 \end{figure}
+
+Rysunek pokazuje drugą część formularza projektu, w której użytkownik może skonfigurować kolumny tablicy kanban. Każda kolumna jest przedstawiona jako osobny wiersz z nazwą, kolorem, oznaczeniem stanu zakończonego oraz przyciskami zmiany kolejności i usunięcia. Dzięki temu struktura przyszłej tablicy projektu jest widoczna jeszcze przed zapisaniem projektu.
 
 \begin{figure}[H]
   \centering
@@ -1134,12 +1146,16 @@ Rysunki \ref{fig:scenariusz-2-taski}--\ref{fig:scenariusz-2-formularz-taska} odn
   \label{fig:scenariusz-5-dodawanie-taskow}
 \end{figure}
 
+Rysunek przedstawia sekcję dodawania tasków bezpośrednio podczas tworzenia projektu. Poszczególne taski zostały ułożone w wierszach, a każdy z nich posiada pola tytułu, priorytetu, statusu i terminu realizacji. Taki układ pozwala użytkownikowi szybko porównać kilka podzadań i przypisać im początkowe statusy jeszcze przed utworzeniem projektu.
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/Scenariusz 5 SS 4.png}
   \caption{Widok, przedstawiający tablicę kanban projektu.}
   \label{fig:scenariusz-5-tablica-kanban}
 \end{figure}
+
+Rysunek pokazuje projekt w widoku tablicy kanban. Zadania są rozmieszczone w kolumnach odpowiadających ich statusom, a kolorowe oznaczenia nagłówków pomagają odróżnić poszczególne etapy pracy. Karty tasków zawierają najważniejsze informacje, takie jak tytuł i priorytet, a przyciski przejścia do poprzedniej lub następnej kolumny wspierają zmianę statusu zadania.
 
 \begin{figure}[H]
   \centering
@@ -1148,9 +1164,7 @@ Rysunki \ref{fig:scenariusz-2-taski}--\ref{fig:scenariusz-2-formularz-taska} odn
   \label{fig:scenariusz-5-lista-taskow-projektu}
 \end{figure}
 
-Rysunki \ref{fig:scenariusz-5-formularz-projektu-pierwsza-czesc}--\ref{fig:scenariusz-5-lista-taskow-projektu} prezentują interfejs związany ze scenariuszem utworzenia projektu i zarządzania podzadaniami. Formularz projektu został podzielony na logiczne części, co ogranicza wizualne przeciążenie mimo dużej liczby parametrów. W pierwszej części użytkownik uzupełnia podstawowe dane, takie jak tytuł, opis, priorytet, status, termin, tagi oraz powiązane checklisty i notatki. Druga część formularza obejmuje konfigurację kolumn kanban, w której każda kolumna jest pokazana jako osobny wiersz z nazwą, kolorem, oznaczeniem zakończenia oraz przyciskami zmiany kolejności i usunięcia. Sekcja dodawania tasków do projektu wykorzystuje układ tabelaryczny, dzięki czemu kilka podzadań można porównać w jednym poziomym rzędzie według tytułu, priorytetu, statusu i terminu.
-
-Po utworzeniu projektu użytkownik może wybrać jeden z dwóch sposobów przeglądania tasków. Widok kanban eksponuje kolumny statusów jako równoległe obszary robocze, z kolorowymi oznaczeniami nagłówków i paskami postępu. Karty tasków znajdują się bezpośrednio w kolumnach odpowiadających ich statusom, a przyciski przejścia do poprzedniej lub następnej kolumny wzmacniają czytelność procesu. Alternatywny widok listy przedstawia te same taski w bardziej zwartym układzie, przeznaczonym do szybkiego przeglądania nazw, priorytetów oraz aktualnych statusów. Przełącznik pomiędzy widokiem kanban i listą jest widoczny nad obszarem tasków, dzięki czemu użytkownik może dobrać prezentację danych do aktualnego sposobu pracy.
+Rysunek przedstawia alternatywny widok tasków projektu w formie listy. W tym układzie zadania są pokazane jako poziome wiersze, dzięki czemu użytkownik może szybko przejrzeć ich nazwy, priorytety oraz aktualne statusy. Przełącznik pomiędzy widokiem kanban i listą znajduje się nad obszarem tasków, co pozwala dobrać sposób prezentacji danych do aktualnego trybu pracy.
 
 \chapter{Implementacja kodu frontendowego}
 
