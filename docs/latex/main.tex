@@ -1240,7 +1240,7 @@ Widok tablicy kanban prezentuje projekt jako zestaw kolumn odpowiadających stat
 
 Alternatywny widok tasków projektu przyjmuje formę listy. W tym układzie zadania są pokazane jako poziome wiersze, dzięki czemu użytkownik może szybko przejrzeć ich nazwy, priorytety oraz aktualne statusy. Przełącznik pomiędzy widokiem kanban i listą znajduje się nad obszarem tasków, co pozwala dobrać sposób prezentacji danych do aktualnego trybu pracy.
 
-\chapter{Implementacja kodu frontendowego}
+\chapter{Implementacja kodu po stronie frontendu}
 
 \FirstParagraph W niniejszym rozdziale opisano wybrane elementy implementacji warstwy frontendowej aplikacji. Skupiono się na dwóch częściach systemu, które mają szczególne znaczenie dla ergonomii pracy użytkownika: widoku kanban w projekcie oraz sekcji przypiętych elementów na dashboardzie. Oba fragmenty zostały zaimplementowane jako komponenty React działające w środowisku Next.js i komunikujące się z backendem za pomocą endpointów API.
 
@@ -1286,7 +1286,7 @@ Za przypinanie i odpinanie odpowiada komponent przycisku pinezki, wydzielony w k
 
 W efekcie sekcja przypiętych elementów pełni rolę spersonalizowanego skrótu do najważniejszych danych użytkownika. Implementacja została oparta na jednym wspólnym modelu przypięcia oraz na uniwersalnym komponencie listującym, dzięki czemu dodanie obsługi kolejnego typu elementu wymagałoby głównie rozszerzenia mapowania typów i sposobu pobierania celu przypięcia.
 
-\chapter{Implementacja backendu}
+\chapter{Implementacja kodu po stronie backendu}
 
 \FirstParagraph W niniejszym rozdziale opisano wybrane elementy implementacji backendu aplikacji. Skupiono się na dwóch obszarach istotnych dla działania systemu: obsłudze checklist przez API oraz mechanizmie autoryzacji użytkownika. Oba fragmenty są wykonywane po stronie serwera, dlatego odpowiadają za sprawdzanie dostępu do danych, walidację żądań oraz komunikację z bazą danych.
 
