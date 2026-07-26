@@ -238,12 +238,11 @@ Rozdział piąty zawiera opis architektury systemu. Przedstawiono w nim podział
 
 Rozdział szósty prezentuje projekt interfejsu użytkownika oraz scenariusze przypadków użycia. Opisano w nim sposób korzystania z głównych funkcji systemu, takich jak obsługa konta użytkownika, praca z notatkami, elementami kontrolnymi, zadaniami i projektami oraz wykorzystanie widoku tablicowego.
 
-
 Rozdział siódmy opisuje wybrane elementy implementacji kodu warstwy interfejsu użytkownika. Skupiono się w nim na realizacji widoku tablicy projektu oraz sekcji przypiętych elementów dashboardu, ponieważ są to części aplikacji istotne dla codziennej pracy użytkownika oraz wygody korzystania z aplikacji.
 
-Rozdział ósmy przedstawia wybrane elementy implementacji backendu. Opisano w nim handler API odpowiedzialny za obsługę checklist oraz konfigurację mechanizmu autoryzacji, który pozwala identyfikować użytkownika i ograniczać dostęp do jego danych.
+Rozdział ósmy przedstawia wybrane elementy implementacji backendu. Opisano w nim handler API odpowiedzialny za pobieranie, tworzenie, aktualizowanie i archiwizowanie checklist, a także konfigurację API autoryzacji opartego na Auth.js, zewnętrznych dostawcach logowania oraz sesji użytkownika.
 
-Rozdział dziewiąty dotyczy testów jednostkowych. Wyjaśniono w nim rolę testów w projekcie oraz opisano przygotowane testy walidacji danych tasków, które sprawdzają poprawność danych wejściowych przed wykonaniem operacji zapisu lub aktualizacji.
+Rozdział dziewiąty dotyczy testów jednostkowych. Wyjaśniono w nim rolę testów w projekcie oraz opisano przygotowane testy walidacji danych tasków, obejmujące poprawny zestaw danych, odrzucanie nieobsługiwanych pól, kontrolę błędnych wartości oraz wymaganie co najmniej jednego pola podczas aktualizacji.
 
 \chapter{Analiza wymagań}
 
