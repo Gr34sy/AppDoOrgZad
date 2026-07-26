@@ -240,6 +240,10 @@ Rozdział szósty prezentuje projekt interfejsu użytkownika oraz scenariusze pr
 
 Rozdział siódmy opisuje wybrane elementy implementacji kodu warstwy interfejsu użytkownika. Skupiono się w nim na realizacji widoku tablicy projektu oraz sekcji przypiętych elementów dashboardu, ponieważ są to części aplikacji istotne dla codziennej pracy użytkownika oraz wygody korzystania z aplikacji.
 
+Rozdział ósmy przedstawia wybrane elementy implementacji backendu. Opisano w nim handler API odpowiedzialny za obsługę checklist oraz konfigurację mechanizmu autoryzacji, który pozwala identyfikować użytkownika i ograniczać dostęp do jego danych.
+
+Rozdział dziewiąty dotyczy testów jednostkowych. Wyjaśniono w nim rolę testów w projekcie oraz opisano przygotowane testy walidacji danych tasków, które sprawdzają poprawność danych wejściowych przed wykonaniem operacji zapisu lub aktualizacji.
+
 \chapter{Analiza wymagań}
 
 \FirstParagraph W dobie rosnącej liczby obowiązków zawodowych, edukacyjnych i prywatnych coraz więcej osób poszukuje skutecznych narzędzi wspierających zarządzanie czasem, planowanie zadań i realizację celów. Wiele aplikacji i systemów do zarządzania zadaniami, takie jak Trello, Asana czy ClickUp zostało zaprojektowanych z myślą o pracy zespołowej oraz dużych organizacjach. W konsekwencji, ich interfejsy bywają skomplikowane, a nadmiar funkcji może przytłaczać i zniechęcać użytkowników indywidualnych, którzy wymagają prostoty, przejrzystości a przede wszystkim szybkiego dostępu do kluczowych funkcji. Użytkownik indywidualny nie potrzebuje licznych widoków listy zadań, zaawansowanej automatyzacji dodawania tasków, czy tworzenia formularzy zespołowych, usprawniających dodawanie zawartości do listy. Użytkownik taki potrzebuje natomiast szybko odnaleźć poszukiwane funkcje aplikacji, bądź sprawnie przejść z poziomu strony głównej do projektu, który aktualnie realizuje i sprawdzić jakie rzeczy pozostały mu jeszcze do wykonania.
@@ -1281,6 +1285,58 @@ Każdy przypięty element jest renderowany jako karta \texttt{ObjectCard}. Ikona
 Za przypinanie i odpinanie odpowiada komponent przycisku pinezki, wydzielony w kodzie jako \texttt{PinEntityButton}. Komponent otrzymuje typ i identyfikator elementu oraz opcjonalny identyfikator istniejącego przypięcia. Jeżeli element nie jest przypięty, kliknięcie wysyła żądanie \texttt{POST} do endpointu \texttt{/api/pins}. Jeżeli element jest już przypięty, kliknięcie wysyła żądanie \texttt{DELETE} do endpointu \texttt{/api/pins/\{pinId\}}. Po poprawnym zakończeniu operacji komponent aktualizuje lokalny stan, zmienia wygląd ikony pinezki oraz wykonuje \texttt{router.refresh()}, aby odświeżyć dashboard i pozostałe widoki.
 
 W efekcie sekcja przypiętych elementów pełni rolę spersonalizowanego skrótu do najważniejszych danych użytkownika. Implementacja została oparta na jednym wspólnym modelu przypięcia oraz na uniwersalnym komponencie listującym, dzięki czemu dodanie obsługi kolejnego typu elementu wymagałoby głównie rozszerzenia mapowania typów i sposobu pobierania celu przypięcia.
+
+\chapter{Implementacja backendu}
+
+\FirstParagraph W niniejszym rozdziale opisano wybrane elementy implementacji backendu aplikacji. Skupiono się na dwóch obszarach istotnych dla działania systemu: obsłudze checklist przez API oraz mechanizmie autoryzacji użytkownika. Oba fragmenty są wykonywane po stronie serwera, dlatego odpowiadają za sprawdzanie dostępu do danych, walidację żądań oraz komunikację z bazą danych.
+
+\section{Implementacja handlera API checklist}
+
+\FirstParagraph Obsługa checklist została zaimplementowana w routach \texttt{/api/checklists} oraz \texttt{/api/checklists/\{checklistId\}}. Pierwszy route odpowiada za operacje wykonywane na całej kolekcji checklist, natomiast drugi za operacje dotyczące pojedynczej checklisty wskazanej przez identyfikator w adresie żądania. Takie rozdzielenie wynika ze sposobu działania mechanizmu routingu w Next.js, w którym struktura katalogów określa ścieżki dostępne w API.
+
+W pliku \texttt{route.ts} zdefiniowano metody \texttt{GET} oraz \texttt{POST}. Metoda \texttt{GET} pobiera listę aktywnych checklist należących do aktualnie zalogowanego użytkownika. Przed wykonaniem zapytania do bazy wywoływana jest funkcja \texttt{getCurrentUserId}, która zwraca identyfikator użytkownika zapisany w sesji. Jeżeli identyfikator nie jest dostępny, handler\footnote{Handler - funkcja obsługująca określony typ żądania przychodzącego do aplikacji, np. pobranie, utworzenie lub aktualizację danych.} kończy działanie odpowiedzią \texttt{401 Unauthorized}.
+
+Po pozytywnej weryfikacji użytkownika wykonywane jest połączenie z bazą danych przez funkcję \texttt{connectDatabase}. Następnie model \texttt{Checklist} wyszukuje dokumenty spełniające warunki \texttt{ownerId} oraz \texttt{archivedAt: null}. Oznacza to, że użytkownik otrzymuje tylko własne checklisty, które nie zostały wcześniej zarchiwizowane. Wyniki są sortowane według pola \texttt{position}, a następnie według daty aktualizacji, dzięki czemu interfejs może prezentować elementy w ustalonej kolejności.
+
+Metoda \texttt{POST} odpowiada za utworzenie nowej checklisty. Treść żądania jest odczytywana za pomocą funkcji \texttt{parseJsonBody}, która jednocześnie korzysta ze schematu \texttt{checklistCreateSchema}. Schemat waliduje tytuł checklisty, elementy checklisty, typ i identyfikator elementu nadrzędnego oraz pozycję. W przypadku niepoprawnych danych handler zwraca odpowiedź błędu i nie wykonuje zapisu w bazie danych.
+
+Przed utworzeniem dokumentu dane są przekazywane do funkcji \texttt{sanitizeMutation}. Jej zadaniem jest ograniczenie zapisywanych wartości do pól dopuszczonych przez logikę aplikacji. Następnie model \texttt{Checklist} tworzy dokument z danymi użytkownika oraz identyfikatorem właściciela. Po poprawnym zapisie wywoływana jest funkcja \texttt{recordActivityEvent}, która rejestruje zdarzenie utworzenia checklisty w historii aktywności.
+
+Operacje na pojedynczej checkliście znajdują się w dynamicznej ścieżce API, w której identyfikator checklisty jest częścią adresu żądania. W metodach \texttt{GET}, \texttt{PATCH} i \texttt{DELETE} najpierw sprawdzana jest sesja użytkownika, a następnie poprawność identyfikatora checklisty za pomocą funkcji \texttt{isValidObjectId}. Dzięki temu aplikacja nie wykonuje zapytań do bazy dla niepoprawnie zbudowanych identyfikatorów.
+
+Metoda \texttt{PATCH} aktualizuje checklistę przy użyciu schematu \texttt{checklistUpdateSchema}. Schemat ten dopuszcza częściową aktualizację, ale wymaga przekazania przynajmniej jednego pola. Aktualizacja wykonywana jest przez \texttt{findOneAndUpdate} z warunkami \texttt{\_id}, \texttt{ownerId} oraz \texttt{archivedAt: null}. Taki zapis zabezpiecza przed zmianą checklist należących do innych użytkowników oraz przed modyfikacją elementów zarchiwizowanych.
+
+Usunięcie checklisty zostało zrealizowane jako archiwizacja. Metoda \texttt{DELETE} nie usuwa dokumentu fizycznie z bazy, lecz zapisuje w polu \texttt{archivedAt} aktualną datę. Dzięki temu dane nie są widoczne w standardowych zapytaniach, ale w razie potrzeby możliwe byłoby zachowanie historii działania systemu. Po aktualizacji dokumentu rejestrowane jest zdarzenie usunięcia checklisty.
+
+\section{Implementacja API odpowiedzialnego za autoryzację}
+
+\FirstParagraph Mechanizm autoryzacji został oparty na bibliotece Auth.js, używanej w projekcie przez pakiet NextAuth. Główny handler autoryzacji znajduje się w dynamicznej ścieżce API przeznaczonej dla NextAuth. Plik ten tworzy handler NextAuth na podstawie konfiguracji \texttt{authOptions}, a następnie udostępnia go dla metod \texttt{GET} i \texttt{POST}. Dzięki temu biblioteka może obsługiwać zarówno rozpoczęcie logowania, jak i odpowiedzi zwrotne od dostawców OAuth.
+
+Konfiguracja autoryzacji została umieszczona w pliku \texttt{src/lib/auth.ts}. Zdefiniowano w nim listę dostawców logowania OAuth, obejmującą Google oraz GitHub. Każdy dostawca posiada identyfikator, nazwę, dane klienta pobierane ze zmiennych środowiskowych oraz funkcję tworzącą konfigurację providera. Aplikacja uruchamia tylko tych dostawców, dla których dostępne są wymagane dane \texttt{clientId} i \texttt{clientSecret}.
+
+Do przechowywania danych autoryzacyjnych wykorzystano adapter \texttt{MongoDBAdapter}. Adapter zapisuje w bazie informacje o użytkownikach i powiązanych kontach zewnętrznych, dzięki czemu aplikacja może rozpoznawać tę samą osobę po kolejnych logowaniach. Dane te są przechowywane w kolekcjach technicznych tworzonych przez mechanizm NextAuth, niezależnie od domenowych kolekcji aplikacji, takich jak taski, checklisty czy projekty.
+
+Sesja użytkownika działa w strategii \texttt{jwt}. JWT\footnote{JWT - skrót od JSON Web Token; jest to format tokenu używany do przenoszenia informacji o użytkowniku lub uprawnieniach między stronami komunikacji.} pozwala przechowywać podstawowe informacje o zalogowanym użytkowniku w tokenie sesyjnym. W konfiguracji zastosowano callback\footnote{Callback - funkcja przekazywana do innego mechanizmu, która jest wywoływana automatycznie w określonym momencie działania programu.} \texttt{session}, który przenosi identyfikator użytkownika z tokenu do obiektu \texttt{session.user.id}. Dzięki temu pozostałe części backendu mogą korzystać z jednolitego sposobu identyfikacji właściciela danych.
+
+W praktyce autoryzacja jest używana w handlerach API przez funkcję \texttt{getCurrentUserId}. Każda operacja na danych użytkownika rozpoczyna się od pobrania identyfikatora sesji. Następnie identyfikator ten trafia do warunków zapytań jako \texttt{ownerId}. Takie rozwiązanie sprawia, że nawet poprawnie zbudowane żądanie nie pozwala odczytać ani zmienić danych należących do innej osoby.
+
+\chapter{Testy jednostkowe}
+
+\FirstParagraph Testy jednostkowe\footnote{Test jednostkowy - test sprawdzający niewielki, wydzielony fragment programu, np. funkcję lub schemat walidacji, bez uruchamiania całego systemu.} służą do sprawdzania małych fragmentów aplikacji w kontrolowanych warunkach. Ich zadaniem jest szybkie wykrywanie błędów w logice programu oraz zabezpieczenie już działających funkcji przed przypadkowymi regresjami podczas dalszego rozwoju projektu. W aplikacji testy zostały uruchamiane za pomocą narzędzia Vitest, które jest dostosowane do testowania kodu JavaScript i TypeScript.
+
+\section{Testy funkcjonalności tasków}
+
+\FirstParagraph Dla funkcjonalności tasków dodano testy jednostkowe w pliku \texttt{task-validation.test.ts}. Testy koncentrują się na schematach \texttt{taskCreateSchema} oraz \texttt{taskUpdateSchema}, ponieważ to one decydują, jakie dane mogą zostać przyjęte przez API odpowiedzialne za tworzenie i aktualizowanie tasków.
+
+Pierwszy test sprawdza poprawny, pełny zestaw danych taska. Weryfikowane są między innymi tytuł, opis, priorytet, status, identyfikator projektu, termin, tagi, powiązane checklisty, nowe checklisty oraz notatki. Test sprawdza również automatyczne przycinanie białych znaków w polach tekstowych, co zapobiega zapisywaniu w bazie danych wartości zawierających przypadkowe spacje na początku lub końcu tekstu.
+
+Drugi test kontroluje odrzucanie pól, które nie należą do obsługiwanego formatu danych. Dotyczy to zarówno głównego obiektu taska, jak i obiektu nowej checklisty tworzonej razem z taskiem. Jest to istotne, ponieważ API nie powinno przyjmować dowolnych pól przesłanych z klienta. W przeciwnym razie użytkownik mógłby przekazać dane, których aplikacja nie przewiduje w swoim modelu.
+
+Kolejny test sprawdza reakcję walidacji na niepoprawne wartości. Odrzucany jest między innymi nieznany priorytet, błędny format daty oraz puste identyfikatory powiązanych checklist i notatek. Dzięki temu błędne dane zostają zatrzymane przed wykonaniem operacji zapisu w bazie danych.
+
+Ostatni test dotyczy aktualizacji taska. Schemat \texttt{taskUpdateSchema} dopuszcza częściową aktualizację, ale wymaga przekazania przynajmniej jednego pola. Test sprawdza więc, że pusty obiekt zostaje odrzucony, natomiast aktualizacja zawierająca samo pole \texttt{statusId} jest uznawana za poprawną. Ma to znaczenie dla działania widoku kanban, w którym zmiana statusu taska może być wykonana bez modyfikowania pozostałych właściwości zadania.
+
+W testach wykorzystano asercje\footnote{Asercja - warunek sprawdzany podczas testu, którego spełnienie oznacza poprawne zachowanie badanego fragmentu programu.} porównujące oczekiwany wynik walidacji z wynikiem rzeczywistym. Dzięki temu możliwe jest szybkie sprawdzenie, czy zmiany w schematach danych nie osłabiły reguł zabezpieczających API tasków.
 
 \chapter*{Bibliografia}
 \addcontentsline{toc}{chapter}{Bibliografia}
