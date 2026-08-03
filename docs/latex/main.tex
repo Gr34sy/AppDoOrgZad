@@ -70,7 +70,7 @@
   name={Tabela}
 }
 
-\renewcommand{\footnotelayout}{\RaggedRight\setstretch{1}\fontsize{10}{12}\selectfont\setlength{\parindent}{0pt}}
+\renewcommand{\footnotelayout}{\justifying\setstretch{1}\fontsize{10}{12}\selectfont\setlength{\parindent}{0pt}}
 \renewcommand{\footnotesize}{\fontsize{10}{12}\selectfont}
 \interfootnotelinepenalty=10000
 \setlength{\footnotemargin}{0pt}
@@ -201,11 +201,11 @@
 
 Dynamiczny rozwój technologii internetowych oraz rosnąca liczba obowiązków zawodowych i prywatnych powodują, że efektywne zarządzanie czasem i zadaniami staje się istotnym elementem codziennego funkcjonowania użytkowników. W odpowiedzi na te potrzeby powstają liczne aplikacje, wspierające planowanie pracy, organizację projektów oraz monitorowanie postępów realizacji celów. Jednocześnie rozwój nowoczesnych narzędzi warstwy interfejsu i warstwy serwerowej pozwala na tworzenie wydajnych, skalowalnych i interaktywnych systemów dostępnych z poziomu przeglądarki internetowej.
 
-Inspiracją dla tematu są popularne aplikacje do zarządzania projektami, kładące duży nacisk na organizację pracy zespołowej. Narzędzia takie jak Trello\footnote{Atlassian, \emph{Trello}, \url{https://trello.com} (dostęp: 17.07.2026).}, Asana\footnote{Asana, Inc., \emph{Asana}, \url{https://asana.com} (dostęp: 17.07.2026).} czy ClickUp\footnote{ClickUp, \emph{ClickUp}, \url{https://clickup.com} (dostęp: 17.07.2026).} dostarczają szeroką gamę funkcji, umożliwiających organizację zadań, jednak wiele z nich jest niepotrzebne użytkownikowi indywidualnemu. Z kolei nadmiar zbędnych funkcji może utrudniać użytkownikowi korzystanie z aplikacji. Dlatego też w projekcie zdecydowano się na zaadaptowanie najważniejszych funkcji z wcześniej wymienionych aplikacji, dla potrzeb użytkowników indywidualnych. Tak więc, w prezentowanym projekcie znajdują się uproszczone rozwiązania stosowane w komercyjnych aplikacjach tego typu.
+Inspiracją dla tematu są popularne aplikacje do zarządzania projektami, kładące duży nacisk na organizację pracy zespołowej. Narzędzia tego typu dostarczają szeroką gamę funkcji, umożliwiających organizację zadań, jednak wiele z nich jest niepotrzebne użytkownikowi indywidualnemu. Z kolei nadmiar zbędnych funkcji może utrudniać użytkownikowi korzystanie z aplikacji. Dlatego też w projekcie zdecydowano się na zaadaptowanie najważniejszych funkcji z komercyjnych aplikacji tego typu, dla potrzeb użytkowników indywidualnych. Tak więc, w prezentowanym projekcie znajdują się uproszczone rozwiązania stosowane w systemach wspierających organizację pracy.
 
 Strona internetowa powinna umożliwiać użytkownikom organizowanie pracy w sposób przejrzysty oraz intuicyjny, z wykorzystaniem funkcji takich jak na przykład przypinanie wybranych treści do widoku strony głównej. Istotnym założeniem projektu jest również zapewnienie bezpieczeństwa danych poprzez wdrożenie mechanizmów logowania, rejestracji oraz autoryzacji użytkowników.
 
-Do celów szczegółowych pracy należy zaprojektowanie graficznego wyglądu interfejsu użytkownika, opracowanie logiki aplikacji zarówno po stronie klienckiej, jak i serwerowej, zaprojektowanie struktury bazy danych oraz implementacja mechanizmów obsługi kont użytkowników. Projekt zakłada wykorzystanie współczesnych technologii webowych\footnote{Webowy - z języka angielskiego oznaczający dosłownie ``sieciowy''. Termin używany powszechnie jako synonim słowa ``internetowy''.}, umożliwiających budowę aplikacji działającej w architekturze klient--serwer\footnote{Architektura klient-serwer - model działania systemu, w którym klient wysyła żądania, a serwer je przetwarza i zwraca odpowiedź.}, z rozdzieleniem warstwy prezentacji, logiki biznesowej\footnote{Logika biznesowa - zbiór reguł i mechanizmów aplikacji określających sposób przetwarzania danych oraz realizacji operacji zgodnie z wymaganiami systemu.} oraz przechowywania danych.
+Do celów szczegółowych pracy należy zaprojektowanie graficznego wyglądu interfejsu użytkownika, opracowanie logiki aplikacji zarówno po stronie klienckiej, jak i serwerowej, zaprojektowanie struktury bazy danych oraz implementacja mechanizmów obsługi kont użytkowników. Projekt zakłada wykorzystanie współczesnych technologii internetowych, umożliwiających budowę aplikacji działającej w architekturze klient--serwer, z rozdzieleniem warstwy prezentacji, logiki biznesowej oraz przechowywania danych.
 
 Zakres realizowanych prac obejmuje analizę dostępnych na rynku rozwiązań, opis odpowiednich narzędzi programistycznych, przygotowanie widoków interfejsu użytkownika oraz przedstawienie implementacji kodu aplikacji. Zakres pracy nie obejmuje publikacji aplikacji w domenie publicznej ani jej komercyjnego wdrożenia.
 
@@ -267,7 +267,7 @@ Użytkownik indywidualny nie potrzebuje licznych nakładek i dodatkowych funkcjo
 
 \section{Omówienie podobnych aplikacji}
 
-\FirstParagraph Asana, ClickUp oraz Trello to przykładowe, popularne narzędzia do zarządzania projektami. Z perspektywy pojedynczego użytkownika ich przydatność zależy od złożoności potrzeb oraz preferowanego stylu pracy. \textbf{Trello} uchodzi za najprostsze, intuicyjne narzędzie, posiadające najbardziej przejrzysty interfejs. \textbf{Asana} natomiast, jest dużo bardziej rozbudowana. Korzystają z niej głównie duże zespoły oraz korporacje. Używa się jej do nadzoru bardziej złożonych projektów. Z kolei \textbf{ClickUp,} oferuje za darmo podobny zakres funkcji co płatny plan Asany, będąc przez to wyborem bardziej atrakcyjnym dla wymagających, indywidualnych użytkowników niż \textbf{Trello}. Liczne zaawansowane funkcje dostarczane przez ClickUp czynią jednak tą aplikację dość złożoną w obsłudze.
+\FirstParagraph Asana\footnote{Asana, Inc., \emph{Asana}, dostęp: \url{https://asana.com} (17.07.2026).}, ClickUp\footnote{ClickUp, \emph{ClickUp}, dostęp: \url{https://clickup.com} (17.07.2026).} oraz Trello\footnote{Atlassian, \emph{Trello}, dostęp: \url{https://trello.com} (17.07.2026).} to przykładowe, popularne narzędzia do zarządzania projektami. Z perspektywy pojedynczego użytkownika ich przydatność zależy od złożoności potrzeb oraz preferowanego stylu pracy. \textbf{Trello} uchodzi za najprostsze, intuicyjne narzędzie, posiadające najbardziej przejrzysty interfejs. \textbf{Asana} natomiast, jest dużo bardziej rozbudowana. Korzystają z niej głównie duże zespoły oraz korporacje. Używa się jej do nadzoru bardziej złożonych projektów. Z kolei \textbf{ClickUp,} oferuje za darmo podobny zakres funkcji co płatny plan Asany, będąc przez to wyborem bardziej atrakcyjnym dla wymagających, indywidualnych użytkowników niż \textbf{Trello}. Liczne zaawansowane funkcje dostarczane przez ClickUp czynią jednak tą aplikację dość złożoną w obsłudze.
 
 \textbf{Trello} wyróżnia się \textbf{prostotą i intuicyjnością} -- jest łatwe do opanowania dla początkujących, dzięki czemu idealnie nadaje się do podstawowego porządkowania. Jego jedyna forma prezentacji - kanban\footnote{Kanban - metoda wizualnego zarządzania pracą, w której zadania przedstawiane są na tablicy podzielonej na etapy realizacji.} sprzyja szybkiemu organizowaniu prostych projektów. Jednocześnie Trello pozostawia dużo przestrzeni użytkownikom bardziej wymagającym, poprzez możliwość integracji przeróżnych narzędzi zewnętrznych, tak zwanych Power-Upów.
 
@@ -398,7 +398,7 @@ HTML jest językiem deklaratywnym służącym do opisu struktury dokumentu, nato
 
 W klasycznym podejściu HTML i JavaScript są rozdzielone - pierwszy język definiuje widok, a drugi modyfikuje go poprzez interakcję z DOM\footnote{DOM - z jęz. ang. Document Object Model, to hierarchiczna reprezentacja struktury dokumentu HTML w postaci drzewa obiektów. Umożliwia on językom programowania, takim jak JavaScript, dynamiczny dostęp do elementów strony oraz ich modyfikację w czasie działania aplikacji.}.
 
-By zmanipulować DOM'em przy użyciu czystego JavaScriptu należy pierw użyć szeregu przygotowanych przez twórców JSa\footnote{JS - skrót od JavaScript} funkcji. JSX pozwala nam ominąć ten niewygodny oraz czasochłonny proces i pisać wewnątrz plików JavaScripta kod HTML deklaratywnie. To znacznie ułatwia definiowanie, utrzymanie oraz ponowne wykorzystanie komponentów. Dodatkowo składnia JSX jest podczas procesu budowania aplikacji transpilowana\footnote{Transpilacja - to proces przekształcania kodu z jednej wersji jakiegoś języka na inną} do czystego JavaScriptu, dzięki czemu React może efektywnie zarządzać komponentami, ich stanem oraz ponownym wykorzystaniem. Poniższy przykład wyjaśnia, jak w React działa JavaScript Extension.
+By zmanipulować DOM'em przy użyciu czystego JavaScriptu należy pierw użyć szeregu przygotowanych przez twórców JSa funkcji. JSX pozwala nam ominąć ten niewygodny oraz czasochłonny proces i pisać wewnątrz plików JavaScripta kod HTML deklaratywnie. To znacznie ułatwia definiowanie, utrzymanie oraz ponowne wykorzystanie komponentów. Dodatkowo składnia JSX jest podczas procesu budowania aplikacji transpilowana do czystego JavaScriptu, dzięki czemu React może efektywnie zarządzać komponentami, ich stanem oraz ponownym wykorzystaniem. Poniższy przykład wyjaśnia, jak w React działa JavaScript Extension.
 
 \begin{figure}[H]
   \centering
@@ -414,7 +414,7 @@ Jak widać na wyżej zamieszczonej grafice, w czystym JavaScripcie komponent mo�
   \caption{Fragment kodu przedstawiający deklaratywne definiowanie komponentu Button dzięki JSX}
 \end{figure}
 
-Wyżej przedstawiono, jak prosto w sposób deklaratywny dodaje się elementy HTMLa, dzięki bibliotece React. W React wyróżnia się dwa podstawowe typy komponentów - klasowe oraz funkcyjne, różniące się zarówno składnią, jak i sposobem zarządzania logiką aplikacji. Komponenty klasowe opierają się na klasach wprowadzonych do JavaScript wraz z aktualizacją ES6\footnote{ES6 - skrót od ``ECMAScript 2015'', jest to szósta edycja standardu języka JavaScript, która znacząco rozszerzyła możliwości języka.}. Dziedziczą one po klasie \textbf{React.Component}, a zarządzanie stanem oraz cyklem życia\footnote{cykl życia komponentu - zbiór kolejnych etapów istnienia komponentu w aplikacji, obejmujący jego generowanie, aktualizację w odpowiedzi na zmiany danych oraz usuwanie z drzewa komponentów.} komponentu odbywa się za pomocą metod takich jak \textbf{constructor}, \textbf{componentDidMount}, czy \textbf{componentDidUpdate}. Taki model prowadzi często do bardziej rozbudowanego i mniej czytelnego kodu, zwłaszcza w przypadku złożonych komponentów. Poniżej widnieje przykład komponentu klasowego o nazwie ``Button''. Komponent ten renderuje\footnote{renderowanie - generowanie, ładowanie} przycisk, którego treść oraz obsługa zdarzenia kliknięcia są przekazywane z zewnątrz za pomocą parametru ``props'', co jest standardem zarówno jeśli chodzi o komponenty klasowe jak i funkcyjne.
+Wyżej przedstawiono, jak prosto w sposób deklaratywny dodaje się elementy HTMLa, dzięki bibliotece React. W React wyróżnia się dwa podstawowe typy komponentów - klasowe oraz funkcyjne, różniące się zarówno składnią, jak i sposobem zarządzania logiką aplikacji. Komponenty klasowe opierają się na klasach wprowadzonych do JavaScript wraz z aktualizacją ES6\footnote{ES6 - skrót od ``ECMAScript 2015'', jest to szósta edycja standardu języka JavaScript, która znacząco rozszerzyła możliwości języka.}. Dziedziczą one po klasie \textbf{React.Component}, a zarządzanie stanem oraz cyklem życia komponentu odbywa się za pomocą metod takich jak \textbf{constructor}, \textbf{componentDidMount}, czy \textbf{componentDidUpdate}. Taki model prowadzi często do bardziej rozbudowanego i mniej czytelnego kodu, zwłaszcza w przypadku złożonych komponentów. Poniżej widnieje przykład komponentu klasowego o nazwie ``Button''. Komponent ten renderuje przycisk, którego treść oraz obsługa zdarzenia kliknięcia są przekazywane z zewnątrz za pomocą parametru ``props'', co jest standardem zarówno jeśli chodzi o komponenty klasowe jak i funkcyjne.
 
 \begin{figure}[H]
   \centering
@@ -422,7 +422,7 @@ Wyżej przedstawiono, jak prosto w sposób deklaratywny dodaje się elementy HTM
   \caption{Fragment kodu przedstawiający klasowy komponent ``Button''}
 \end{figure}
 
-Jeśli chodzi o komponenty funkcyjne, to są one zwykłymi funkcjami JavaScript, przyjmującymi dane wejściowe za pomocą ``props'' i zwracają strukturę interfejsu użytkownika. Początkowo były one ograniczone do komponentów prezentacyjnych, jednak wprowadzenie mechanizmu React Hooks\footnote{Hooks - z jęz. ang. ``zaczepy'', w React są to funkcje, pozwalające na dostęp do tych samych danych w obrębie całego zakresu funkcji.}, rozszerzyło ich zastosowanie do pełnoprawnych elementów logiki aplikacji. Dzięki prostszej składni i lepszej modularności komponenty funkcyjne są obecnie preferowanym i rekomendowanym podejściem w nowoczesnych aplikacjach.
+Jeśli chodzi o komponenty funkcyjne, to są one zwykłymi funkcjami JavaScript, przyjmującymi dane wejściowe za pomocą ``props'' i zwracają strukturę interfejsu użytkownika. Początkowo były one ograniczone do komponentów prezentacyjnych, jednak wprowadzenie mechanizmu React Hooks rozszerzyło ich zastosowanie do pełnoprawnych elementów logiki aplikacji. Dzięki prostszej składni i lepszej modularności komponenty funkcyjne są obecnie preferowanym i rekomendowanym podejściem w nowoczesnych aplikacjach.
 
 Poniżej zamieszczono przykład tego samego komponentu ``Button'', lecz w formie funkcji.
 
@@ -461,7 +461,7 @@ W powyższym przykładzie:
   wywołanie funkcji setCount powoduje zmianę danych oraz odświeżenie widoku komponentu na stronie
 \end{itemize}
 
-Takie podejście zapewnia enkapsulację\footnote{Enkapsulacja - zasada projektowania oprogramowania polegająca na ukrywaniu szczegółów działania danego elementu i udostępnianiu na zewnątrz jedynie kontrolowanego interfejsu.} danych wewnątrz komponentu oraz precyzyjne sterowanie jego zachowaniem. Dzięki hookom zarządzanie stanem staje się czytelne i ściśle powiązane z zakresem funkcji komponentu, co ułatwia rozwój i utrzymanie aplikacji.
+Takie podejście zapewnia enkapsulację danych wewnątrz komponentu oraz precyzyjne sterowanie jego zachowaniem. Dzięki hookom zarządzanie stanem staje się czytelne i ściśle powiązane z zakresem funkcji komponentu, co ułatwia rozwój i utrzymanie aplikacji.
 
 \section{TailwindCSS}
 
@@ -488,7 +488,7 @@ Dla przykładu - klasa ``flex''nadana znacznikowi ``div'' w piątej linijce kodu
 
 \section{TypeScript}
 
-\FirstParagraph Kolejną technologią zastosowaną w projekcie jest TypeScript\footnote{Microsoft, \emph{TypeScript Documentation}, \url{https://www.typescriptlang.org/docs/} (dostęp: 25.07.2026).}, czyli nadzbiór języka\footnote{Nadzbiór języka programowania - język rozszerzający możliwości innego języka przy zachowaniu zgodności z jego składnią lub znaczną jej częścią.} JavaScript. Rozszerza on JSa o system typów, interfejsy oraz mechanizmy kontroli poprawności kodu na etapie kompilacji\footnote{Kompilacja - proces przekształcania kodu źródłowego do postaci możliwej do wykonania lub dalszego przetworzenia przez środowisko uruchomieniowe.}. Kod TypeScript nie jest bezpośrednio interpretowany przez przeglądarkę, lecz przed uruchomieniem musi zostać transpilowany do standardowego JavaScriptu, zachowując pełną kompatybilność ze środowiskiem wykonawczym.
+\FirstParagraph Kolejną technologią zastosowaną w projekcie jest TypeScript\footnote{Microsoft, \emph{TypeScript Documentation}, \url{https://www.typescriptlang.org/docs/} (dostęp: 25.07.2026).}, czyli nadzbiór języka JavaScript. Rozszerza on JSa o system typów, interfejsy oraz mechanizmy kontroli poprawności kodu na etapie kompilacji. Kod TypeScript nie jest bezpośrednio interpretowany przez przeglądarkę, lecz przed uruchomieniem musi zostać transpilowany do standardowego JavaScriptu, zachowując pełną kompatybilność ze środowiskiem wykonawczym.
 
 Głównym celem stosowania TypeScript jest zwiększenie bezpieczeństwa, czytelności oraz przewidywalności kodu. Statyczne typowanie pozwala wykrywać błędy już na etapie pisania kodu a nie podczas działania aplikacji. TypeScript znacząco ułatwia pracę w dużych projektach oraz zespołach programistycznych, ponieważ jasno definiuje struktury danych oraz oczekiwane typy argumentów. Ponadto redukuje ryzyko błędów logicznych trudnych do wykrycia w czystym JavaScripcie i dobrze integruje się z nowoczesnymi frameworkami frontendowymi.
 
@@ -498,13 +498,13 @@ Jak dokładnie działa TypeScript można wytłumaczyć na następującym przykł
 
 \chapter{Backend}
 
-\FirstParagraph Backend\footnote{Backend -termin pochodzący z języka angielskiego, będący złożeniem słów ''back'' ( tył, zaplecze) oraz end (część, warstwa), odnoszący się do części aplikacji niedostępnej dla użytkownika.} to warstwa aplikacji działająca po stronie serwera i odpowiedzialna za przetwarzanie danych oraz komunikację z bazą danych lub innymi systemami. Backend nie jest bezpośrednio widoczny dla użytkownika końcowego. Obsługuje m.in. autoryzację, walidację\footnote{Walidacja - proces sprawdzania poprawności, kompletności oraz zgodności danych wejściowych z określonymi regułami i wymaganiami systemu.} danych, realizację reguł biznesowych oraz udostępnianie danych frontendowi za pomocą API\footnote{API - skrót z języka angielskiego, oznaczający Application Programming Interface.}.
+\FirstParagraph Backend\footnote{Backend - termin pochodzący z języka angielskiego, będący złożeniem słów ``back'' (tył, zaplecze) oraz ``end'' (część, warstwa), odnoszący się do części aplikacji niedostępnej dla użytkownika.} to warstwa aplikacji działająca po stronie serwera i odpowiedzialna za przetwarzanie danych oraz komunikację z bazą danych lub innymi systemami. Backend nie jest bezpośrednio widoczny dla użytkownika końcowego. Obsługuje m.in. autoryzację, walidację\footnote{Walidacja - proces sprawdzania poprawności, kompletności oraz zgodności danych wejściowych z określonymi regułami i wymaganiami systemu.} danych, realizację reguł biznesowych oraz udostępnianie danych frontendowi za pomocą API\footnote{API - skrót z języka angielskiego, oznaczający Application Programming Interface.}.
 
 API natomiast to zestaw reguł, metod i struktur danych umożliwiających komunikację pomiędzy różnymi systemami informatycznymi lub ich częściami. Określa, w jaki sposób aplikacje mogą wymieniać dane oraz wywoływać określone funkcje, bez konieczności znajomości wewnętrznej implementacji drugiej strony. API pełni rolę pośrednika pomiędzy frontendem a backendem. Frontend wysyła żądania lub zapytania, natomiast backend przetwarza je, zwracając później odpowiedź.
 
 \section{Next.js}
 
-\FirstParagraph Next.js\footnote{Vercel, \emph{Next.js Docs}, \url{https://nextjs.org/docs} (dostęp: 29.01.2026).} jest frameworkiem opartym na bibliotece React, przeznaczonym do tworzenia pełnostosowych\footnote{Pełnostosowy - stos to określenie powszechnie stosowane w języku programistycznym jako zestaw narzędzi użytych do produkcji aplikacji. Full-stack to termin z języka angielskiego, oznaczający technologie zarówno frontendowe, jak i backendowe.} aplikacji webowych. Interfejs użytkownika budowany jest przy użyciu komponentów Reacta, natomiast Next.js dostarcza dodatkowe funkcje oraz mechanizmy optymalizacyjne. Framework automatycznie konfiguruje narzędzia niskiego poziomu, takie jak bundlery\footnote{Bundler - narzędzie programistyczne służące do łączenia wielu plików źródłowych w jeden lub kilka zoptymalizowanych pakietów, które mogą być uruchamiane w przeglądarce.} oraz kompilatory\footnote{Kompilator - program, tłumaczący kod źródłowy napisany w jednym języku programowania na inną postać, umożliwiając jego uruchomienie w danym środowisku.}, dzięki czemu programista może skupić się na tworzeniu aplikacji i szybkim wdrażaniu jej do użytku.
+\FirstParagraph Next.js\footnote{Vercel, \emph{Next.js Docs}, \url{https://nextjs.org/docs} (dostęp: 29.01.2026).} jest frameworkiem opartym na bibliotece React, przeznaczonym do tworzenia pełnostosowych aplikacji webowych. Interfejs użytkownika budowany jest przy użyciu komponentów Reacta, natomiast Next.js dostarcza dodatkowe funkcje oraz mechanizmy optymalizacyjne. Framework automatycznie konfiguruje narzędzia niskiego poziomu, takie jak bundlery oraz kompilatory, dzięki czemu programista może skupić się na tworzeniu aplikacji i szybkim wdrażaniu jej do użytku.
 
 Next.js rozszerza możliwości Reacta o funkcje takie jak renderowanie zawartości po stronie serwera, routing\footnote{Routing - mechanizm zarządzania nawigacją w aplikacji, umożliwiający użytkownikowi poruszanie się pomiędzy różnymi częściami systemu.} oparty na strukturze plików, optymalizację obrazów oraz wygodne tworzenie endpointów API. Umożliwia również budowę aplikacji przyjaznych dla wyszukiwarek internetowych, ponieważ część treści może zostać przygotowana przed wysłaniem strony do przeglądarki. Dzięki temu framework łączy w jednym projekcie warstwę interfejsu użytkownika i wybrane mechanizmy backendowe.
 
@@ -530,7 +530,7 @@ Zastosowanie wbudowanego systemu routingu w Next.js upraszcza proces tworzenia a
 
 \FirstParagraph Domyślnie Next.js używa serwerowych komponentów Reacta. Wykonują się one najpierw po stronie serwera, a następnie ich wynik wysyłany jest do klienta.
 
-Komponenty te zapewniają wsparcie dla JSowych obiektów typu Promise, umożliwiających wykonywanie zadań asynchronicznych\footnote{Zadanie asynchroniczne - operacja wykonywana bez blokowania dalszego działania programu, której wynik może zostać obsłużony dopiero po zakończeniu, np. po pobraniu danych z serwera.}, bez konieczności używania dodatkowych bibliotek czy hooków Reactowych. Natomiast pobieranie danych zawsze odbywa się asynchronicznie. Ponieważ komponenty serwerowe działają po stronie serwera, możliwe jest bezpośrednie wykonywanie zapytań do bazy danych bez konieczności korzystania z dodatkowej warstwy API. Pozwala to ograniczyć ilość kodu, który trzeba pisać i utrzymywać.
+Komponenty te zapewniają wsparcie dla JSowych obiektów typu Promise, umożliwiających wykonywanie zadań asynchronicznych bez konieczności używania dodatkowych bibliotek czy hooków Reactowych. Natomiast pobieranie danych zawsze odbywa się asynchronicznie. Ponieważ komponenty serwerowe działają po stronie serwera, możliwe jest bezpośrednie wykonywanie zapytań do bazy danych bez konieczności korzystania z dodatkowej warstwy API. Pozwala to ograniczyć ilość kodu, który trzeba pisać i utrzymywać.
 
 Pobrane dane można generować i przetwarzać na dwa różne sposoby. Renderowanie statyczne polega na generowaniu treści na etapie budowania aplikacji lub podczas jej ponownej walidacji, a następnie dostarczaniu gotowych stron użytkownikom, co zwiększa wydajność i zmniejsza obciążenie serwera oraz sprzyja optymalizacji SEO\footnote{SEO (z jęz. ang. Search Engine Optimization) -- proces optymalizacji stron internetowych, mający na celu poprawę ich widoczności w wynikach wyszukiwarek internetowych poprzez dostosowanie treści, struktury oraz wydajności serwisu do wymagań algorytmów indeksujących.}. Renderowanie dynamiczne natomiast, odbywa się przy każdym żądaniu użytkownika, umożliwiając prezentację danych aktualnych w czasie rzeczywistym. Pierwsze podejście sprawdza się w przypadku stron o stałej zawartości, natomiast drugie jest preferowane w aplikacjach, wymagających częstych aktualizacji danych, takich jak panele administracyjne czy profile użytkowników.
 
@@ -601,7 +601,7 @@ Dzięki swojej niezawodności oraz dobrej integracji z popularnymi technologiami
 
 \section{MongoDB}
 
-\FirstParagraph MongoDB\footnote{MongoDB, Inc., \emph{Welcome to the MongoDB docs}, \url{https://www.mongodb.com/docs/} (dostęp: 02.02.2026).} jest nierelacyjnym systemem zarządzania bazą danych, którego podstawową różnicą względem relacyjnych rozwiązań, jest sposób przechowywania informacji. MongoDB wykorzystuje model dokumentowy, w którym dane zapisywane są w elastycznych strukturach przypominających format JSON\footnote{JSON - z jęz. ang JavaScript Object Notation,, tekstowy format zapisu i wymiany danych oparty na strukturze obiektów oraz tablic, wykorzystywany w komunikacji między aplikacjami.}. Oznacza to brak sztywno zdefiniowanego schematu tabel oraz większą swobodę w organizacji informacji.
+\FirstParagraph MongoDB\footnote{MongoDB, Inc., \emph{Welcome to the MongoDB docs}, \url{https://www.mongodb.com/docs/} (dostęp: 02.02.2026).} jest nierelacyjnym systemem zarządzania bazą danych, którego podstawową różnicą względem relacyjnych rozwiązań, jest sposób przechowywania informacji. MongoDB wykorzystuje model dokumentowy, w którym dane zapisywane są w elastycznych strukturach przypominających format JSON\footnote{JSON - z jęz. ang. JavaScript Object Notation, tekstowy format zapisu i wymiany danych oparty na strukturze obiektów oraz tablic, wykorzystywany w komunikacji między aplikacjami.}. Oznacza to brak sztywno zdefiniowanego schematu tabel oraz większą swobodę w organizacji informacji.
 
 MongoDB przechowuje powiązane dane często w obrębie jednego dokumentu. Takie podejście redukuje potrzebę wykonywania złożonych połączeń między poszczególnymi tabelami, co przyspiesza operacje odczytu i upraszcza projektowanie aplikacji o dynamicznej strukturze danych.
 
@@ -1239,13 +1239,15 @@ W przypadku logowania z użyciem zewnętrznych dostawców ważne jest nie tylko 
 
 Do przechowywania danych autoryzacyjnych wykorzystano adapter MongoDB. Adapter zapisuje w bazie informacje o użytkownikach i powiązanych kontach zewnętrznych, dzięki czemu aplikacja może rozpoznawać tę samą osobę po kolejnych logowaniach. Dane te są przechowywane w kolekcjach technicznych tworzonych przez mechanizm NextAuth, niezależnie od domenowych kolekcji aplikacji, takich jak taski, checklisty czy projekty.
 
-Sesja użytkownika działa w strategii \texttt{jwt}. JWT\footnote{JWT - skrót od JSON Web Token; jest to format tokenu używany do przenoszenia informacji o użytkowniku lub uprawnieniach między stronami komunikacji.} pozwala przechowywać podstawowe informacje o zalogowanym użytkowniku w tokenie sesyjnym. W konfiguracji zastosowano callback\footnote{Callback - funkcja przekazywana do innego mechanizmu, która jest wywoływana automatycznie w określonym momencie działania programu.} \texttt{session}, który przenosi identyfikator użytkownika z tokenu do obiektu \texttt{session.user.id}. Dzięki temu pozostałe części backendu mogą korzystać z jednolitego sposobu identyfikacji właściciela danych.
+Sesja użytkownika działa w strategii \texttt{jwt}. JWT\footnote{JWT - skrót od JSON Web Token; jest to format tokenu używany do przenoszenia informacji o użytkowniku lub uprawnieniach między stronami komunikacji.} pozwala przechowywać podstawowe informacje o zalogowanym użytkowniku w tokenie sesyjnym. W konfiguracji zastosowano callback \texttt{session}, który przenosi identyfikator użytkownika z tokenu do obiektu \texttt{session.user.id}. Dzięki temu pozostałe części backendu mogą korzystać z jednolitego sposobu identyfikacji właściciela danych.
 
 W praktyce autoryzacja jest używana w handlerach API przez funkcję pobierającą identyfikator aktualnego użytkownika. Każda operacja na danych użytkownika rozpoczyna się od pobrania identyfikatora sesji. Następnie identyfikator ten trafia do warunków zapytań jako \texttt{ownerId}. Takie rozwiązanie sprawia, że nawet poprawnie zbudowane żądanie nie pozwala odczytać ani zmienić danych należących do innej osoby.
 
 \chapter{Testy jednostkowe}
 
-\FirstParagraph Testy jednostkowe\footnote{Test jednostkowy - test sprawdzający niewielki, wydzielony fragment programu, np. funkcję lub schemat walidacji, bez uruchamiania całego systemu.} służą do sprawdzania małych fragmentów aplikacji w kontrolowanych warunkach. Ich zadaniem jest szybkie wykrywanie błędów w logice programu oraz zabezpieczenie już działających funkcji przed przypadkowymi regresjami podczas dalszego rozwoju projektu. W aplikacji testy zostały uruchamiane za pomocą narzędzia Vitest, które jest dostosowane do testowania kodu JavaScript i TypeScript.
+\FirstParagraph Test jednostkowy sprawdza niewielki, wydzielony fragment programu, np. funkcję lub schemat walidacji, bez uruchamiania całego systemu. Testy jednostkowe służą więc do weryfikowania małych części aplikacji w kontrolowanych warunkach. Ich zadaniem jest szybkie wykrywanie błędów w logice programu oraz zabezpieczenie już działających funkcji przed przypadkowymi regresjami podczas dalszego rozwoju projektu.
+
+W aplikacji testy zostały uruchamiane za pomocą narzędzia Vitest, które jest dostosowane do testowania kodu JavaScript i TypeScript. Dokumentacja Vitest wskazuje, że test opisuje oczekiwane zachowanie wybranego fragmentu kodu, a funkcje \texttt{test} oraz \texttt{expect} pozwalają definiować sprawdzane przypadki i porównywać wynik działania programu z oczekiwanym rezultatem\footnote{Vitest, \emph{Writing Tests}, dostęp: \url{https://vitest.dev/guide/learn/writing-tests.html} (03.08.2026).}. W kontekście aplikacji React podobną rolę pełnią narzędzia pozwalające renderować komponenty w środowisku testowym i sprawdzać widoczne dla użytkownika elementy interfejsu; dokumentacja React Testing Library opisuje m.in. funkcję \texttt{render}, służącą do osadzania komponentu w kontenerze testowym\footnote{Testing Library, \emph{React Testing Library API}, dostęp: \url{https://testing-library.com/docs/react-testing-library/api/} (03.08.2026).}.
 
 \section{Testy funkcjonalności tasków}
 
@@ -1259,7 +1261,7 @@ Kolejny test sprawdza reakcję walidacji na niepoprawne wartości. Odrzucany jes
 
 Ostatni test dotyczy aktualizacji taska. Schemat \texttt{taskUpdateSchema} dopuszcza częściową aktualizację, ale wymaga przekazania przynajmniej jednego pola. Test sprawdza więc, że pusty obiekt zostaje odrzucony, natomiast aktualizacja zawierająca samo pole \texttt{statusId} jest uznawana za poprawną. Ma to znaczenie dla działania widoku kanban, w którym zmiana statusu taska może być wykonana bez modyfikowania pozostałych właściwości zadania.
 
-W testach wykorzystano asercje\footnote{Asercja - warunek sprawdzany podczas testu, którego spełnienie oznacza poprawne zachowanie badanego fragmentu programu.} porównujące oczekiwany wynik walidacji z wynikiem rzeczywistym. Dzięki temu możliwe jest szybkie sprawdzenie, czy zmiany w schematach danych nie osłabiły reguł zabezpieczających API tasków.
+W testach wykorzystano asercje porównujące oczekiwany wynik walidacji z wynikiem rzeczywistym. Dzięki temu możliwe jest szybkie sprawdzenie, czy zmiany w schematach danych nie osłabiły reguł zabezpieczających API tasków.
 
 \chapter*{Bibliografia}
 \addcontentsline{toc}{chapter}{Bibliografia}
@@ -1270,35 +1272,39 @@ W testach wykorzystano asercje\footnote{Asercja - warunek sprawdzany podczas tes
 
 \item {\RaggedRight Ahmad M. O., Dennehy D., Conboy K., Oivo M., \emph{Kanban in software engineering: A systematic mapping study}, ``Journal of Systems and Software'', vol. 137, 2018, s. 96--113, DOI: 10.1016/j.jss.2017.11.045, \url{https://doi.org/10.1016/j.jss.2017.11.045} (dostęp: 31.07.2026).\par}
 
-\item {\RaggedRight Albiorix Technology, \emph{Web application architecture layers}, \url{https://www.albiorixtech.com/wp-content/uploads/2025/12/web-application-architecture-layers.jpg} (dostęp: 03.02.2026).\par}
+\item {\RaggedRight Albiorix Technology, \emph{Web application architecture layers}, [b.r.], dostęp: \url{https://www.albiorixtech.com/wp-content/uploads/2025/12/web-application-architecture-layers.jpg} (03.02.2026).\par}
 
-\item {\RaggedRight Asana, Inc., \emph{Asana}, \url{https://asana.com} (dostęp: 17.07.2026).\par}
+\item {\RaggedRight Asana, Inc., \emph{Asana}, [b.r.], dostęp: \url{https://asana.com} (17.07.2026).\par}
 
-\item {\RaggedRight Atlassian, \emph{Trello}, \url{https://trello.com} (dostęp: 17.07.2026).\par}
+\item {\RaggedRight Atlassian, \emph{Trello}, [b.r.], dostęp: \url{https://trello.com} (17.07.2026).\par}
 
-\item {\RaggedRight Auth.js, \emph{Auth.js}, \url{https://authjs.dev} (dostęp: 17.07.2026).\par}
+\item {\RaggedRight Auth.js, \emph{Auth.js}, [b.r.], dostęp: \url{https://authjs.dev} (17.07.2026).\par}
 
-\item {\RaggedRight Canva, \emph{Creating a data flow diagram: How-tos, templates, and tips}, \url{https://www.canva.com/online-whiteboard/data-flow-diagrams/} (dostęp: 03.02.2026).\par}
+\item {\RaggedRight Canva, \emph{Creating a data flow diagram: How-tos, templates, and tips}, [b.r.], dostęp: \url{https://www.canva.com/online-whiteboard/data-flow-diagrams/} (03.02.2026).\par}
 
-\item {\RaggedRight ClickUp, \emph{ClickUp}, \url{https://clickup.com} (dostęp: 17.07.2026).\par}
+\item {\RaggedRight ClickUp, \emph{ClickUp}, [b.r.], dostęp: \url{https://clickup.com} (17.07.2026).\par}
 
 \item Dean J., \emph{Web programming with HTML, CSS, and JavaScript}, Burlington 2017.
 
-\item {\RaggedRight \emph{Frontend vs Backend}, \url{https://d1zruf9db62p8s.cloudfront.net/2025/08/Frontend-vs-Backend.webp} (dostęp: 02.02.2026).\par}
+\item {\RaggedRight \emph{Frontend vs Backend}, [b.r.], dostęp: \url{https://d1zruf9db62p8s.cloudfront.net/2025/08/Frontend-vs-Backend.webp} (02.02.2026).\par}
 
-\item {\RaggedRight Microsoft, \emph{TypeScript Documentation}, \url{https://www.typescriptlang.org/docs/} (dostęp: 25.07.2026).\par}
+\item {\RaggedRight Microsoft, \emph{TypeScript Documentation}, [b.r.], dostęp: \url{https://www.typescriptlang.org/docs/} (25.07.2026).\par}
 
-\item {\RaggedRight MongoDB, Inc., \emph{Welcome to the MongoDB docs}, \url{https://www.mongodb.com/docs/} (dostęp: 02.02.2026).\par}
+\item {\RaggedRight MongoDB, Inc., \emph{Welcome to the MongoDB docs}, [b.r.], dostęp: \url{https://www.mongodb.com/docs/} (02.02.2026).\par}
 
-\item {\RaggedRight Oracle, \emph{MySQL Documentation}, \url{https://dev.mysql.com/doc/} (dostęp: 25.07.2026).\par}
+\item {\RaggedRight Oracle, \emph{MySQL Documentation}, [b.r.], dostęp: \url{https://dev.mysql.com/doc/} (25.07.2026).\par}
 
-\item {\RaggedRight React, \emph{React: The library for web and native interfaces}, \url{https://react.dev} (dostęp: 28.01.2026).\par}
+\item {\RaggedRight React, \emph{React: The library for web and native interfaces}, [b.r.], dostęp: \url{https://react.dev} (28.01.2026).\par}
 
 \item {\RaggedRight Sun S.-T., Beznosov K., \emph{The Devil is in the (Implementation) Details: An Empirical Analysis of OAuth SSO Systems}, w: \emph{Proceedings of the 2012 ACM Conference on Computer and Communications Security}, 2012, s. 378--390, DOI: 10.1145/2382196.2382238, \url{https://doi.org/10.1145/2382196.2382238} (dostęp: 31.07.2026).\par}
 
-\item {\RaggedRight Tailwind Labs, \emph{Tailwind CSS}, \url{https://tailwindcss.com} (dostęp: 28.01.2026).\par}
+\item {\RaggedRight Tailwind Labs, \emph{Tailwind CSS}, [b.r.], dostęp: \url{https://tailwindcss.com} (28.01.2026).\par}
 
-\item {\RaggedRight Vercel, \emph{Next.js Docs}, \url{https://nextjs.org/docs} (dostęp: 29.01.2026).\par}
+\item {\RaggedRight Testing Library, \emph{React Testing Library API}, [b.r.], dostęp: \url{https://testing-library.com/docs/react-testing-library/api/} (03.08.2026).\par}
+
+\item {\RaggedRight Vercel, \emph{Next.js Docs}, [b.r.], dostęp: \url{https://nextjs.org/docs} (29.01.2026).\par}
+
+\item {\RaggedRight Vitest, \emph{Writing Tests}, [b.r.], dostęp: \url{https://vitest.dev/guide/learn/writing-tests.html} (03.08.2026).\par}
 
 \end{list}
 
