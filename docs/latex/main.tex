@@ -1175,9 +1175,27 @@ Komponent utrzymuje lokalny stan tablicy za pomocą hooków \texttt{useState}. W
 
 Lista kolumn jest wyliczana w \texttt{useMemo}. Jeżeli projekt nie posiada zdefiniowanych kolumn, komponent tworzy kolumnę domyślną \texttt{todo}. Dodatkowo sprawdzane są statusy istniejących zadań. Jeżeli zadanie posiada status, którego nie ma w konfiguracji projektu, tworzona jest dodatkowa kolumna techniczna. Takie rozwiązanie zabezpiecza interfejs przed sytuacją, w której zadanie miałoby zniknąć z tablicy tylko dlatego, że jego status nie występuje już w konfiguracji kolumn.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/frontend/1.png}
+  \caption{Fragment kodu przedstawiający wyliczanie kolumn widoku kanban.}
+  \label{fig:frontend-ordered-columns}
+\end{figure}
+
+Na powyższym fragmencie widoczne jest zabezpieczenie przed pustą konfiguracją kolumn oraz przed niespójnością między statusem zadania a definicją tablicy. Komponent najpierw ustala bazową listę kolumn, a następnie dopisuje kolumny techniczne wynikające z danych tasków. Dzięki temu interfejs zachowuje kompletność nawet wtedy, gdy dane projektu nie są idealnie zsynchronizowane.
+
 Przenoszenie zadania między kolumnami zostało zaimplementowane na dwa sposoby. Pierwszym jest mechanizm \texttt{drag and drop}, w którym funkcje \texttt{handleDragStart}, \texttt{handleDragOver} i \texttt{handleDrop} obsługują przeciąganie karty oraz upuszczanie jej w wybranej kolumnie. Drugim sposobem są przyciski \texttt{Back} i \texttt{Next}, które przenoszą zadanie do poprzedniej lub następnej kolumny. Dzięki temu widok pozostaje użyteczny również wtedy, gdy użytkownik nie chce korzystać z przeciągania.
 
 Za właściwą zmianę statusu odpowiada funkcja \texttt{moveTask}. Po wybraniu nowej kolumny funkcja oblicza następną pozycję zadania w tej kolumnie, aktualizuje lokalny stan tablicy i wysyła żądanie \texttt{PATCH} do endpointu \texttt{/api/tasks/\{taskId\}}. W treści żądania przekazywane są \texttt{statusId}, \texttt{projectId} oraz \texttt{position}. Aktualizacja lokalnego stanu wykonywana jest przed odpowiedzią serwera, co daje użytkownikowi wrażenie natychmiastowej reakcji interfejsu. Jeżeli backend zwróci błąd, komponent przywraca poprzedni stan zadań i wyświetla komunikat o niepowodzeniu operacji.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/frontend/2.png}
+  \caption{Fragment kodu przedstawiający zmianę statusu taska w widoku kanban.}
+  \label{fig:frontend-move-task}
+\end{figure}
+
+Kod funkcji \texttt{moveTask} pokazuje połączenie logiki interfejsu z zapisem danych po stronie serwera. Najpierw wyliczana jest nowa pozycja zadania w kolumnie docelowej, potem aktualizowany jest stan lokalny, a następnie wykonywane jest żądanie do API. W razie błędu komponent wycofuje zmianę, dzięki czemu użytkownik nie zostaje z widokiem niespójnym ze stanem zapisanym w bazie danych.
 
 Istotnym elementem implementacji jest również edycja kolumn. Użytkownik może kliknąć nagłówek kolumny, zmienić jej nazwę, kolor oraz oznaczyć ją jako kolumnę końcową. Po zapisaniu zmian komponent wysyła żądanie \texttt{PATCH} do endpointu \texttt{/api/projects/\{projectId\}}, przekazując zaktualizowaną tablicę \texttt{kanbanColumns}. Każda kolumna otrzymuje także pozycję wynikającą z kolejności w tablicy. Po poprawnym zapisie wykonywane jest \texttt{router.refresh()}, co odświeża dane projektu.
 
@@ -1199,11 +1217,29 @@ Głównym komponentem dashboardu jest \texttt{PinnedBoard}. Renderuje on kafelki
 
 Za właściwą listę przypiętych elementów odpowiada komponent \texttt{PinnedItemsSearch}. Komponent ten działa po stronie klienta, ponieważ obsługuje stan wyszukiwarki, filtrów oraz sortowania. Użytkownik może wyszukiwać przypięte elementy po tytule, opisie, typie, statusie i metadanych. Może także filtrować wyniki według typu elementu: notatek, checklist, zadań lub projektów. Lista typów jest przechowywana w stanie \texttt{selectedTypes}, a filtrowanie wykonywane jest w \texttt{useMemo}, aby nie przeliczać wyników bez potrzeby przy każdym renderowaniu.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/frontend/3.png}
+  \caption{Fragment kodu przedstawiający filtrowanie i sortowanie przypiętych elementów.}
+  \label{fig:frontend-pinned-search}
+\end{figure}
+
+Przedstawiony kod skupia w jednym miejscu stan wyszukiwarki, wybrane filtry typów oraz konfigurację sortowania. Zastosowanie \texttt{useMemo} ogranicza ponowne przeliczanie listy do sytuacji, w których zmieniają się dane wejściowe albo ustawienia użytkownika. Dzięki temu komponent pozostaje czytelny, a jednocześnie obsługuje kilka wariantów przeglądania przypiętych elementów.
+
 Sortowanie przypiętych elementów obsługuje stan \texttt{sortField} oraz \texttt{sortDirection}. Użytkownik może sortować elementy po dacie aktualizacji, dacie utworzenia, tytule lub opisie. Dla pól tekstowych domyślnym kierunkiem jest sortowanie rosnące, natomiast dla dat domyślnie pokazywane są najnowsze elementy. Wyniki po filtrowaniu są kopiowane do nowej tablicy i sortowane bez modyfikowania danych wejściowych przekazanych do komponentu.
 
 Każdy przypięty element jest renderowany jako karta \texttt{ObjectCard}. Ikona karty zależy od typu elementu: notatka, checklista, zadanie lub projekt. Dla zadań i projektów przekazywany jest status oraz priorytet, natomiast dla checklist możliwe jest pokazanie podglądu elementów checklisty. Link karty prowadzi bezpośrednio do szczegółowego widoku danego elementu.
 
 Za przypinanie i odpinanie odpowiada komponent przycisku pinezki, wydzielony w kodzie jako \texttt{PinEntityButton}. Komponent otrzymuje typ i identyfikator elementu oraz opcjonalny identyfikator istniejącego przypięcia. Jeżeli element nie jest przypięty, kliknięcie wysyła żądanie \texttt{POST} do endpointu \texttt{/api/pins}. Jeżeli element jest już przypięty, kliknięcie wysyła żądanie \texttt{DELETE} do endpointu \texttt{/api/pins/\{pinId\}}. Po poprawnym zakończeniu operacji komponent aktualizuje lokalny stan, zmienia wygląd ikony pinezki oraz wykonuje \texttt{router.refresh()}, aby odświeżyć dashboard i pozostałe widoki.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/frontend/4.png}
+  \caption{Fragment kodu przedstawiający obsługę przypinania i odpinania elementów.}
+  \label{fig:frontend-pin-toggle}
+\end{figure}
+
+Komponent \texttt{PinEntityButton} obsługuje dwa przeciwne stany tego samego mechanizmu. Jeżeli element ma już przypięcie, wysyłane jest żądanie \texttt{DELETE}; w przeciwnym razie komponent tworzy nowe przypięcie za pomocą żądania \texttt{POST}. Po zakończeniu operacji aktualizowany jest lokalny identyfikator przypięcia, co pozwala natychmiast zmienić wygląd przycisku.
 
 W efekcie sekcja przypiętych elementów pełni rolę spersonalizowanego skrótu do najważniejszych danych użytkownika. Implementacja została oparta na jednym wspólnym modelu przypięcia oraz na uniwersalnym komponencie listującym, dzięki czemu dodanie obsługi kolejnego typu elementu wymagałoby głównie rozszerzenia mapowania typów i sposobu pobierania celu przypięcia.
 
@@ -1223,11 +1259,38 @@ Metoda \texttt{POST} odpowiada za utworzenie nowej checklisty. Treść żądania
 
 Przed utworzeniem dokumentu dane są przekazywane do funkcji \texttt{sanitizeMutation}. Jej zadaniem jest ograniczenie zapisywanych wartości do pól dopuszczonych przez logikę aplikacji. Następnie model \texttt{Checklist} tworzy dokument z danymi użytkownika oraz identyfikatorem właściciela. Po poprawnym zapisie wywoływana jest funkcja \texttt{recordActivityEvent}, która rejestruje zdarzenie utworzenia checklisty w historii aktywności.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/backend/1.png}
+  \caption{Fragment kodu przedstawiający obsługę metod GET i POST dla checklist.}
+  \label{fig:backend-checklists-get-post}
+\end{figure}
+
+Na fragmencie kodu widać wspólny schemat obsługi żądań listowych. Obie metody najpierw pobierają identyfikator użytkownika z sesji, a następnie odrzucają żądanie, jeśli użytkownik nie jest zalogowany. Metoda \texttt{GET} filtruje checklisty po właścicielu i stanie archiwizacji, natomiast metoda \texttt{POST} dodatkowo waliduje dane wejściowe, oczyszcza przekazywany obiekt i zapisuje zdarzenie aktywności.
+
 Operacje na pojedynczej checkliście znajdują się w dynamicznej ścieżce API, w której identyfikator checklisty jest częścią adresu żądania. W metodach \texttt{GET}, \texttt{PATCH} i \texttt{DELETE} najpierw sprawdzana jest sesja użytkownika, a następnie poprawność identyfikatora checklisty za pomocą funkcji \texttt{isValidObjectId}. Dzięki temu aplikacja nie wykonuje zapytań do bazy dla niepoprawnie zbudowanych identyfikatorów.
 
 Metoda \texttt{PATCH} aktualizuje checklistę przy użyciu schematu \texttt{checklistUpdateSchema}. Schemat ten dopuszcza częściową aktualizację, ale wymaga przekazania przynajmniej jednego pola. Aktualizacja wykonywana jest przez \texttt{findOneAndUpdate} z warunkami \texttt{\_id}, \texttt{ownerId} oraz \texttt{archivedAt: null}. Taki zapis zabezpiecza przed zmianą checklist należących do innych użytkowników oraz przed modyfikacją elementów zarchiwizowanych.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/backend/2.png}
+  \caption{Fragment kodu przedstawiający aktualizację pojedynczej checklisty.}
+  \label{fig:backend-checklist-patch}
+\end{figure}
+
+Aktualizacja pojedynczej checklisty łączy kilka zabezpieczeń w jednym przepływie. Najpierw sprawdzana jest sesja i poprawność identyfikatora, później walidowana jest treść żądania, a sama aktualizacja wykonywana jest wyłącznie dla dokumentu należącego do aktualnego użytkownika. Warunek \texttt{archivedAt: null} uniemożliwia modyfikację checklist, które zostały już usunięte z aktywnych widoków.
+
 Usunięcie checklisty zostało zrealizowane jako archiwizacja. Metoda \texttt{DELETE} nie usuwa dokumentu fizycznie z bazy, lecz zapisuje w polu \texttt{archivedAt} aktualną datę. Dzięki temu dane nie są widoczne w standardowych zapytaniach, ale w razie potrzeby możliwe byłoby zachowanie historii działania systemu. Po aktualizacji dokumentu rejestrowane jest zdarzenie usunięcia checklisty.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/backend/3.png}
+  \caption{Fragment kodu przedstawiający archiwizację checklisty w metodzie DELETE.}
+  \label{fig:backend-checklist-delete}
+\end{figure}
+
+Zastosowanie archiwizacji sprawia, że operacja usunięcia jest odwracalna na poziomie danych i nie narusza powiązań z innymi elementami systemu. Kod zachowuje ten sam model bezpieczeństwa co aktualizacja: wymaga zalogowanego użytkownika, poprawnego identyfikatora oraz zgodności pola \texttt{ownerId}. Dopiero spełnienie tych warunków pozwala ustawić datę archiwizacji.
 
 \section{Implementacja API odpowiedzialnego za autoryzację}
 
@@ -1240,6 +1303,15 @@ W przypadku logowania z użyciem zewnętrznych dostawców ważne jest nie tylko 
 Do przechowywania danych autoryzacyjnych wykorzystano adapter MongoDB. Adapter zapisuje w bazie informacje o użytkownikach i powiązanych kontach zewnętrznych, dzięki czemu aplikacja może rozpoznawać tę samą osobę po kolejnych logowaniach. Dane te są przechowywane w kolekcjach technicznych tworzonych przez mechanizm NextAuth, niezależnie od domenowych kolekcji aplikacji, takich jak taski, checklisty czy projekty.
 
 Sesja użytkownika działa w strategii \texttt{jwt}. JWT\footnote{JWT - skrót od JSON Web Token; jest to format tokenu używany do przenoszenia informacji o użytkowniku lub uprawnieniach między stronami komunikacji.} pozwala przechowywać podstawowe informacje o zalogowanym użytkowniku w tokenie sesyjnym. W konfiguracji zastosowano callback \texttt{session}, który przenosi identyfikator użytkownika z tokenu do obiektu \texttt{session.user.id}. Dzięki temu pozostałe części backendu mogą korzystać z jednolitego sposobu identyfikacji właściciela danych.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/backend/4.png}
+  \caption{Fragment kodu przedstawiający konfigurację autoryzacji w Auth.js.}
+  \label{fig:backend-auth-options}
+\end{figure}
+
+Konfiguracja \texttt{authOptions} stanowi centralny punkt mechanizmu autoryzacji. W tym miejscu wskazano adapter MongoDB, strategię sesji, stronę logowania oraz listę aktywnych dostawców OAuth. Callback sesji dopisuje identyfikator użytkownika do obiektu sesji, dzięki czemu pozostałe endpointy mogą korzystać z jednej funkcji pobierającej właściciela danych.
 
 W praktyce autoryzacja jest używana w handlerach API przez funkcję pobierającą identyfikator aktualnego użytkownika. Każda operacja na danych użytkownika rozpoczyna się od pobrania identyfikatora sesji. Następnie identyfikator ten trafia do warunków zapytań jako \texttt{ownerId}. Takie rozwiązanie sprawia, że nawet poprawnie zbudowane żądanie nie pozwala odczytać ani zmienić danych należących do innej osoby.
 
