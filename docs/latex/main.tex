@@ -1264,6 +1264,15 @@ Struktura formularza została osadzona w komponencie ``\texttt{FormShell}'', kt�
 
 Komponent przechowuje stan formularza za pomocą hooków ``\texttt{useState}''. W stanie znajdują się między innymi komunikaty błędów, informacja o trwającym zapisie, wybrane tagi, powiązane checklisty, powiązane notatki, nowe tytuły checklist oraz identyfikator wybranego projektu. Dodatkowo zastosowano ``\texttt{useMemo}'', aby wyliczać aktualnie wybrany projekt i listę jego statusów tylko wtedy, gdy zmienią się dane wejściowe formularza. Funkcja ``\texttt{useEffect}'' pilnuje natomiast, aby po zmianie projektu wybrany status nadal należał do dostępnych kolumn kanban.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/frontend/Rozbudowa 1.png}
+  \caption{Fragment kodu przedstawiający stan formularza taska oraz dopasowanie statusów do wybranego projektu.}
+  \label{fig:frontend-task-form-state}
+\end{figure}
+
+Pokazany fragment kodu obrazuje sposób połączenia pól formularza z konfiguracją projektu. Stan komponentu przechowuje wartości wybierane przez użytkownika, a wyliczane listy statusów pozwalają dopasować formularz taska do kolumn kanban przypisanych do konkretnego projektu. Dzięki temu użytkownik nie wybiera statusu oderwanego od struktury projektu, lecz korzysta z opcji wynikających z jego aktualnej konfiguracji.
+
 Wysyłanie formularza obsługuje funkcja ``\texttt{handleSubmit}''. Po zatrzymaniu domyślnego działania formularza tworzony jest obiekt ``\texttt{FormData}'', z którego pobierane są wartości pól. Przed wysłaniem żądania sprawdzane jest, czy tytuł taska nie jest pusty. Następnie komponent buduje obiekt danych zawierający między innymi pola ``\texttt{title}'', ``\texttt{description}'', ``\texttt{priority}'', ``\texttt{statusId}'', ``\texttt{projectId}'', ``\texttt{dueDate}'', ``\texttt{tags}'', ``\texttt{checklistIds}'', ``\texttt{newChecklists}'' oraz ``\texttt{noteIds}''. W zależności od trybu formularz wysyła żądanie ``\texttt{POST}'' do endpointu ``\texttt{/api/tasks}'' albo żądanie ``\texttt{PATCH}'' do endpointu ``\texttt{/api/tasks/\{taskId\}}''.
 
 Po poprawnym utworzeniu taska użytkownik jest przenoszony do widoku listy tasków, a router odświeża dane strony. W trybie edycji formularz pozostaje w bieżącym widoku, wyświetla komunikat o zapisaniu zmian i wywołuje funkcję ``\texttt{onSaved}'', jeżeli została przekazana przez komponent nadrzędny. Takie rozwiązanie pozwala używać formularza zarówno jako pełnej strony tworzenia, jak i elementu edycji w istniejącym przepływie pracy.
@@ -1275,6 +1284,24 @@ Po poprawnym utworzeniu taska użytkownik jest przenoszony do widoku listy task�
 Podstawowa część formularza obejmuje tytuł, opis, priorytet, status cyklu życia projektu, termin wykonania oraz tagi. Dane te są wysyłane do backendu jako pola ``\texttt{title}'', ``\texttt{description}'', ``\texttt{priority}'', ``\texttt{lifecycleStatus}'', ``\texttt{dueDate}'' oraz ``\texttt{tags}''. Formularz pozwala również powiązać projekt z istniejącymi checklistami i notatkami oraz utworzyć nowe checklisty podczas zapisu projektu. Dzięki temu użytkownik może przygotować projekt wraz z najważniejszymi elementami organizacyjnymi w jednym widoku.
 
 Najważniejszą częścią formularza jest konfiguracja kolumn kanban. Domyślnie formularz posiada zestaw kolumn ``\texttt{backlog}'', ``\texttt{todo}'', ``\texttt{in\_progress}'', ``\texttt{testing}'' oraz ``\texttt{done}''. Każda kolumna ma identyfikator, nazwę, kolor, informację o tym, czy jest kolumną końcową, oraz pozycję. Funkcja ``\texttt{slugifyColumnId}'' tworzy techniczny identyfikator kolumny na podstawie jej nazwy, natomiast funkcja ``\texttt{normalizeKanbanColumns}'' porządkuje tablicę kolumn przed wysłaniem jej do API. Normalizacja usuwa puste nazwy, uzupełnia brakujące kolory, nadaje pozycje oraz zabezpiecza przed powtórzeniem identyfikatorów.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.5\textheight,keepaspectratio]{../screenshots/frontend/Rozbudowa 2 a.png}
+  \caption{Fragment kodu przedstawiający tworzenie identyfikatorów oraz normalizację kolumn kanban w formularzu projektu.}
+  \label{fig:frontend-project-form-normalize-columns}
+\end{figure}
+
+Rysunek przedstawia pierwszą część logiki odpowiedzialnej za przygotowanie kolumn kanban przed zapisem projektu. Funkcja tworząca identyfikator techniczny ujednolica nazwy kolumn, natomiast normalizacja porządkuje ich listę, usuwa puste wartości i zabezpiecza formularz przed zapisaniem niespójnej konfiguracji.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.5\textheight,keepaspectratio]{../screenshots/frontend/Rozbudowa 2 b.png}
+  \caption{Fragment kodu przedstawiający edycję oraz zmianę kolejności kolumn kanban w formularzu projektu.}
+  \label{fig:frontend-project-form-edit-columns}
+\end{figure}
+
+Drugi fragment pokazuje funkcje wykorzystywane podczas bieżącej pracy użytkownika z formularzem projektu. Kod pozwala aktualizować właściwości kolumn, usuwać je oraz zmieniać ich kolejność, dzięki czemu końcowa struktura tablicy kanban może zostać dopasowana do sposobu realizacji projektu.
 
 Formularz projektu umożliwia także zarządzanie kolejnością kolumn. Funkcje ``\texttt{moveKanbanColumn}'', ``\texttt{updateKanbanColumn}'', ``\texttt{removeKanbanColumn}'' oraz mechanizm dodawania nowej kolumny pozwalają użytkownikowi zbudować strukturę tablicy dopasowaną do sposobu pracy nad projektem. Jeżeli podczas edycji zmieni się identyfikator kolumny, komponent aktualizuje również statusy nowych tasków przypisanych do tej kolumny. Dzięki temu dane przygotowane w formularzu pozostają spójne przed wysłaniem do backendu.
 
@@ -1337,11 +1364,29 @@ Zastosowanie archiwizacji sprawia, że operacja usunięcia jest odwracalna na po
 
 Pierwszym takim elementem jest moduł ``\texttt{api-request.ts}'', w którym umieszczono funkcje ``\texttt{readJsonBody}'' oraz ``\texttt{parseJsonBody}''. Funkcja ``\texttt{readJsonBody}'' próbuje odczytać treść żądania jako obiekt JSON. Jeżeli ciało żądania jest niepoprawne albo nie ma postaci obiektu, zwracana jest wartość pusta. Funkcja ``\texttt{parseJsonBody}'' rozszerza ten mechanizm o walidację przy użyciu przekazanego schematu Zod. W przypadku błędu zwracana jest para wartości zawierająca ``\texttt{data: null}'' oraz komunikat ``\texttt{error}'', natomiast poprawne dane trafiają do handlera już po przejściu walidacji.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/backend/Rozbudowa 3.png}
+  \caption{Fragment kodu przedstawiający odczyt i walidację ciała żądania API.}
+  \label{fig:backend-api-request-parser}
+\end{figure}
+
+Na rysunku widoczny jest wspólny mechanizm, który ogranicza powtarzanie kodu w handlerach API. Funkcja odczytująca ciało żądania zabezpiecza aplikację przed niepoprawnym formatem JSON, a funkcja walidująca zwraca ujednolicony wynik w postaci danych albo komunikatu błędu. Dzięki temu poszczególne endpointy mogą korzystać z tego samego sposobu obsługi danych wejściowych.
+
 Drugim wspólnym obszarem jest obsługa odpowiedzi błędów. W module odpowiedzi API zdefiniowano funkcje zwracające błędy żądania, przekroczenia limitu oraz niedostępności usługi. Każda z nich zwraca odpowiedź ``\texttt{NextResponse.json}'' z ustalonym kodem statusu HTTP i spójną strukturą komunikatu. Podobną rolę pełnią funkcje ``\texttt{unauthorizedResponse}'' oraz ``\texttt{notFoundResponse}'' z modułu ``\texttt{session.ts}''. Dzięki temu błędy ``\texttt{400}'', ``\texttt{401}'', ``\texttt{404}'', ``\texttt{429}'' i ``\texttt{503}'' są zwracane w przewidywalny sposób, bez ręcznego składania odpowiedzi w każdym handlerze.
 
 Jak opisano w podrozdziale 3.5, mechanizm sesji pozwala powiązać żądanie z zalogowanym użytkownikiem. W backendzie sprowadzono to do funkcji ``\texttt{getCurrentUserId}'', która zwraca identyfikator wykorzystywany później jako warunek zapytań do bazy danych, najczęściej w polu ``\texttt{ownerId}''.
 
 Wspólna funkcja ``\texttt{sanitizeMutation}'' odpowiada za oczyszczanie danych przed zapisem w bazie. Usuwa ona pola techniczne, których klient nie powinien ustawiać samodzielnie, takie jak ``\texttt{\_id}'', ``\texttt{id}'', ``\texttt{ownerId}'', ``\texttt{createdAt}'' oraz ``\texttt{updatedAt}''. Mechanizm ten stanowi dodatkową warstwę ochrony obok walidacji schematem, ponieważ nawet jeżeli w przesłanym obiekcie pojawią się pola systemowe, nie zostaną one przekazane do operacji modyfikującej dokument.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/backend/Rozbudowa 4.png}
+  \caption{Fragment kodu przedstawiający pobieranie użytkownika z sesji oraz oczyszczanie danych przed zapisem.}
+  \label{fig:backend-session-sanitize}
+\end{figure}
+
+Ten fragment pokazuje dwa zabezpieczenia stosowane w wielu miejscach backendu. Funkcja pobierająca identyfikator użytkownika pozwala powiązać operację z właścicielem danych, natomiast oczyszczanie modyfikacji usuwa pola techniczne, których klient nie powinien nadpisywać. Wspólne użycie tych mechanizmów wzmacnia kontrolę dostępu i zmniejsza ryzyko przypadkowej modyfikacji danych systemowych.
 
 Ostatnim przykładem wspólnego mechanizmu jest funkcja ``\texttt{recordActivityEvent}'', zapisana w module ``\texttt{activity-events.ts}''. Funkcja przyjmuje identyfikator użytkownika, typ encji, identyfikator encji, nazwę akcji oraz opcjonalne metadane, a następnie tworzy dokument w kolekcji zdarzeń aktywności. Dzięki temu różne części backendu mogą zapisywać historię operacji w jednolitym formacie. W aplikacji jest to wykorzystywane między innymi przy tworzeniu, aktualizowaniu, przenoszeniu i archiwizowaniu elementów.
 
@@ -1380,6 +1425,15 @@ Testy przygotowane w projekcie uruchamiane są poleceniem ``\texttt{npm test}'',
 
 Pierwszy test sprawdza poprawny, pełny zestaw danych taska. Weryfikowane są między innymi tytuł, opis, priorytet, status, identyfikator projektu, termin, tagi, powiązane checklisty, nowe checklisty oraz notatki. Test sprawdza również automatyczne przycinanie białych znaków w polach tekstowych, co zapobiega zapisywaniu w bazie danych wartości zawierających przypadkowe spacje na początku lub końcu tekstu.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/testy/Testy 1 .png}
+  \caption{Fragment testu przedstawiający walidację pełnego zestawu danych taska.}
+  \label{fig:test-task-validation-complete}
+\end{figure}
+
+Widoczny test sprawdza nie tylko przyjęcie poprawnego obiektu taska, ale także działanie reguł porządkujących dane tekstowe. Asercje odnoszą się między innymi do tytułu, statusu i tagów, dzięki czemu potwierdzają, że schemat walidacji zwraca dane w oczekiwanej postaci po przejściu przez parser.
+
 Drugi test kontroluje odrzucanie pól, które nie należą do obsługiwanego formatu danych. Dotyczy to zarówno głównego obiektu taska, jak i obiektu nowej checklisty tworzonej razem z taskiem. Jest to istotne, ponieważ API nie powinno przyjmować dowolnych pól przesłanych z klienta. W przeciwnym razie użytkownik mógłby przekazać dane, których aplikacja nie przewiduje w swoim modelu.
 
 Kolejny test sprawdza reakcję walidacji na niepoprawne wartości. Odrzucany jest między innymi nieznany priorytet, błędny format daty oraz puste identyfikatory powiązanych checklist i notatek. Dzięki temu błędne dane zostają zatrzymane przed wykonaniem operacji zapisu w bazie danych.
@@ -1394,7 +1448,25 @@ W testach wykorzystano asercje porównujące oczekiwany wynik walidacji z wyniki
 
 W testach endpointu listowego sprawdzono między innymi odrzucenie żądania niezalogowanego użytkownika, pobieranie aktywnych tasków aktualnego właściciela, walidację danych przed zapisem oraz poprawne utworzenie taska powiązanego z projektem. Szczególnie istotne jest sprawdzenie, że przy tworzeniu taska z polem ``\texttt{projectId}'' backend dopisuje identyfikator taska do tablicy ``\texttt{taskIds}'' projektu oraz zapisuje zdarzenie aktywności z akcją ``\texttt{created}''.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/testy/Testy 2.png}
+  \caption{Fragment testu przedstawiający utworzenie taska, powiązanie go z projektem oraz zapis aktywności.}
+  \label{fig:test-task-route-create}
+\end{figure}
+
+Na zrzucie pokazano test endpointu odpowiedzialnego za tworzenie taska. Przygotowane atrapy modeli pozwalają sprawdzić, czy handler wywołuje ``\texttt{Task.create}'', dopisuje identyfikator taska do projektu przez operator ``\texttt{\$addToSet}'' oraz rejestruje zdarzenie aktywności z akcją ``\texttt{created}''. Dzięki temu test obejmuje zarówno główną operację zapisu, jak i jej skutki uboczne.
+
 Testy dynamicznego endpointu taska obejmują odczyt pojedynczego dokumentu, odrzucenie pustej aktualizacji, zmianę projektu przypisanego do taska oraz miękkie usuwanie. Podczas przeniesienia taska między projektami sprawdzane jest usunięcie identyfikatora ze starego projektu i dopisanie go do nowego. Przy usunięciu weryfikowane jest ustawienie pola ``\texttt{archivedAt}'', usunięcie powiązania z projektem oraz zapisanie zdarzenia ``\texttt{deleted}''. Dzięki temu testy obejmują nie tylko walidację wejścia, ale także najważniejsze skutki uboczne operacji wykonywanych przez API. Testy endpointów wykorzystują atrapy zależności, dlatego należy traktować je jako testy jednostkowe logiki handlerów, a nie jako pełne testy integracyjne z rzeczywistą bazą danych.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/testy/Testy 3.png}
+  \caption{Fragment testu przedstawiający aktualizację taska oraz przeniesienie powiązań między projektami.}
+  \label{fig:test-task-route-move}
+\end{figure}
+
+Ostatni z dodanych screenów przedstawia test dynamicznego endpointu taska. Weryfikowane jest wywołanie aktualizacji dokumentu, usunięcie identyfikatora taska ze starego projektu przez ``\texttt{\$pull}'', dopisanie go do nowego projektu przez ``\texttt{\$addToSet}'' oraz zapis zdarzenia aktywności. Ten przypadek jest ważny, ponieważ zmiana projektu wpływa nie tylko na sam dokument taska, ale również na powiązania zapisane w dokumentach projektów.
 
 \chapter*{Podsumowanie i zakończenie}
 \addcontentsline{toc}{chapter}{Podsumowanie i zakończenie}
