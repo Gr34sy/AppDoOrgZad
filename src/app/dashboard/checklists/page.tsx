@@ -13,6 +13,7 @@ import { Checklist } from "@/models/checklist";
 type ChecklistsPageProps = {
   searchParams?: {
     q?: string | string[];
+    linked?: string | string[];
     sort?: string | string[];
     direction?: string | string[];
   };
@@ -33,6 +34,7 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
 
   const ownerId = session.user.id;
   const search = getSearchParam(searchParams?.q).trim();
+  const linked = getSearchParam(searchParams?.linked).trim();
   const sort = getSearchParam(searchParams?.sort) || "updated";
   const direction = getSearchParam(searchParams?.direction) === "asc" ? "asc" : "desc";
   const query: Record<string, unknown> = {
@@ -43,6 +45,15 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
   if (search) {
     const searchRegex = new RegExp(escapeRegex(search), "i");
     query.title = searchRegex;
+  }
+
+  if (linked === "linked") {
+    query.parentType = { $in: ["task", "project"] };
+    query.parentId = { $exists: true, $ne: null };
+  }
+
+  if (linked === "unlinked") {
+    query.parentId = null;
   }
 
   await connectDatabase();
@@ -71,6 +82,7 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
         <ListControls
           entityType="checklists"
           searchValue={search}
+          linkedValue={linked}
           sortValue={sort}
           sortDirection={direction}
           clearHref="/dashboard/checklists"

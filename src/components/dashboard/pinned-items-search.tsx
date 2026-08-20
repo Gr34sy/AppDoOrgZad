@@ -15,6 +15,8 @@ type PinnedItem = {
   priority?: string;
   tags: string[];
   items?: Array<{ title: string; isCompleted?: boolean }>;
+  canFilterRelation: boolean;
+  isLinkedToProjectOrTask: boolean;
   createdAt: string;
   updatedAt: string;
   href: string;
@@ -64,6 +66,7 @@ export function PinnedItemsSearch({ pinnedItems }: PinnedItemsSearchProps) {
   const [selectedTypes, setSelectedTypes] = useState<string[]>(() =>
     typeFilters.map((filter) => filter.value)
   );
+  const [relationFilter, setRelationFilter] = useState("");
   const [sortField, setSortField] = useState("updated");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const normalizedQuery = query.trim().toLowerCase();
@@ -71,13 +74,18 @@ export function PinnedItemsSearch({ pinnedItems }: PinnedItemsSearchProps) {
   const filteredItems = useMemo(() => {
     return pinnedItems.filter((item) =>
       selectedTypeSet.has(item.type) &&
+      (!relationFilter ||
+        (item.canFilterRelation &&
+          (relationFilter === "linked"
+            ? item.isLinkedToProjectOrTask
+            : !item.isLinkedToProjectOrTask))) &&
       (!normalizedQuery ||
         [item.title, item.description, item.type, item.meta, item.status]
           .join(" ")
           .toLowerCase()
           .includes(normalizedQuery))
     );
-  }, [normalizedQuery, pinnedItems, selectedTypeSet]);
+  }, [normalizedQuery, pinnedItems, relationFilter, selectedTypeSet]);
   const sortedItems = useMemo(() => {
     const directionModifier = sortDirection === "asc" ? 1 : -1;
 
@@ -121,7 +129,7 @@ export function PinnedItemsSearch({ pinnedItems }: PinnedItemsSearchProps) {
     setSortDirection(nextSortField === "title" || nextSortField === "description" ? "asc" : "desc");
   }
 
-  const hasActiveFilters = Boolean(normalizedQuery) || selectedTypes.length !== typeFilters.length;
+  const hasActiveFilters = Boolean(normalizedQuery) || selectedTypes.length !== typeFilters.length || Boolean(relationFilter);
   const hasSelectedAllTypes = selectedTypes.length === typeFilters.length;
   const countLabel = hasActiveFilters
     ? `${filteredItems.length} of ${pinnedItems.length} saved items`
@@ -198,6 +206,20 @@ export function PinnedItemsSearch({ pinnedItems }: PinnedItemsSearchProps) {
               })}
             </div>
             <div className="flex min-w-0 flex-wrap items-end gap-2">
+              <label className="grid min-w-[13rem] gap-1">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase text-zinc-500 dark:text-zinc-400">
+                  Relation
+                </span>
+                <select
+                  value={relationFilter}
+                  onChange={(event) => setRelationFilter(event.target.value)}
+                  className="h-9 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition focus:border-[var(--app-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:bg-zinc-950"
+                >
+                  <option value="">all relations</option>
+                  <option value="linked">linked to project/task</option>
+                  <option value="unlinked">not linked</option>
+                </select>
+              </label>
               <label className="grid min-w-[11rem] gap-1">
                 <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase text-zinc-500 dark:text-zinc-400">
                   <ArrowDownUp aria-hidden="true" className="h-3.5 w-3.5 text-sky-500" />

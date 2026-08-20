@@ -11,6 +11,8 @@ type PinnedItem = {
   priority?: string;
   tags: string[];
   items?: Array<{ title: string; isCompleted?: boolean }>;
+  canFilterRelation: boolean;
+  isLinkedToProjectOrTask: boolean;
   createdAt: string;
   updatedAt: string;
   href: string;

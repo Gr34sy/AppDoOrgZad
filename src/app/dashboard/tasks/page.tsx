@@ -14,6 +14,7 @@ type TasksPageProps = {
   searchParams?: {
     q?: string | string[];
     priority?: string | string[];
+    linked?: string | string[];
     sort?: string | string[];
     direction?: string | string[];
   };
@@ -52,6 +53,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
   const ownerId = session.user.id;
   const search = getSearchParam(searchParams?.q).trim();
   const priority = getSearchParam(searchParams?.priority).trim();
+  const linked = getSearchParam(searchParams?.linked).trim();
   const sort = getSearchParam(searchParams?.sort) || "updated";
   const direction = getSearchParam(searchParams?.direction) === "asc" ? "asc" : "desc";
   const query: Record<string, unknown> = {
@@ -71,6 +73,14 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
 
   if (priority) {
     query.priority = priority;
+  }
+
+  if (linked === "linked") {
+    query.projectId = { $exists: true, $ne: null };
+  }
+
+  if (linked === "unlinked") {
+    query.projectId = null;
   }
 
   await connectDatabase();
@@ -99,6 +109,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
           entityType="tasks"
           searchValue={search}
           filterValue={priority}
+          linkedValue={linked}
           sortValue={sort}
           sortDirection={direction}
           clearHref="/dashboard/tasks"

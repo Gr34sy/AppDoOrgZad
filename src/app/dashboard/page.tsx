@@ -21,6 +21,10 @@ type PinnedTarget = {
   title: string;
   description?: string;
   content?: string;
+  projectId?: unknown;
+  parentType?: string | null;
+  parentId?: unknown;
+  linkedItems?: Array<{ targetType?: string }>;
   priority?: string;
   lifecycleStatus?: string;
   statusId?: string;
@@ -158,6 +162,10 @@ export default async function DashboardPage() {
           target.description ??
           target.content ??
           (target.items ? `items: ${target.items.length}` : target.priority ?? "Pinned");
+        const isLinkedToProjectOrTask =
+          (pin.targetType === "task" && Boolean(target.projectId)) ||
+          (pin.targetType === "checklist" && Boolean(target.parentId) && (target.parentType === "task" || target.parentType === "project")) ||
+          (pin.targetType === "note" && Boolean(target.linkedItems?.some((item) => item.targetType === "task" || item.targetType === "project")));
 
         return {
           id: String(pin._id),
@@ -169,6 +177,8 @@ export default async function DashboardPage() {
           priority: target.priority,
           tags: target.tags ?? [],
           items: pin.targetType === "checklist" ? target.items ?? [] : undefined,
+          canFilterRelation: pin.targetType !== "project",
+          isLinkedToProjectOrTask,
           createdAt: target.createdAt ? new Date(target.createdAt).toISOString() : "",
           updatedAt: target.updatedAt ? new Date(target.updatedAt).toISOString() : "",
           href: `${config.hrefBase}/${targetId}`

@@ -13,6 +13,7 @@ import { Note } from "@/models/note";
 type NotesPageProps = {
   searchParams?: {
     q?: string | string[];
+    linked?: string | string[];
     sort?: string | string[];
     direction?: string | string[];
   };
@@ -34,6 +35,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
 
   const ownerId = session.user.id;
   const search = getSearchParam(searchParams?.q).trim();
+  const linked = getSearchParam(searchParams?.linked).trim();
   const sort = getSearchParam(searchParams?.sort) || "updated";
   const direction = getSearchParam(searchParams?.direction) === "asc" ? "asc" : "desc";
   const query: Record<string, unknown> = {
@@ -44,6 +46,26 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
   if (search) {
     const searchRegex = new RegExp(escapeRegex(search), "i");
     query.$or = [{ title: searchRegex }, { content: searchRegex }, { tags: searchRegex }];
+  }
+
+  if (linked === "linked") {
+    query.linkedItems = {
+      $elemMatch: {
+        targetType: { $in: ["task", "project"] }
+      }
+    };
+  }
+
+  if (linked === "unlinked") {
+    query.$nor = [
+      {
+        linkedItems: {
+          $elemMatch: {
+            targetType: { $in: ["task", "project"] }
+          }
+        }
+      }
+    ];
   }
 
   await connectDatabase();
@@ -72,6 +94,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
         <ListControls
           entityType="notes"
           searchValue={search}
+          linkedValue={linked}
           sortValue={sort}
           sortDirection={direction}
           clearHref="/dashboard/notes"

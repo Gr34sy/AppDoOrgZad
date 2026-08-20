@@ -21,6 +21,7 @@ type ListControlsProps = {
   clearHref: string;
   filterValue?: string;
   filterOptions?: SelectOption[];
+  linkedValue?: string;
 };
 
 const priorityOptions = [
@@ -36,6 +37,11 @@ const taskProjectSortOptions = [
   { label: "priority", value: "priority" }
 ];
 
+const linkedOptions = [
+  { label: "linked to project/task", value: "linked" },
+  { label: "not linked", value: "unlinked" }
+];
+
 const controlConfig: Record<
   ListEntityType,
   {
@@ -43,10 +49,12 @@ const controlConfig: Record<
     filterLabel?: string;
     filterPlaceholder?: string;
     filterOptions?: SelectOption[];
+    linkedFilter?: boolean;
     sortOptions: SelectOption[];
   }
 > = {
   notes: {
+    linkedFilter: true,
     sortOptions: defaultSortOptions
   },
   tasks: {
@@ -54,9 +62,11 @@ const controlConfig: Record<
     filterLabel: "Priority",
     filterPlaceholder: "all priorities",
     filterOptions: priorityOptions,
+    linkedFilter: true,
     sortOptions: taskProjectSortOptions
   },
   checklists: {
+    linkedFilter: true,
     sortOptions: defaultSortOptions
   },
   projects: {
@@ -75,7 +85,8 @@ export function ListControls({
   sortDirection,
   clearHref,
   filterValue = "",
-  filterOptions
+  filterOptions,
+  linkedValue = ""
 }: ListControlsProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -83,8 +94,10 @@ export function ListControls({
   const config = controlConfig[entityType];
   const resolvedFilterOptions = filterOptions ?? config.filterOptions ?? [];
   const hasFilter = Boolean(config.filterName);
+  const hasLinkedFilter = Boolean(config.linkedFilter);
   const [query, setQuery] = useState(searchValue);
   const [selectedFilter, setSelectedFilter] = useState(filterValue);
+  const [selectedLinkedFilter, setSelectedLinkedFilter] = useState(linkedValue);
   const [selectedSort, setSelectedSort] = useState(sortValue);
   const [direction, setDirection] = useState<"asc" | "desc">(sortDirection);
   const hasSearchSettled = useRef(false);
@@ -92,12 +105,14 @@ export function ListControls({
   const navigateWithControls = useCallback(({
     nextQuery,
     nextFilter,
+    nextLinkedFilter,
     nextSort,
     nextDirection,
     replace
   }: {
     nextQuery: string;
     nextFilter: string;
+    nextLinkedFilter: string;
     nextSort: string;
     nextDirection: "asc" | "desc";
     replace: boolean;
@@ -111,6 +126,10 @@ export function ListControls({
 
     if (config.filterName && nextFilter) {
       params.set(config.filterName, nextFilter);
+    }
+
+    if (config.linkedFilter && nextLinkedFilter) {
+      params.set("linked", nextLinkedFilter);
     }
 
     if (nextSort && nextSort !== "updated") {
@@ -136,7 +155,7 @@ export function ListControls({
     }
 
     router.push(nextHref);
-  }, [config.filterName, pathname, router, searchParams]);
+  }, [config.filterName, config.linkedFilter, pathname, router, searchParams]);
 
   useEffect(() => {
     setQuery(searchValue);
@@ -145,6 +164,10 @@ export function ListControls({
   useEffect(() => {
     setSelectedFilter(filterValue);
   }, [filterValue]);
+
+  useEffect(() => {
+    setSelectedLinkedFilter(linkedValue);
+  }, [linkedValue]);
 
   useEffect(() => {
     setSelectedSort(sortValue);
@@ -164,6 +187,7 @@ export function ListControls({
       navigateWithControls({
         nextQuery: query,
         nextFilter: selectedFilter,
+        nextLinkedFilter: selectedLinkedFilter,
         nextSort: sortValue,
         nextDirection: direction,
         replace: true
@@ -171,7 +195,7 @@ export function ListControls({
     }, 250);
 
     return () => window.clearTimeout(timeoutId);
-  }, [direction, navigateWithControls, query, selectedFilter, sortValue]);
+  }, [direction, navigateWithControls, query, selectedFilter, selectedLinkedFilter, sortValue]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -179,6 +203,7 @@ export function ListControls({
     navigateWithControls({
       nextQuery: query,
       nextFilter: selectedFilter,
+      nextLinkedFilter: selectedLinkedFilter,
       nextSort: selectedSort,
       nextDirection: direction,
       replace: false
@@ -192,6 +217,21 @@ export function ListControls({
     navigateWithControls({
       nextQuery: query,
       nextFilter,
+      nextLinkedFilter: selectedLinkedFilter,
+      nextSort: sortValue,
+      nextDirection: direction,
+      replace: true
+    });
+  }
+
+  function handleLinkedFilterChange(event: ChangeEvent<HTMLSelectElement>) {
+    const nextLinkedFilter = event.target.value;
+
+    setSelectedLinkedFilter(nextLinkedFilter);
+    navigateWithControls({
+      nextQuery: query,
+      nextFilter: selectedFilter,
+      nextLinkedFilter,
       nextSort: sortValue,
       nextDirection: direction,
       replace: true
@@ -205,6 +245,7 @@ export function ListControls({
     navigateWithControls({
       nextQuery: query,
       nextFilter: selectedFilter,
+      nextLinkedFilter: selectedLinkedFilter,
       nextSort: sortValue,
       nextDirection,
       replace: true
@@ -214,6 +255,7 @@ export function ListControls({
   function clearControls() {
     setQuery("");
     setSelectedFilter("");
+    setSelectedLinkedFilter("");
     setSelectedSort("updated");
     setDirection("desc");
     router.push(clearHref);
@@ -230,9 +272,11 @@ export function ListControls({
       />
       <div
         className={`grid min-w-0 items-end gap-3 ${
-          hasFilter
-            ? "lg:grid-cols-[minmax(16rem,24rem)_minmax(10rem,0.75fr)_minmax(10rem,0.75fr)_auto_auto_auto]"
-            : "lg:grid-cols-[minmax(16rem,24rem)_minmax(10rem,0.75fr)_auto_auto_auto]"
+          hasFilter && hasLinkedFilter
+            ? "lg:grid-cols-[minmax(16rem,24rem)_minmax(10rem,0.75fr)_minmax(10rem,0.75fr)_minmax(10rem,0.75fr)_auto_auto_auto]"
+            : hasFilter || hasLinkedFilter
+              ? "lg:grid-cols-[minmax(16rem,24rem)_minmax(10rem,0.75fr)_minmax(10rem,0.75fr)_auto_auto_auto]"
+              : "lg:grid-cols-[minmax(16rem,24rem)_minmax(10rem,0.75fr)_auto_auto_auto]"
         } lg:justify-start`}
       >
         <div className="w-full min-w-0">
@@ -271,6 +315,28 @@ export function ListControls({
             >
               <option value="">{config.filterPlaceholder ?? "all"}</option>
               {resolvedFilterOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+
+        {hasLinkedFilter ? (
+          <label className="grid min-w-0 gap-1">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase text-zinc-500 dark:text-zinc-400">
+              <Filter aria-hidden="true" className="h-3.5 w-3.5 text-[var(--app-accent)]" />
+              Relation
+            </span>
+            <select
+              name="linked"
+              value={selectedLinkedFilter}
+              onChange={handleLinkedFilterChange}
+              className="h-11 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition focus:border-[var(--app-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:bg-zinc-950"
+            >
+              <option value="">all relations</option>
+              {linkedOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
