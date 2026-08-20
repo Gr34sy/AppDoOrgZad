@@ -22,6 +22,8 @@ tsconfig.tsbuildinfo
 *.fls
 *.fdb_latexmk
 *.synctex.gz
+*.xdv
+docs/Web Programming with HTML5, CSS, and JavaScript.pdf
 
 # Local Node DNS workaround
 dns-fix.cjs

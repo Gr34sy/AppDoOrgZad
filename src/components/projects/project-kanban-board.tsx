@@ -1,10 +1,18 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, CalendarClock, Check, GripVertical, Plus, X } from "lucide-react";
-import { DragEvent, useEffect, useMemo, useState } from "react";
-import { TagList } from "@/components/dashboard/tag-list";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarClock,
+  Check,
+  GripVertical,
+  Plus,
+  X,
+} from 'lucide-react';
+import { DragEvent, useEffect, useMemo, useState } from 'react';
+import { TagList } from '@/components/dashboard/tag-list';
 
 type KanbanColumn = {
   id: string;
@@ -31,10 +39,12 @@ type ProjectKanbanBoardProps = {
 };
 
 const priorityStyles: Record<string, string> = {
-  low: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200",
-  medium: "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-200",
-  high: "border-fuchsia-200 bg-fuchsia-50 text-fuchsia-700 dark:border-fuchsia-500/30 dark:bg-fuchsia-500/10 dark:text-fuchsia-200",
-  urgent: "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200"
+  low: 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200',
+  medium:
+    'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-200',
+  high: 'border-fuchsia-200 bg-fuchsia-50 text-fuchsia-700 dark:border-fuchsia-500/30 dark:bg-fuchsia-500/10 dark:text-fuchsia-200',
+  urgent:
+    'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200',
 };
 
 function getColumnProgress(tasks: KanbanTask[], taskCount: number) {
@@ -45,14 +55,18 @@ function getColumnProgress(tasks: KanbanTask[], taskCount: number) {
   return Math.round((tasks.length / taskCount) * 100);
 }
 
-export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanBoardProps) {
+export function ProjectKanbanBoard({
+  projectId,
+  columns,
+  tasks,
+}: ProjectKanbanBoardProps) {
   const router = useRouter();
-  const [movingTaskId, setMovingTaskId] = useState("");
-  const [draggedTaskId, setDraggedTaskId] = useState("");
-  const [activeDropColumnId, setActiveDropColumnId] = useState("");
+  const [movingTaskId, setMovingTaskId] = useState('');
+  const [draggedTaskId, setDraggedTaskId] = useState('');
+  const [activeDropColumnId, setActiveDropColumnId] = useState('');
   const [boardTasks, setBoardTasks] = useState(tasks);
   const [boardColumns, setBoardColumns] = useState(columns);
-  const [editingColumnId, setEditingColumnId] = useState("");
+  const [editingColumnId, setEditingColumnId] = useState('');
   const [columnDraft, setColumnDraft] = useState<KanbanColumn | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,24 +81,27 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
   const orderedColumns = useMemo(() => {
     const baseColumns = boardColumns.length
       ? boardColumns
-      : [{ id: "todo", title: "To do", color: "#2563eb", isDone: false }];
+      : [{ id: 'todo', title: 'To do', color: '#2563eb', isDone: false }];
     const knownColumnIds = new Set(baseColumns.map((column) => column.id));
     const extraColumns = Array.from(
       new Set(
         boardTasks
           .map((task) => task.statusId)
-          .filter((statusId) => statusId && !knownColumnIds.has(statusId))
-      )
+          .filter((statusId) => statusId && !knownColumnIds.has(statusId)),
+      ),
     ).map((statusId) => ({
       id: statusId,
-      title: statusId.replace(/_/g, " "),
-      color: "#71717a",
-      isDone: false
+      title: statusId.replace(/_/g, ' '),
+      color: '#71717a',
+      isDone: false,
     }));
 
     return [...baseColumns, ...extraColumns];
   }, [boardColumns, boardTasks]);
-  const columnIds = useMemo(() => orderedColumns.map((column) => column.id), [orderedColumns]);
+  const columnIds = useMemo(
+    () => orderedColumns.map((column) => column.id),
+    [orderedColumns],
+  );
   const taskCount = boardTasks.length;
 
   async function moveTask(task: KanbanTask, nextStatusId: string) {
@@ -98,38 +115,42 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
       Math.max(
         -1,
         ...boardTasks
-          .filter((currentTask) => currentTask.id !== task.id && currentTask.statusId === nextStatusId)
-          .map((currentTask) => currentTask.position ?? 0)
+          .filter(
+            (currentTask) =>
+              currentTask.id !== task.id &&
+              currentTask.statusId === nextStatusId,
+          )
+          .map((currentTask) => currentTask.position ?? 0),
       ) + 1;
 
     setBoardTasks((currentTasks) =>
       currentTasks.map((currentTask) =>
         currentTask.id === task.id
           ? { ...currentTask, statusId: nextStatusId, position: nextPosition }
-          : currentTask
-      )
+          : currentTask,
+      ),
     );
 
     const response = await fetch(`/api/tasks/${task.id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         statusId: nextStatusId,
         projectId,
-        position: nextPosition
-      })
+        position: nextPosition,
+      }),
     });
 
     if (!response.ok) {
-      setError("Could not move the task.");
+      setError('Could not move the task.');
       setBoardTasks(tasks);
-      setMovingTaskId("");
+      setMovingTaskId('');
       return;
     }
 
-    setMovingTaskId("");
+    setMovingTaskId('');
     router.refresh();
   }
 
@@ -137,7 +158,7 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
     setEditingColumnId(column.id);
     setColumnDraft({
       ...column,
-      color: column.color ?? "#71717a"
+      color: column.color ?? '#71717a',
     });
   }
 
@@ -151,35 +172,35 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
         ? {
             ...column,
             title: columnDraft.title.trim() || column.title,
-            color: columnDraft.color || column.color || "#71717a",
-            isDone: columnDraft.isDone
+            color: columnDraft.color || column.color || '#71717a',
+            isDone: columnDraft.isDone,
           }
-        : column
+        : column,
     );
 
     setError(null);
     setBoardColumns(nextColumns);
-    setEditingColumnId("");
+    setEditingColumnId('');
     setColumnDraft(null);
 
     const response = await fetch(`/api/projects/${projectId}`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         kanbanColumns: nextColumns.map((column, index) => ({
           id: column.id,
           title: column.title,
-          color: column.color ?? "#71717a",
+          color: column.color ?? '#71717a',
           isDone: column.isDone,
-          position: index
-        }))
-      })
+          position: index,
+        })),
+      }),
     });
 
     if (!response.ok) {
-      setError("Could not save the column.");
+      setError('Could not save the column.');
       setBoardColumns(columns);
       return;
     }
@@ -188,29 +209,29 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
   }
 
   function cancelColumnEdit() {
-    setEditingColumnId("");
+    setEditingColumnId('');
     setColumnDraft(null);
   }
 
   function handleDragStart(event: DragEvent<HTMLElement>, taskId: string) {
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", taskId);
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', taskId);
     setDraggedTaskId(taskId);
   }
 
   function handleDragOver(event: DragEvent<HTMLElement>, columnId: string) {
     event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
+    event.dataTransfer.dropEffect = 'move';
     setActiveDropColumnId(columnId);
   }
 
   async function handleDrop(event: DragEvent<HTMLElement>, columnId: string) {
     event.preventDefault();
-    const taskId = event.dataTransfer.getData("text/plain") || draggedTaskId;
+    const taskId = event.dataTransfer.getData('text/plain') || draggedTaskId;
     const task = boardTasks.find((currentTask) => currentTask.id === taskId);
 
-    setDraggedTaskId("");
-    setActiveDropColumnId("");
+    setDraggedTaskId('');
+    setActiveDropColumnId('');
 
     if (!task) {
       return;
@@ -227,7 +248,8 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
             Kanban board
           </h2>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            {taskCount} {taskCount === 1 ? "task" : "tasks"} across {orderedColumns.length} columns
+            {taskCount} {taskCount === 1 ? 'task' : 'tasks'} across{' '}
+            {orderedColumns.length} columns
           </p>
         </div>
         <Link
@@ -249,7 +271,10 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
         {orderedColumns.map((column, columnIndex) => {
           const columnTasks = boardTasks
             .filter((task) => task.statusId === column.id)
-            .sort((firstTask, secondTask) => firstTask.position - secondTask.position);
+            .sort(
+              (firstTask, secondTask) =>
+                firstTask.position - secondTask.position,
+            );
           const previousColumnId = columnIds[columnIndex - 1];
           const nextColumnId = columnIds[columnIndex + 1];
           const progress = getColumnProgress(columnTasks, taskCount);
@@ -258,12 +283,12 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
             <section
               key={column.id}
               onDragOver={(event) => handleDragOver(event, column.id)}
-              onDragLeave={() => setActiveDropColumnId("")}
+              onDragLeave={() => setActiveDropColumnId('')}
               onDrop={(event) => handleDrop(event, column.id)}
               className={`grid min-h-72 min-w-0 content-start gap-3 rounded-md border bg-zinc-50 p-3 transition dark:bg-zinc-900/70 ${
                 activeDropColumnId === column.id
-                  ? "border-[var(--app-accent)] ring-2 ring-[var(--app-accent)]/15"
-                  : "border-zinc-200 dark:border-zinc-800"
+                  ? 'border-[var(--app-accent)] ring-2 ring-[var(--app-accent)]/15'
+                  : 'border-zinc-200 dark:border-zinc-800'
               }`}
             >
               <div className="grid gap-3">
@@ -274,13 +299,16 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
                         <input
                           value={columnDraft.title}
                           onChange={(event) =>
-                            setColumnDraft({ ...columnDraft, title: event.target.value })
+                            setColumnDraft({
+                              ...columnDraft,
+                              title: event.target.value,
+                            })
                           }
                           onKeyDown={(event) => {
-                            if (event.key === "Enter") {
+                            if (event.key === 'Enter') {
                               void saveColumnEdit();
                             }
-                            if (event.key === "Escape") {
+                            if (event.key === 'Escape') {
                               cancelColumnEdit();
                             }
                           }}
@@ -289,9 +317,12 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
                         <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] gap-2">
                           <input
                             type="color"
-                            value={columnDraft.color ?? "#71717a"}
+                            value={columnDraft.color ?? '#71717a'}
                             onChange={(event) =>
-                              setColumnDraft({ ...columnDraft, color: event.target.value })
+                              setColumnDraft({
+                                ...columnDraft,
+                                color: event.target.value,
+                              })
                             }
                             className="h-10 w-full rounded-md border border-zinc-300 bg-white p-1 dark:border-zinc-700 dark:bg-zinc-950"
                             aria-label={`${column.title} color`}
@@ -301,7 +332,10 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
                               type="checkbox"
                               checked={columnDraft.isDone}
                               onChange={(event) =>
-                                setColumnDraft({ ...columnDraft, isDone: event.target.checked })
+                                setColumnDraft({
+                                  ...columnDraft,
+                                  isDone: event.target.checked,
+                                })
                               }
                               className="app-form-checkbox h-3.5 w-3.5"
                             />
@@ -338,14 +372,18 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
                         <span className="flex min-w-0 items-center gap-2">
                           <span
                             className="h-2.5 w-2.5 shrink-0 rounded-full"
-                            style={{ backgroundColor: column.color ?? "var(--app-accent)" }}
+                            style={{
+                              backgroundColor:
+                                column.color ?? 'var(--app-accent)',
+                            }}
                           />
                           <span className="truncate text-sm font-semibold text-zinc-950 dark:text-zinc-50">
                             {column.title}
                           </span>
                         </span>
                         <span className="mt-1 block text-xs text-zinc-500 dark:text-zinc-400">
-                          {columnTasks.length} {columnTasks.length === 1 ? "task" : "tasks"}
+                          {columnTasks.length}{' '}
+                          {columnTasks.length === 1 ? 'task' : 'tasks'}
                         </span>
                       </button>
                     )}
@@ -361,7 +399,7 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
                     className="h-full rounded-full"
                     style={{
                       width: `${progress}%`,
-                      backgroundColor: column.color ?? "var(--app-accent)"
+                      backgroundColor: column.color ?? 'var(--app-accent)',
                     }}
                   />
                 </div>
@@ -375,11 +413,11 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
                       draggable
                       onDragStart={(event) => handleDragStart(event, task.id)}
                       onDragEnd={() => {
-                        setDraggedTaskId("");
-                        setActiveDropColumnId("");
+                        setDraggedTaskId('');
+                        setActiveDropColumnId('');
                       }}
                       className={`group grid cursor-grab gap-3 rounded-md border border-zinc-200 bg-white p-3 shadow-sm transition hover:border-[var(--app-accent)] active:cursor-grabbing dark:border-zinc-800 dark:bg-zinc-950 ${
-                        draggedTaskId === task.id ? "opacity-60" : ""
+                        draggedTaskId === task.id ? 'opacity-60' : ''
                       }`}
                     >
                       <div className="flex items-start gap-2">
@@ -406,14 +444,17 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
                         <span
                           className={`rounded-md border px-2 py-1 text-xs font-medium ${
                             priorityStyles[task.priority] ??
-                            "border-zinc-200 bg-zinc-100 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                            'border-zinc-200 bg-zinc-100 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200'
                           }`}
                         >
                           {task.priority}
                         </span>
                         {task.dueDateLabel ? (
                           <span className="inline-flex items-center gap-1 rounded-md bg-zinc-100 px-2 py-1 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-                            <CalendarClock aria-hidden="true" className="h-3 w-3" />
+                            <CalendarClock
+                              aria-hidden="true"
+                              className="h-3 w-3"
+                            />
                             {task.dueDateLabel}
                           </span>
                         ) : null}
@@ -424,21 +465,33 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
-                          disabled={!previousColumnId || movingTaskId === task.id}
-                          onClick={() => previousColumnId && moveTask(task, previousColumnId)}
+                          disabled={
+                            !previousColumnId || movingTaskId === task.id
+                          }
+                          onClick={() =>
+                            previousColumnId && moveTask(task, previousColumnId)
+                          }
                           className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-zinc-300 px-2 text-xs font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-45 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
                         >
-                          <ArrowLeft aria-hidden="true" className="h-3.5 w-3.5" />
+                          <ArrowLeft
+                            aria-hidden="true"
+                            className="h-3.5 w-3.5"
+                          />
                           Back
                         </button>
                         <button
                           type="button"
                           disabled={!nextColumnId || movingTaskId === task.id}
-                          onClick={() => nextColumnId && moveTask(task, nextColumnId)}
+                          onClick={() =>
+                            nextColumnId && moveTask(task, nextColumnId)
+                          }
                           className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-zinc-300 px-2 text-xs font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-45 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
                         >
                           Next
-                          <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" />
+                          <ArrowRight
+                            aria-hidden="true"
+                            className="h-3.5 w-3.5"
+                          />
                         </button>
                       </div>
                     </article>
@@ -446,7 +499,9 @@ export function ProjectKanbanBoard({ projectId, columns, tasks }: ProjectKanbanB
                 </div>
               ) : (
                 <div className="grid min-h-32 place-items-center rounded-md border border-dashed border-zinc-300 bg-white px-4 py-8 text-center dark:border-zinc-700 dark:bg-zinc-950">
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">No tasks in this column.</p>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    No tasks in this column.
+                  </p>
                 </div>
               )}
             </section>
