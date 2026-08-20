@@ -199,9 +199,9 @@
 
 \FirstParagraph Tematem niniejszej pracy inżynierskiej jest opracowanie wraz z implementacją aplikacji internetowej, służącej do organizacji zadań. Zaprojektowane narzędzie skierowane jest do użytkowników indywidualnych, potrzebujących pomocy w sprawnym zarządzaniu zarówno obowiązkami dnia codziennego jak i projektami.
 
-Dynamiczny rozwój technologii internetowych oraz rosnąca liczba obowiązków zawodowych i prywatnych powodują, że efektywne zarządzanie czasem i zadaniami staje się istotnym elementem codziennego funkcjonowania użytkowników. W odpowiedzi na te potrzeby powstają liczne aplikacje, wspierające planowanie pracy, organizację projektów oraz monitorowanie postępów realizacji celów. Jednocześnie rozwój nowoczesnych narzędzi warstwy interfejsu i warstwy serwerowej pozwala na tworzenie wydajnych, skalowalnych i interaktywnych systemów dostępnych z poziomu przeglądarki internetowej.
+W praktyce codziennej organizacja zadań rzadko ogranicza się do jednej prostej listy. Użytkownik musi pamiętać o drobnych sprawach, terminach, notatkach oraz większych projektach, które składają się z wielu etapów. Z tego powodu aplikacja dostępna w przeglądarce powinna nie tylko zapisywać informacje, lecz także pomagać szybko odnaleźć to, co w danym momencie wymaga uwagi.
 
-Inspiracją dla tematu są popularne aplikacje do zarządzania projektami, kładące duży nacisk na organizację pracy zespołowej. Narzędzia tego typu dostarczają szeroką gamę funkcji, umożliwiających organizację zadań, jednak wiele z nich jest niepotrzebne użytkownikowi indywidualnemu. Z kolei nadmiar zbędnych funkcji może utrudniać użytkownikowi korzystanie z aplikacji. Dlatego też w projekcie zdecydowano się na zaadaptowanie najważniejszych funkcji z komercyjnych aplikacji tego typu, dla potrzeb użytkowników indywidualnych. Tak więc, w prezentowanym projekcie znajdują się uproszczone rozwiązania stosowane w systemach wspierających organizację pracy.
+Inspiracją dla tematu były popularne aplikacje do zarządzania projektami, w których duży nacisk położono na współpracę zespołową. W przypadku pojedynczego użytkownika część takich funkcji staje się jednak zbędna: rozbudowane uprawnienia, widoki zespołów czy mechanizmy raportowania potrafią odciągać uwagę od samego zapisania i wykonania zadania. W projekcie przyjęto więc założenie, że najważniejsze rozwiązania znane z narzędzi komercyjnych powinny zostać uproszczone i podporządkowane pracy indywidualnej.
 
 Strona internetowa powinna umożliwiać użytkownikom organizowanie pracy w sposób przejrzysty oraz intuicyjny, z wykorzystaniem funkcji takich jak na przykład przypinanie wybranych treści do widoku strony głównej. Istotnym założeniem projektu jest również zapewnienie bezpieczeństwa danych poprzez wdrożenie mechanizmów logowania, tworzenia konta użytkownika przez zewnętrznego dostawcę oraz autoryzacji dostępu do zasobów aplikacji.
 
@@ -209,7 +209,7 @@ Do celów szczegółowych pracy należy zaprojektowanie graficznego wyglądu int
 
 Zakres realizowanych prac obejmuje analizę dostępnych na rynku rozwiązań, opis odpowiednich narzędzi programistycznych, przygotowanie widoków interfejsu użytkownika oraz przedstawienie implementacji kodu aplikacji. Zakres pracy nie obejmuje publikacji aplikacji w domenie publicznej ani jej komercyjnego wdrożenia.
 
-Rezultatem pracy jest funkcjonalna aplikacja internetowa, stanowiąca przykład zastosowania nowoczesnych technologii tworzenia interfejsu i obsługi serwerowej w praktycznej realizacji systemu wspierającego zarządzanie zadaniami.
+Rezultatem pracy jest działająca aplikacja internetowa, w której użytkownik może tworzyć taski, checklisty, notatki i projekty, łączyć je ze sobą oraz wyróżniać najważniejsze elementy na stronie głównej.
 
 Cele szczegółowe niniejszej pracy obejmują:
 
@@ -246,9 +246,9 @@ Rozdział dziewiąty dotyczy testów jednostkowych. Wyjaśniono w nim rolę test
 
 \chapter{Analiza wymagań}
 
-\FirstParagraph W dobie rosnącej liczby obowiązków zawodowych, edukacyjnych i prywatnych coraz więcej osób poszukuje skutecznych narzędzi wspierających zarządzanie czasem, planowanie zadań i realizację celów. Wiele aplikacji i systemów do zarządzania zadaniami, takich jak Trello, Asana czy ClickUp, zostało zaprojektowanych z myślą o pracy zespołowej oraz dużych organizacjach. W konsekwencji ich interfejsy bywają skomplikowane, a nadmiar funkcji może przytłaczać i zniechęcać użytkowników indywidualnych, którzy wymagają prostoty, przejrzystości, a przede wszystkim szybkiego dostępu do kluczowych funkcji. Użytkownik indywidualny nie potrzebuje licznych widoków listy zadań, zaawansowanej automatyzacji dodawania tasków ani formularzy zespołowych usprawniających dodawanie zawartości do listy. Potrzebuje natomiast szybko odnaleźć funkcje aplikacji, sprawnie przejść ze strony głównej do realizowanego projektu i sprawdzić, które elementy pozostały jeszcze do wykonania.
+\FirstParagraph Analiza wymagań została rozpoczęta od określenia sytuacji, w której użytkownik korzysta z aplikacji samodzielnie, bez zespołu projektowego i bez formalnego procesu zarządzania pracą. W takim przypadku najważniejsze są prosty zapis obowiązków, szybki powrót do aktualnie wykonywanych zadań oraz możliwość oddzielenia drobnych spraw od większych projektów. Narzędzia takie jak Trello, Asana czy ClickUp pokazują różne sposoby organizacji pracy, lecz wiele ich funkcji powstało z myślą o zespołach, raportowaniu i koordynacji wielu osób.
 
-Na rynku brakuje aplikacji, które w sposób zbalansowany łączą prostotę obsługi z możliwością wyboru sposobu organizacji zadań. Użytkownicy często zmuszeni są korzystać z kilku narzędzi jednocześnie -- jednej aplikacji do zarządzania codziennymi zadaniami, innej do planowania bardziej skomplikowanych projektów, a jeszcze innej do tworzenia krótkich notatek. Istnieje więc potrzeba stworzenia prostej, nowoczesnej aplikacji internetowej, która odpowiadałaby użytkownikom indywidualnym, oferując przejrzysty sposób zarządzania i organizacji rozmaitych zadań.
+Z punktu widzenia projektowanej aplikacji istotny problem stanowi rozproszenie informacji. Użytkownik może prowadzić osobną listę codziennych zadań, oddzielne notatki i osobny plan większego projektu, przez co część danych traci kontekst. Dlatego projekt skupia się na połączeniu kilku prostych modułów w jednym miejscu, bez rozbudowywania ich o funkcje typowe dla środowisk korporacyjnych.
 
 Narzędzie, takie powinno przede wszystkim:
 
@@ -289,11 +289,11 @@ Ostateczny wybór zależy od indywidualnych preferencji i potrzeb. Dla typowego 
 
 \section{Historie użytkownika}
 
-\FirstParagraph W procesie projektowania aplikacji internetowej istotne znaczenie ma dokładne zrozumienie potrzeb przyszłych użytkowników oraz sposobu, w jaki będą oni korzystać z systemu. Jedną z powszechnie stosowanych metod opisu wymagań funkcjonalnych są tzw. historie użytkownika, które przedstawiają oczekiwania wobec aplikacji z perspektywy osoby korzystającej z oprogramowania. Takie podejście pozwala skupić się nie na szczegółach implementacyjnych, lecz na rzeczywistych celach i problemach, jakie system ma rozwiązywać.
+\FirstParagraph Historie użytkownika wykorzystano jako krótkie opisy sytuacji, w których aplikacja ma pomóc w wykonaniu konkretnej czynności. Zamiast zaczynać od listy ekranów lub struktur danych, przyjęto perspektywę osoby, która chce coś szybko zapisać, uporządkować albo odnaleźć. Dzięki temu wymagania łatwiej powiązać z faktycznymi działaniami w interfejsie.
 
-Historie użytkownika opisują konkretne scenariusze użycia aplikacji w prosty i zrozumiały sposób. Ułatwia to identyfikację kluczowych funkcjonalności systemu, priorytetyzację wymagań oraz projektowanie interfejsu i logiki działania aplikacji zgodnie z rzeczywistymi potrzebami odbiorców. Dodatkowo stanowią one podstawę do planowania implementacji oraz testowania poprawności działania poszczególnych modułów.
+Każda historia wskazuje rolę użytkownika, jego potrzebę oraz powód wykonania danej czynności. Taki zapis pomógł wybrać funkcje najważniejsze dla pierwszej wersji systemu: przypinanie elementów, obsługę tasków, checklist, notatek i projektów oraz przełączanie sposobu prezentacji zadań w projekcie.
 
-Poniżej przedstawiono zestaw pięciu historii użytkownika dla projektowanej aplikacji. Opisują one typowe czynności i odzwierciedlają najważniejsze scenariusze wykorzystania systemu.
+Poniżej zebrano pięć historii, które wyznaczają główne ścieżki pracy użytkownika w aplikacji.
 
 \begin{enumerate}
 \item
@@ -340,7 +340,7 @@ W projektowanej aplikacji tablica kanban może zostać wykorzystana przede wszys
 
 \section{Najważniejsze funkcje aplikacji}
 
-\FirstParagraph Wymagania funkcjonalne i niefunkcjonalne stanowią podstawę do opracowania architektury aplikacji, zaprojektowania interfejsu użytkownika oraz implementacji poszczególnych modułów.
+\FirstParagraph W tej części zebrano funkcje, które muszą być dostępne z poziomu aplikacji, oraz cechy jakościowe wpływające na wygodę korzystania z systemu. Wymagania te wynikają bezpośrednio z wcześniej opisanych historii użytkownika.
 
 Podstawową funkcjonalnością systemu jest umożliwienie użytkownikowi kompleksowego zarządzania elementami organizacyjnymi, którymi są checklisty, notatki, taski oraz projekty. Aplikacja wspiera pełen zestaw operacji CRUD\footnote{CRUD (z jęz. ang. Create, Read, Update, Delete) - zestaw podstawowych operacji wykonywanych na danych w systemach informatycznych, obejmujący ich tworzenie, odczyt, modyfikację oraz usuwanie.}, co pozwala na swobodne dodawanie elementów, ich edycję oraz usuwanie w zależności od potrzeb użytkownika.
 
@@ -350,9 +350,9 @@ Dodatkowo aplikacja udostępnia panel strony głównej, określany jako dashboar
 
 Oprócz funkcjonalności biznesowych istotne znaczenie mają również aspekty jakościowe systemu. Aplikacja umożliwia personalizację poprzez zmianę motywów kolorystycznych oraz przełączanie interfejsu na tryb nocny, co zwiększa komfort użytkowania w różnych warunkach oświetleniowych. Interfejs powinien być minimalistyczny, intuicyjny oraz estetyczny, aby zapewnić łatwość obsługi nawet dla nowych użytkowników.
 
-W zakresie bezpieczeństwa przewidziano integrację z zewnętrznymi dostawcami autentykacji, takimi jak Google i GitHub, co pozwala na bezpieczne logowanie bez konieczności przechowywania haseł w aplikacji. System powinien również zapewniać krótkie czasy ładowania, nieprzekraczające 3--4 sekund dla kluczowych operacji, a także efektywną synchronizację danych w czasie rzeczywistym, umożliwiającą natychmiastowe odświeżanie informacji.
+W zakresie bezpieczeństwa przewidziano integrację z zewnętrznymi dostawcami autentykacji, takimi jak Google i GitHub, co pozwala na logowanie bez przechowywania haseł w aplikacji. System powinien również zapewniać krótkie czasy ładowania dla kluczowych operacji oraz sprawne odświeżanie danych po zapisaniu zmian przez użytkownika.
 
-Architektura aplikacji została zaprojektowana w sposób umożliwiający łatwe skalowanie i rozszerzanie funkcjonalności w przyszłości, co pozwala na dalszy rozwój systemu. Dodatkowo przewidziano stosowanie testów jednostkowych i integracyjnych w celu zapewnienia wysokiej jakości oraz niezawodności kodu.
+Architektura aplikacji powinna umożliwiać późniejsze dodawanie kolejnych typów elementów i filtrów bez przebudowy całego systemu. W projekcie przewidziano także testy sprawdzające najważniejsze reguły związane z obsługą tasków, aby zmiany w kodzie nie naruszały podstawowych scenariuszy działania.
 
 \chapter{Frontend}
 
@@ -378,7 +378,7 @@ Fundamentalne narzędzia używane do tworzenia frontendu to HTML\footnote{HTML -
 
 Wraz ze wzrostem złożoności współczesnych interfejsów użytkownika, wynikła potrzeba rozbudowy i rozszerzania podstawowych technologii frontendowych.
 
-Wczesne zastosowania HTML, CSS i JavaScript ograniczały się głównie do prostych, statycznych stron. Jednak wraz ze wzrostem ilości aplikacji interaktywnych, pojawiła się konieczność lepszej organizacji kodu, ponownego wykorzystania komponentów oraz efektywniejszego zarządzania stanem aplikacji. Dynamiczny rozwój stron internetowych względem ich funkcjonalności i użyteczności zmusił programistów do usprawnienia wcześniej wymienionych języków, w celu sprostania rosnącym oczekiwaniom użytkowników. Biblioteki powstały jako odpowiedź na te wyzwania, umożliwiając realizację dużo bardziej ambitnych i zaawansowanych aplikacji.
+Początkowo HTML, CSS i JavaScript wystarczały do budowy prostych stron, w których najważniejsza była prezentacja treści. W aplikacjach takich jak system do organizacji zadań sam układ dokumentu nie jest jednak wystarczający, ponieważ interfejs musi reagować na zmiany stanu, formularze, filtry i dane pobierane z serwera. Dlatego w projektach frontendowych zaczęto korzystać z bibliotek, które porządkują komponenty, ułatwiają ponowne użycie kodu i pomagają utrzymać spójne zachowanie widoków.
 
 Biblioteki programistyczne to zbiory gotowych funkcji, klas oraz komponentów, które rozszerzają możliwości języków programowania i ułatwiają realizację określonych zadań. Ich celem jest ponowne wykorzystanie sprawdzonych rozwiązań oraz ograniczenie konieczności samodzielnego implementowania powtarzalnych mechanizmów. Pozwalają one na skrócenie czasu tworzenia oprogramowania oraz zwiększenie czytelności i niezawodności kodu. W kontekście technologii frontendowych biblioteki wspierają m.in. budowę interfejsu użytkownika, obsługę zdarzeń oraz zarządzanie danymi po stronie klienta.
 
@@ -494,9 +494,9 @@ W aplikacji Tailwind CSS wykorzystano do przygotowania układów formularzy, kar
 
 \FirstParagraph Kolejną technologią zastosowaną w projekcie jest TypeScript\footnote{Microsoft, \emph{TypeScript Documentation}, dokumentacja języka TypeScript, [b.r.], dostęp: \url{https://www.typescriptlang.org/docs/} (25.07.2026).}, czyli nadzbiór języka JavaScript. Rozszerza on JavaScript o system typów, interfejsy oraz mechanizmy kontroli poprawności kodu na etapie kompilacji. Kod TypeScript nie jest bezpośrednio interpretowany przez przeglądarkę, lecz przed uruchomieniem musi zostać transpilowany do standardowego JavaScriptu, zachowując pełną kompatybilność ze środowiskiem wykonawczym.
 
-Głównym celem stosowania TypeScript jest zwiększenie bezpieczeństwa, czytelności oraz przewidywalności kodu. Statyczne typowanie pozwala wykrywać błędy już na etapie pisania kodu a nie podczas działania aplikacji. TypeScript znacząco ułatwia pracę w dużych projektach oraz zespołach programistycznych, ponieważ jasno definiuje struktury danych oraz oczekiwane typy argumentów. Ponadto redukuje ryzyko błędów logicznych trudnych do wykrycia w czystym JavaScripcie i dobrze integruje się z nowoczesnymi frameworkami frontendowymi.
+W projekcie TypeScript został wykorzystany przede wszystkim po to, aby jawnie opisać dane przekazywane między komponentami, formularzami i endpointami API. Statyczne typowanie pomaga wykrywać część pomyłek jeszcze podczas pracy nad kodem, na przykład niezgodny typ pola, brak wymaganej właściwości albo błędny argument funkcji. Ma to znaczenie szczególnie w miejscach, w których ten sam obiekt taska lub projektu przechodzi przez formularz, walidację, handler API i model bazy danych.
 
-Brak TypeScriptu w większych aplikacjach pisanych w JavaScript może prowadzić do szeregu problemów. Przykładowo, JS pozwala na swobodne przekazywanie danych dowolnego typu, co może skutkować błędami w czasie działania aplikacji, np. wywołaniem metod na nieprawidłowym typie danych. Również wiele problemów, takich jak błędnie zapisane wyrazy w nazwach pól obiektów, czy nieprawidłowe argumenty funkcji, ujawnia się dopiero podczas działania aplikacji. W czystym JavaScripcie brakuje też mechanizmu, wymuszającego spójność zmian w całym projekcie, przez co zmiana struktury danych wiąże się z większym ryzykiem niezamierzonych błędów. Jednak najważniejszą cechą projektów, wykorzystujących TypeScript jest zdecydowanie dużo wyższa czytelność i przewidywalność kodu. Jawnie zdefiniowane typy ułatwiają zrozumienie, jakie dane są przetwarzane przez funkcje oraz komponenty, co znacznie wpływa na utrzymanie aplikacji oraz wdrażanie nowych programistów do projektu.
+W samym JavaScripcie wiele takich błędów ujawnia się dopiero po uruchomieniu aplikacji. Przykładem może być literówka w nazwie pola obiektu albo przekazanie wartości liczbowej tam, gdzie komponent oczekuje tekstu. TypeScript nie zastępuje testów ani walidacji danych wejściowych, ale stanowi dodatkową warstwę kontroli podczas implementacji. Dzięki temu zmiana struktury danych, np. dodanie pola do projektu lub taska, szybciej pokazuje miejsca wymagające aktualizacji.
 
 Jak dokładnie działa TypeScript, można wytłumaczyć na następującym przykładzie. Tworzony jest komponent odpowiedzialny za wyświetlanie na stronie danych użytkownika, takich jak imię, adres e-mail oraz wiek. W TypeScripcie definiowany jest typ lub interfejs, który jednoznacznie określa, jaką strukturę muszą mieć parametry przyjmowane przez komponent. Na przykład imię i adres e-mail muszą być zmiennymi typu ``\texttt{string}'', a wiek - ``\texttt{number}''. Następnie komponent lub funkcja przyjmująca dane użytkownika deklaruje, że oczekuje dokładnie takiego typu danych. Dzięki temu TypeScript już na etapie pisania kodu sprawdza, czy przekazywane wartości są poprawne. Jeżeli programista spróbuje przekazać zmienną typu ``\texttt{number}'' zamiast ``\texttt{string}'' lub pominie wymagane pole, błąd zostanie wykryty jeszcze przed uruchomieniem aplikacji. W trakcie dalszego rozwoju projektu, gdy struktura danych użytkownika ulegnie zmianie, TypeScript automatycznie wskaże wszystkie miejsca w aplikacji, które wymagają aktualizacji. Zintegrowane środowiska programistyczne\footnote{Zintegrowane środowisko programistyczne - w skrócie IDE, to zestaw narzędzi oraz konfiguracji wykorzystywanych do tworzenia oprogramowania, obejmujący m.in. edytor lub środowisko IDE.} posiadają możliwość integracji z TypeScriptem poprzez wyświetlanie na bieżąco powiadomień i ostrzeżeń o potencjalnych błędach wykrywanych przez ten język.
 
@@ -528,7 +528,7 @@ Next.js obsługuje również routing dynamiczny, który umożliwia tworzenie str
 
 Dodatkowo framework wspiera nawigację po stronie klienta, realizowaną za pomocą komponentu ``\texttt{Link}'', dzięki czemu przejścia pomiędzy stronami odbywają się bez pełnego przeładowania dokumentu. Rozwiązanie to zwiększa wydajność oraz poprawia płynność działania interfejsu użytkownika.
 
-Zastosowanie wbudowanego systemu routingu w Next.js upraszcza proces tworzenia aplikacji, redukuje ilość kodu konfiguracyjnego oraz sprzyja zachowaniu spójnej i logicznej struktury projektu, co ma istotne znaczenie w większych i długoterminowych przedsięwzięciach programistycznych.
+W projektowanej aplikacji mechanizm routingu pozwolił powiązać strukturę katalogów z modułami widocznymi dla użytkownika, takimi jak dashboard, taski, checklisty, notatki i projekty. Dzięki temu ścieżki widoków oraz endpointów API są łatwiejsze do odnalezienia w kodzie.
 
 \section{Generowanie zawartości strony}
 
@@ -538,9 +538,9 @@ Komponenty te zapewniają wsparcie dla obiektów typu Promise w JavaScripcie, um
 
 Pobrane dane można generować i przetwarzać na dwa różne sposoby. Renderowanie statyczne polega na generowaniu treści na etapie budowania aplikacji lub podczas jej ponownej walidacji, a następnie dostarczaniu gotowych stron użytkownikom, co zwiększa wydajność i zmniejsza obciążenie serwera oraz sprzyja optymalizacji SEO\footnote{SEO (z jęz. ang. Search Engine Optimization) -- proces optymalizacji stron internetowych, mający na celu poprawę ich widoczności w wynikach wyszukiwarek internetowych poprzez dostosowanie treści, struktury oraz wydajności serwisu do wymagań algorytmów indeksujących.}. Renderowanie dynamiczne natomiast, odbywa się przy każdym żądaniu użytkownika, umożliwiając prezentację danych aktualnych w czasie rzeczywistym. Pierwsze podejście sprawdza się w przypadku stron o stałej zawartości, natomiast drugie jest preferowane w aplikacjach, wymagających częstych aktualizacji danych, takich jak panele administracyjne czy profile użytkowników.
 
-Buforowanie danych polega na tymczasowym przechowywaniu wyników wcześniej wykonanych operacji, takich jak zapytania do bazy danych lub odpowiedzi z API, w celu ich wykorzystania bez konieczności ponownego przetwarzania. Dzięki temu kolejne żądania mogą zostać obsłużone szybciej, ponieważ dane są odczytywane z pamięci podręcznej zamiast generowane od podstaw. Mechanizm ten zmniejsza obciążenie serwera, skraca czas odpowiedzi aplikacji oraz poprawia ogólną wydajność systemu.
+Buforowanie danych polega na tymczasowym przechowywaniu wyników wcześniej wykonanych operacji, takich jak zapytania do bazy danych lub odpowiedzi z API. W aplikacjach z danymi użytkownika mechanizm ten trzeba stosować ostrożnie, ponieważ część widoków, na przykład dashboard lub lista tasków, powinna po zapisie szybko pokazywać aktualny stan.
 
-Równie istotnym elementem optymalizacji w Next.js, jest deduplikacja zapytań, czyli eliminacja wielokrotnego pobierania tych samych danych. Jeżeli kilka komponentów wymaga tych samych informacji, system wykonuje zapytanie tylko raz, a następnie współdzieli wynik pomiędzy wszystkimi. Zmniejsza to obciążenie serwera, skraca czas odpowiedzi oraz poprawia efektywność wykorzystania zasobów, co ma szczególne znaczenie w rozbudowanych aplikacjach.
+Next.js wspiera także ograniczanie powtarzania tych samych zapytań w obrębie renderowania. Ma to znaczenie wtedy, gdy kilka części widoku korzysta z podobnych danych i nie powinno wymuszać osobnych, identycznych operacji. W projekcie ważniejsze od agresywnego buforowania było jednak zachowanie poprawnego odświeżania po utworzeniu lub edycji elementu.
 
 \section{API w Next.js}
 
@@ -601,7 +601,7 @@ Backend aplikacji komunikuje się z bazą poprzez zapytania, pobierając lub mod
   zarządzanie użytkownikami, uprawnieniami oraz szyfrowaniem połączeń.
 \end{itemize}
 
-Dzięki swojej niezawodności oraz dobrej integracji z popularnymi technologiami backendowymi MySQL stanowi uniwersalne i efektywne rozwiązanie dla aplikacji wymagających uporządkowanego modelu danych oraz wysokiej spójności informacji. System ten dobrze sprawdza się w aplikacjach administracyjnych, systemach rezerwacji, portalach społecznościowych czy sklepach internetowych.
+MySQL dobrze pasuje do systemów, w których struktura danych jest z góry określona, a relacje między tabelami powinny być ściśle kontrolowane przez bazę. Przykładem mogą być aplikacje administracyjne, systemy rezerwacji lub sklepy internetowe, gdzie wiele operacji opiera się na jasno zdefiniowanych zależnościach między rekordami.
 
 W niniejszej pracy MySQL został opisany jako punkt odniesienia dla technologii finalnie wykorzystanej w projekcie, czyli MongoDB. Porównanie obu podejść pozwala wskazać różnicę między relacyjnym modelem tabel a dokumentowym modelem kolekcji i dokumentów. W przypadku projektowanej aplikacji większe znaczenie miała elastyczność struktury danych, dlatego wybrano MongoDB, natomiast MySQL pozostaje przykładem rozwiązania właściwego dla systemów o bardziej stałych i silnie powiązanych relacjach.
 
@@ -609,7 +609,7 @@ W niniejszej pracy MySQL został opisany jako punkt odniesienia dla technologii 
 
 \FirstParagraph MongoDB\footnote{MongoDB, Inc., \emph{Welcome to the MongoDB Docs}, dokumentacja systemu MongoDB, [b.r.], dostęp: \url{https://www.mongodb.com/docs/} (02.02.2026).} jest nierelacyjnym systemem zarządzania bazą danych, którego podstawową różnicą względem relacyjnych rozwiązań, jest sposób przechowywania informacji. MongoDB wykorzystuje model dokumentowy, w którym dane zapisywane są w elastycznych strukturach przypominających format JSON\footnote{JSON - z jęz. ang. JavaScript Object Notation, tekstowy format zapisu i wymiany danych oparty na strukturze obiektów oraz tablic, wykorzystywany w komunikacji między aplikacjami.}. Oznacza to brak sztywno zdefiniowanego schematu tabel oraz większą swobodę w organizacji informacji.
 
-MongoDB przechowuje powiązane dane często w obrębie jednego dokumentu. Takie podejście redukuje potrzebę wykonywania złożonych połączeń między poszczególnymi tabelami, co przyspiesza operacje odczytu i upraszcza projektowanie aplikacji o dynamicznej strukturze danych.
+W MongoDB powiązane informacje mogą być zapisywane w obrębie jednego dokumentu albo łączone przez identyfikatory innych dokumentów. W projekcie wykorzystano oba podejścia: część danych, na przykład elementy checklisty, jest zagnieżdżona, natomiast relacje między taskami, projektami, notatkami i przypięciami są opisane przez identyfikatory.
 
 MongoDB zapisuje dane w kolekcjach składających się z dokumentów. Każdy dokument może posiadać inną strukturę oraz zestaw pól, co pozwala na łatwe rozszerzanie modelu danych bez konieczności modyfikowania schematu całej bazy. Komunikacja z bazą odbywa się poprzez zapytania realizowane w formie obiektów lub metod API, zamiast klasycznych zapytań w języku SQL.
 
@@ -617,9 +617,9 @@ W niniejszej pracy, kluczowe znaczenie ma łatwość rozbudowy funkcjonalności 
 
 W systemie zarządzania zadaniami pojedyncze obiekty, takie jak projekt lub zadanie, mogą posiadać zróżnicowane właściwości. Model dokumentowy MongoDB pozwala przechowywać takie dane w postaci jednego, zagnieżdżonego dokumentu, bez konieczności tworzenia wielu tabel i relacji. Ułatwia to modyfikację struktury danych w trakcie rozwoju aplikacji, bez potrzeby przeprowadzania kosztownych migracji schematu.
 
-Dodatkową zaletą jest wysoka wydajność operacji odczytu i zapisu oraz możliwość łatwego skalowania poziomego, co ma istotne znaczenie w przypadku rosnącej liczby użytkowników i zadań. Brak konieczności wykonywania złożonych połączeń upraszcza zapytania oraz przyspiesza dostęp do danych, szczególnie gdy informacje dotyczące jednego projektu są przechowywane w jednym dokumencie.
+Wybór MongoDB był korzystny również dlatego, że dane aplikacji nie mają wyłącznie tabelarycznego charakteru. Projekt może posiadać własne kolumny kanban, taski mogą zawierać różne zestawy powiązań, a checklista składa się z tablicy elementów. Model dokumentowy ułatwia zapis takich struktur bez projektowania wielu tabel pomocniczych.
 
-Ponadto MongoDB dobrze integruje się z technologiami JavaScript, co sprzyja spójności technologicznej projektu i upraszcza proces programowania. Next.js, będący częścią stosu technologicznego aplikacji, może korzystać z narzędzi obsługujących MongoDB zarówno w kodzie serwerowym, jak i w handlerach API. Ten typ bazy danych sprawdza się w systemach do zarządzania treścią oraz aplikacjach internetowych, które operują na dynamicznie zmieniających się modelach danych. MySQL sprawdza się lepiej w systemach wymagających ścisłych relacji i spójności danych, natomiast MongoDB oferuje większą elastyczność i łatwiejsze skalowanie.
+MongoDB dobrze współpracuje także z aplikacją pisaną w TypeScripcie i Next.js, ponieważ dokumenty mogą być obsługiwane w kodzie jako obiekty. W projekcie dodatkową warstwą porządkującą strukturę danych są modele Mongoose, które opisują pola dokumentów i pozwalają zachować kontrolę nad zapisem mimo elastycznego charakteru bazy.
 
 \chapter{Architektura aplikacji}
 
@@ -627,9 +627,9 @@ Ponadto MongoDB dobrze integruje się z technologiami JavaScript, co sprzyja sp�
 
 W tym modelu komunikacja odbywa się w schemacie ``żądanie - odpowiedź''. Klient wysyła do serwera zapytanie, np. o pobranie danych lub zapis informacji, a serwer przetwarza je i zwraca odpowiedź w postaci danych lub komunikatu o wyniku operacji. Takie podejście pozwala oddzielić warstwę prezentacji od warstwy przetwarzania danych, co zwiększa przejrzystość projektu oraz ułatwia jego rozwój.
 
-Istotną zaletą architektury klient-serwer jest możliwość niezależnego skalowania poszczególnych części systemu. Warstwa serwerowa może być rozbudowywana w celu obsługi większej liczby użytkowników, natomiast frontend może być rozwijany niezależnie od zmian w logice backendu. Dodatkowo centralizacja przetwarzania danych po stronie serwera zwiększa bezpieczeństwo, ponieważ użytkownik nie ma bezpośredniego dostępu do bazy danych ani wewnętrznych mechanizmów aplikacji. Wszelkie operacje wykonywane są po stronie serwera, gdzie możliwa jest weryfikacja tożsamości użytkownika, kontrola uprawnień oraz walidacja przesyłanych danych. Pozwala to zapobiegać nieautoryzowanemu dostępowi do cudzych zasobów, a także ogranicza ryzyko manipulacji danymi lub ataków polegających na modyfikacji kodu po stronie przeglądarki. Zmniejsza to również ryzyko wycieku danych poufnych i dostania się ich w niepowołane ręce.
+W projektowanej aplikacji podział klient-serwer ma przede wszystkim znaczenie bezpieczeństwa i porządku odpowiedzialności. Przeglądarka prezentuje widoki oraz zbiera dane z formularzy, natomiast operacje zapisu i odczytu przechodzą przez warstwę serwerową. To tam sprawdzana jest sesja użytkownika, wykonywana jest walidacja i dopiero potem następuje komunikacja z bazą danych. Użytkownik nie otrzymuje więc bezpośredniego dostępu do kolekcji bazy ani do mechanizmów odpowiedzialnych za kontrolę właściciela danych.
 
-Architektura klient-serwer stanowi fundament współczesnych aplikacji internetowych, umożliwiając tworzenie systemów modularnych, wydajnych i łatwych w utrzymaniu, co ma szczególne znaczenie w projektach o rosnącej złożoności i liczbie użytkowników.
+Takie rozdzielenie ułatwia również rozwijanie projektu, ponieważ zmiana wyglądu formularza nie musi oznaczać zmiany modelu danych, a dopisanie kolejnego endpointu nie wymaga przebudowy całego interfejsu.
 
 \section{Omówienie warstw aplikacji}
 
@@ -664,7 +664,7 @@ Za magazynowanie danych w sposób trwały odpowiada warstwa przechowywania danyc
 
 \section{Diagramy architektoniczne}
 
-\FirstParagraph Jednym z najważniejszych diagramów, stworzonych podczas procesu projektowania fundamentów aplikacji jest diagram komponentów. Przedstawia on architekturę komponentową aplikacji, zrealizowaną w modelu klient-serwer, z wyraźnym podziałem na interfejs użytkownika (frontend), warstwę API, logikę serwerową (backend), bazę danych oraz zewnętrznych dostawców autentykacji. Strzałki obrazują zależności oraz przepływ danych pomiędzy komponentami.
+\FirstParagraph Diagram komponentów przygotowano po to, aby pokazać najważniejsze części systemu i kierunek komunikacji między nimi. Schemat obejmuje interfejs użytkownika, warstwę API, logikę serwerową, bazę danych oraz zewnętrznych dostawców autentykacji. Strzałki wskazują, które elementy przekazują sobie dane podczas typowej operacji wykonywanej przez użytkownika.
 
 \begin{figure}[H]
   \centering
@@ -787,7 +787,7 @@ Usuwanie większości elementów domenowych zostało zrealizowane jako archiwiza
 
 \chapter{Projekt interfejsu użytkownika}
 
-\FirstParagraph Projekt interfejsu użytkownika jest jednym z najważniejszych aspektów aplikacji. Przejrzystość, czytelność oraz prostota obsługi decydują w dużej mierze o użyteczności. W tym celu najpierw rozpisane zostały historie użytkownika, po których analizie powstał graficzny projekt interfejsu.
+\FirstParagraph Projekt interfejsu użytkownika podporządkowano prostemu przepływowi pracy: użytkownik powinien móc szybko przejść od strony głównej do taska, checklisty, notatki albo projektu. Z tego powodu najpierw rozpisano scenariusze przypadków użycia, a dopiero później przygotowano widoki, które odpowiadają tym czynnościom.
 
 \section{Scenariusze przypadków użycia}
 
@@ -1075,7 +1075,7 @@ Na diagramie zaprezentowano sekwencję działań wykonywanych podczas przypinani
 
 \section{Widoki użytkownika aplikacji}
 
-\FirstParagraph W niniejszym podrozdziale przedstawiono wybrane widoki aplikacji, które odpowiadają scenariuszom przypadków użycia opisanym w poprzedniej części rozdziału. Zaprezentowane ekrany dotyczą przypięcia checklisty do strony głównej, utworzenia taska oraz utworzenia projektu z taskami wyświetlanymi w widoku tablicy kanban i w widoku listy. Opis koncentruje się na układzie interfejsu graficznego, sposobie prezentacji danych oraz elementach ułatwiających użytkownikowi rozpoznanie aktualnego stanu wykonywanych czynności.
+\FirstParagraph W podrozdziale pokazano widoki odpowiadające wybranym scenariuszom przypadków użycia. Są to ekrany związane z przypięciem checklisty do strony głównej, utworzeniem taska oraz przygotowaniem projektu, którego zadania można oglądać jako tablicę kanban albo listę. Przy opisie zwrócono uwagę przede wszystkim na rozmieszczenie elementów, czytelność stanu interfejsu i informacje, które użytkownik otrzymuje bez konieczności przechodzenia do innych miejsc aplikacji.
 
 \begin{figure}[H]
   \centering
@@ -1084,7 +1084,7 @@ Na diagramie zaprezentowano sekwencję działań wykonywanych podczas przypinani
   \label{fig:scenariusz-1-checklista-przypiecie}
 \end{figure}
 
-Na pierwszym z widoków scenariusza pokazano szczegóły checklisty, w których centralnym elementem jest panel z tytułem, datami utworzenia i aktualizacji oraz listą pozycji do odhaczenia. Po prawej stronie umieszczono przyciski akcji, w tym ikonę pinezki służącą do przypięcia checklisty do ekranu głównego. Wykonane elementy checklisty są wyróżnione kolorem oraz przekreśleniem, co pozwala szybko rozpoznać postęp realizacji.
+Pierwszy ekran scenariusza pokazuje szczegóły checklisty. Najważniejsze miejsce zajmuje panel z tytułem, datami utworzenia i aktualizacji oraz pozycjami do odhaczenia. Po prawej stronie umieszczono przyciski akcji, w tym ikonę pinezki służącą do przypięcia checklisty do ekranu głównego. Wykonane elementy są wyróżnione kolorem oraz przekreśleniem, dlatego postęp można ocenić bez dodatkowego otwierania szczegółów.
 
 \begin{figure}[H]
   \centering
@@ -1169,25 +1169,25 @@ Alternatywny widok tasków projektu przyjmuje formę listy. W tym układzie zada
 
 \chapter{Implementacja kodu po stronie frontendu}
 
-\FirstParagraph W niniejszym rozdziale opisano wybrane elementy implementacji warstwy frontendowej aplikacji. Skupiono się na częściach systemu, które mają szczególne znaczenie dla ergonomii pracy użytkownika: widoku kanban w projekcie, sekcji przypiętych elementów na dashboardzie oraz formularzach odpowiedzialnych za tworzenie i edycję tasków oraz projektów. Opisane fragmenty zostały zaimplementowane jako komponenty React, działające w środowisku Next.js i komunikujące się z backendem za pomocą endpointów API.
+\FirstParagraph Rozdział opisuje te fragmenty frontendu, które najmocniej wpływają na codzienną pracę z aplikacją: widok kanban w projekcie, przypięte elementy dashboardu oraz formularze tasków i projektów. Nie omawiano każdego komponentu osobno, lecz wybrano miejsca, w których najlepiej widać sposób łączenia stanu interfejsu, danych z backendu i reakcji na działania użytkownika.
 
 \section{Wspólne komponenty interfejsu}
 
-\FirstParagraph Warstwa frontendowa aplikacji została oparta na zestawie wspólnych komponentów, które porządkują wygląd i zachowanie powtarzalnych części interfejsu. Dzięki temu formularze, karty elementów, sekcje listujące dane oraz przyciski akcji zachowują spójny układ wizualny i podobny sposób działania w różnych modułach aplikacji.
+\FirstParagraph W warstwie frontendowej wydzielono komponenty używane w wielu modułach aplikacji. Dotyczy to przede wszystkim formularzy, kart elementów, sekcji listujących dane i przycisków akcji. Dzięki temu użytkownik spotyka podobny układ pól i podobne zachowanie kontrolek niezależnie od tego, czy tworzy task, projekt, notatkę czy checklistę.
 
 Przykładem takiego rozwiązania jest komponent ``\texttt{FormShell}'', wykorzystywany jako wspólna struktura formularzy tasków i projektów. Odpowiada on za układ nagłówka, obszaru pól, komunikatów oraz przycisków zapisu, dzięki czemu poszczególne formularze mogą skupiać się na własnych danych i logice wysyłania żądania. Podobną rolę pełni komponent ``\texttt{ObjectCard}'', który pozwala prezentować notatki, checklisty, taski i projekty w ujednoliconej formie karty z ikoną, tytułem, opisem oraz metadanymi.
 
-Wspólne komponenty wykorzystano również przy obsłudze tagów i wyboru powiązanych elementów. Edytory tagów pozwalają dodawać i usuwać etykiety w podobny sposób w formularzach tasków oraz projektów, natomiast komponenty wyboru checklist i notatek pomagają utrzymać jednolity sposób łączenia danych. Takie podejście ogranicza powielanie kodu, ułatwia późniejsze zmiany w interfejsie i zwiększa przewidywalność działania aplikacji dla użytkownika.
+Wspólne komponenty pojawiają się także przy tagach i wyborze powiązanych elementów. Edytor tagów działa tak samo w formularzu taska i projektu, a komponenty wyboru checklist oraz notatek porządkują sposób łączenia danych. W rezultacie zmiana wyglądu lub zachowania jednego powtarzalnego elementu może zostać wykonana w jednym miejscu, zamiast w kilku osobnych formularzach.
 
 \section{Implementacja widoku kanban}
 
-\FirstParagraph Widok kanban został zaimplementowany w komponencie ``\texttt{ProjectKanbanBoard}'', znajdującym się w pliku ``\texttt{project-kanban-board.tsx}''. Komponent ten odpowiada za wyświetlanie tablicy projektu, kolumn statusów oraz kart zadań. Dane wejściowe przekazywane do komponentu obejmują identyfikator projektu, listę kolumn oraz listę zadań. Dzięki temu komponent nie pobiera danych samodzielnie, lecz otrzymuje je z warstwy strony projektu, co upraszcza jego odpowiedzialność i pozwala wykorzystać renderowanie po stronie serwera dla początkowego stanu widoku strony.
+\FirstParagraph Widok kanban zaimplementowano w komponencie ``\texttt{ProjectKanbanBoard}'', zapisanym w pliku ``\texttt{project-kanban-board.tsx}''. Komponent odpowiada za ułożenie kolumn statusów, pokazanie kart tasków oraz obsługę przenoszenia ich między etapami pracy. Dane wejściowe obejmują identyfikator projektu, listę kolumn i listę tasków, dlatego komponent nie musi samodzielnie pobierać danych z bazy. Jego rola jest ograniczona do prezentacji i obsługi interakcji na otrzymanym zestawie informacji.
 
 Każda kolumna kanban jest reprezentowana przez obiekt zawierający identyfikator, nazwę, kolor oraz informację, czy dane zadanie zostało zakończone. Zadanie zawiera między innymi identyfikator, tytuł, opis, priorytet, aktualny status, pozycję, termin oraz tagi. Relacja pomiędzy zadaniem i kolumną jest realizowana przez pole ``\texttt{statusId}''. Jeżeli ``\texttt{statusId}'' zadania jest równe identyfikatorowi kolumny, karta zadania zostaje wyrenderowana właśnie w tej kolumnie.
 
-Komponent utrzymuje lokalny stan tablicy za pomocą hooków ``\texttt{useState}''. W stanie przechowywane są między innymi aktualne zadania, kolumny, identyfikator przenoszonego zadania, informacja o aktywnej kolumnie upuszczania oraz dane edytowanej kolumny. Dodatkowo zastosowano ``\texttt{useEffect}'', aby synchronizować lokalny stan komponentu z danymi przekazanymi przez stronę projektu. Dzięki temu po odświeżeniu danych przez router widok zostaje zaktualizowany zgodnie ze stanem zapisanym w bazie.
+Lokalny stan tablicy przechowywany jest przy użyciu hooków ``\texttt{useState}''. Obejmuje on aktualne taski, kolumny, identyfikator przeciąganego taska, aktywną kolumnę upuszczania oraz dane edytowanej kolumny. Hook ``\texttt{useEffect}'' synchronizuje ten stan z danymi przekazanymi przez stronę projektu, co jest potrzebne po odświeżeniu danych przez router albo po zapisaniu zmian w bazie.
 
-Lista kolumn jest wyliczana w funkcji ``\texttt{useMemo}''. Jeżeli projekt nie posiada zdefiniowanych kolumn, komponent tworzy kolumnę domyślną ``\texttt{todo}''. Dodatkowo sprawdzane są statusy istniejących zadań. Jeżeli zadanie posiada status, którego nie ma w konfiguracji projektu, tworzona jest dodatkowa kolumna techniczna. Takie rozwiązanie zabezpiecza interfejs przed sytuacją, w której zadanie miałoby zniknąć z tablicy tylko dlatego, że jego status nie występuje już w konfiguracji kolumn.
+Lista kolumn powstaje w ``\texttt{useMemo}'', ponieważ zależy od konfiguracji projektu i statusów istniejących tasków. Gdy projekt nie ma własnych kolumn, dodawana jest kolumna domyślna ``\texttt{todo}''. Jeśli natomiast task wskazuje status, którego nie ma już w konfiguracji projektu, komponent tworzy dodatkową kolumnę techniczną. Dzięki temu task nie znika z widoku tylko dlatego, że dane projektu i dane tasków chwilowo nie są w pełni zgodne.
 
 \begin{figure}[H]
   \centering
@@ -1196,7 +1196,7 @@ Lista kolumn jest wyliczana w funkcji ``\texttt{useMemo}''. Jeżeli projekt nie 
   \label{fig:frontend-ordered-columns}
 \end{figure}
 
-Na powyższym fragmencie widoczne jest zabezpieczenie przed pustą konfiguracją kolumn oraz przed niespójnością między statusem taska a definicją tablicy. Komponent najpierw ustala bazową listę kolumn, a następnie dopisuje kolumny techniczne wynikające z danych tasków. Dzięki temu interfejs zachowuje kompletność nawet wtedy, gdy dane projektu nie są idealnie zsynchronizowane.
+Powyższy kod pokazuje zabezpieczenie przed pustą konfiguracją kolumn oraz przed niespójnością między statusem taska a definicją tablicy. Komponent najpierw ustala bazową listę kolumn, a następnie dopisuje kolumny techniczne wynikające z danych tasków. W efekcie widok pozostaje kompletny nawet wtedy, gdy konfiguracja projektu wymaga późniejszego uporządkowania.
 
 Przenoszenie zadania między kolumnami zostało zaimplementowane na dwa sposoby. Pierwszym jest mechanizm ``\texttt{drag and drop}'', w którym funkcje ``\texttt{handleDragStart}'', ``\texttt{handleDragOver}'' i ``\texttt{handleDrop}'' obsługują przeciąganie karty oraz upuszczanie jej w wybranej kolumnie. Drugim sposobem są przyciski ``\texttt{Back}'' i ``\texttt{Next}'', które przenoszą zadanie do poprzedniej lub następnej kolumny. Dzięki temu widok pozostaje użyteczny również wtedy, gdy użytkownik nie chce korzystać z przeciągania.
 
@@ -1240,7 +1240,7 @@ Za właściwą listę przypiętych elementów odpowiada komponent ``\texttt{Pinn
 
 Przedstawiony kod skupia w jednym miejscu stan wyszukiwarki, wybrane filtry typów oraz konfigurację sortowania. Zastosowanie ``\texttt{useMemo}'' ogranicza ponowne przeliczanie listy do sytuacji, w których zmieniają się dane wejściowe albo ustawienia użytkownika. Dzięki temu komponent pozostaje czytelny, a jednocześnie obsługuje kilka wariantów przeglądania przypiętych elementów.
 
-Sortowanie przypiętych elementów obsługuje stan ``\texttt{sortField}'' oraz ``\texttt{sortDirection}''. Użytkownik może sortować elementy po dacie aktualizacji, dacie utworzenia, tytule lub opisie. Dla pól tekstowych domyślnym kierunkiem jest sortowanie rosnące, natomiast dla dat domyślnie pokazywane są najnowsze elementy. Wyniki po filtrowaniu są kopiowane do nowej tablicy i sortowane bez modyfikowania danych wejściowych przekazanych do komponentu.
+Sortowanie przypiętych elementów wykorzystuje stan ``\texttt{sortField}'' i ``\texttt{sortDirection}''. Dostępne są kryteria związane z datą aktualizacji, datą utworzenia, tytułem i opisem. Po przefiltrowaniu elementy są kopiowane do nowej tablicy, a dopiero później sortowane, dzięki czemu komponent nie modyfikuje danych wejściowych otrzymanych z dashboardu.
 
 Każdy przypięty element jest renderowany jako karta ``\texttt{ObjectCard}''. Ikona karty zależy od typu elementu: notatka, checklista, zadanie lub projekt. Dla zadań i projektów przekazywany jest status oraz priorytet, natomiast dla checklist możliwe jest pokazanie podglądu elementów checklisty. Link karty prowadzi bezpośrednio do szczegółowego widoku danego elementu.
 
@@ -1258,7 +1258,7 @@ W efekcie sekcja przypiętych elementów pełni rolę spersonalizowanego skrótu
 
 \section{Implementacja formularza taska}
 
-\FirstParagraph Formularz taska został zaimplementowany w komponencie ``\texttt{TaskForm}'', znajdującym się w pliku ``\texttt{task-form.tsx}''. Komponent obsługuje zarówno tworzenie nowego taska, jak i edycję istniejącego, ponieważ tryb działania jest przekazywany w parametrze ``\texttt{mode}''. Dzięki temu ten sam formularz może zostać użyty w dwóch widokach, bez powielania logiki odpowiedzialnej za pola, walidację podstawową oraz wysyłanie danych do API.
+\FirstParagraph Formularz taska znajduje się w komponencie ``\texttt{TaskForm}'' w pliku ``\texttt{task-form.tsx}''. Ten sam komponent obsługuje tworzenie i edycję, ponieważ tryb działania przekazywany jest w parametrze ``\texttt{mode}''. Rozwiązanie ogranicza powielanie kodu: układ pól, podstawowa walidacja i wysyłanie danych do API są wspólne dla obu widoków.
 
 Struktura formularza została osadzona w komponencie ``\texttt{FormShell}'', który zapewnia wspólny układ wizualny dla formularzy aplikacji. Wewnątrz formularza umieszczono pola odpowiadające najważniejszym właściwościom taska: tytuł, opis, priorytet, status, projekt, termin wykonania oraz tagi. Część pól jest prezentowana warunkowo. Jeżeli użytkownik przypisze task do projektu, formularz pobiera dostępne statusy z kolumn kanban danego projektu i pozwala wybrać właściwą kolumnę. Jeżeli task nie należy do projektu, wykorzystywane są podstawowe statusy tasków osobistych.
 
@@ -1279,7 +1279,7 @@ Po poprawnym utworzeniu taska użytkownik jest przenoszony do widoku listy task�
 
 \section{Implementacja formularza projektu}
 
-\FirstParagraph Formularz projektu został zaimplementowany w komponencie ``\texttt{ProjectForm}'', znajdującym się w pliku ``\texttt{project-form.tsx}''. Podobnie jak formularz taska, komponent obsługuje dwa tryby działania: tworzenie i edycję. Formularz projektu jest jednak bardziej rozbudowany, ponieważ poza podstawowymi polami projektu obsługuje także konfigurację kolumn kanban oraz możliwość dodania początkowych tasków.
+\FirstParagraph Formularz projektu zapisano w komponencie ``\texttt{ProjectForm}'' w pliku ``\texttt{project-form.tsx}''. Podobnie jak formularz taska działa on w trybie tworzenia i edycji, ale ma szerszy zakres odpowiedzialności. Poza podstawowymi polami projektu obsługuje konfigurację kolumn kanban oraz dodawanie początkowych tasków, więc już na etapie tworzenia projektu można przygotować jego roboczą strukturę.
 
 Podstawowa część formularza obejmuje tytuł, opis, priorytet, status cyklu życia projektu, termin wykonania oraz tagi. Dane te są wysyłane do backendu jako pola ``\texttt{title}'', ``\texttt{description}'', ``\texttt{priority}'', ``\texttt{lifecycleStatus}'', ``\texttt{dueDate}'' oraz ``\texttt{tags}''. Formularz pozwala również powiązać projekt z istniejącymi checklistami i notatkami oraz utworzyć nowe checklisty podczas zapisu projektu. Dzięki temu użytkownik może przygotować projekt wraz z najważniejszymi elementami organizacyjnymi w jednym widoku.
 
@@ -1292,7 +1292,7 @@ Najważniejszą częścią formularza jest konfiguracja kolumn kanban. Domyślni
   \label{fig:frontend-project-form-normalize-columns}
 \end{figure}
 
-Rysunek przedstawia pierwszą część logiki odpowiedzialnej za przygotowanie kolumn kanban przed zapisem projektu. Funkcja tworząca identyfikator techniczny ujednolica nazwy kolumn, natomiast normalizacja porządkuje ich listę, usuwa puste wartości i zabezpiecza formularz przed zapisaniem niespójnej konfiguracji.
+Pierwszy fragment kodu pokazuje przygotowanie kolumn kanban przed zapisem projektu. Funkcja tworząca identyfikator techniczny ujednolica nazwy kolumn, natomiast normalizacja porządkuje ich listę, usuwa puste wartości i zabezpiecza formularz przed zapisaniem niespójnej konfiguracji.
 
 \begin{figure}[H]
   \centering
@@ -1311,7 +1311,7 @@ Zapis projektu odbywa się w funkcji ``\texttt{handleSubmit}''. Formularz najpie
 
 \chapter{Implementacja kodu po stronie backendu}
 
-\FirstParagraph W niniejszym rozdziale opisano wybrane, reprezentatywne elementy implementacji backendu aplikacji. Skupiono się na trzech obszarach istotnych dla działania systemu: obsłudze checklist przez API, wspólnych mechanizmach obsługi żądań oraz mechanizmie autoryzacji użytkownika. Fragmenty te są wykonywane po stronie serwera, dlatego odpowiadają za sprawdzanie dostępu do danych, walidację żądań oraz komunikację z bazą danych. Rozdział nie omawia każdego endpointu aplikacji osobno, lecz przedstawia rozwiązania pokazujące najważniejsze wzorce użyte również w pozostałych częściach backendu.
+\FirstParagraph Rozdział przedstawia wybrane elementy backendu, które dobrze pokazują sposób działania części serwerowej aplikacji. Omówiono obsługę checklist przez API, wspólne mechanizmy pracy z żądaniami oraz autoryzację użytkownika. Nie rozpisano każdego endpointu osobno, ponieważ wiele z nich powtarza ten sam schemat: sprawdzenie sesji, walidację danych, wykonanie operacji na bazie i zwrócenie odpowiedzi do frontendu.
 
 \section{Implementacja handlera API checklist}
 
@@ -1360,9 +1360,9 @@ Zastosowanie archiwizacji sprawia, że operacja usunięcia jest odwracalna na po
 
 \section{Wspólne mechanizmy obsługi żądań API}
 
-\FirstParagraph W backendzie aplikacji wydzielono zestaw funkcji pomocniczych, które są wykorzystywane przez wiele endpointów API. Ich zadaniem jest ograniczenie powtarzania tego samego kodu oraz ujednolicenie sposobu obsługi żądań, odpowiedzi błędów, danych użytkownika i zapisywanych modyfikacji. Dzięki temu handlery poszczególnych zasobów mogą skupiać się na logice domenowej, a wspólne czynności techniczne pozostają zapisane w jednym miejscu.
+\FirstParagraph W backendzie wydzielono funkcje pomocnicze używane przez wiele endpointów API. Odpowiadają one za powtarzalne czynności: odczyt danych z żądania, walidację, przygotowanie odpowiedzi błędów, pobranie użytkownika z sesji i oczyszczenie danych przed zapisem. Dzięki temu kod handlerów checklist, tasków czy projektów nie musi za każdym razem powtarzać tych samych fragmentów technicznych.
 
-Pierwszym takim elementem jest moduł ``\texttt{api-request.ts}'', w którym umieszczono funkcje ``\texttt{readJsonBody}'' oraz ``\texttt{parseJsonBody}''. Funkcja ``\texttt{readJsonBody}'' próbuje odczytać treść żądania jako obiekt JSON. Jeżeli ciało żądania jest niepoprawne albo nie ma postaci obiektu, zwracana jest wartość pusta. Funkcja ``\texttt{parseJsonBody}'' rozszerza ten mechanizm o walidację przy użyciu przekazanego schematu Zod. W przypadku błędu zwracana jest para wartości zawierająca ``\texttt{data: null}'' oraz komunikat ``\texttt{error}'', natomiast poprawne dane trafiają do handlera już po przejściu walidacji.
+Pierwszym przykładem jest moduł ``\texttt{api-request.ts}'', w którym znajdują się funkcje ``\texttt{readJsonBody}'' oraz ``\texttt{parseJsonBody}''. Funkcja ``\texttt{readJsonBody}'' próbuje odczytać treść żądania jako obiekt JSON i zwraca pustą wartość, gdy format jest niepoprawny. Funkcja ``\texttt{parseJsonBody}'' dodaje do tego walidację schematem Zod. Handler otrzymuje więc albo poprawne dane, albo ujednolicony komunikat błędu.
 
 \begin{figure}[H]
   \centering
@@ -1388,7 +1388,7 @@ Wspólna funkcja ``\texttt{sanitizeMutation}'' odpowiada za oczyszczanie danych 
 
 Ten fragment pokazuje dwa zabezpieczenia stosowane w wielu miejscach backendu. Funkcja pobierająca identyfikator użytkownika pozwala powiązać operację z właścicielem danych, natomiast oczyszczanie modyfikacji usuwa pola techniczne, których klient nie powinien nadpisywać. Wspólne użycie tych mechanizmów wzmacnia kontrolę dostępu i zmniejsza ryzyko przypadkowej modyfikacji danych systemowych.
 
-Ostatnim przykładem wspólnego mechanizmu jest funkcja ``\texttt{recordActivityEvent}'', zapisana w module ``\texttt{activity-events.ts}''. Funkcja przyjmuje identyfikator użytkownika, typ encji, identyfikator encji, nazwę akcji oraz opcjonalne metadane, a następnie tworzy dokument w kolekcji zdarzeń aktywności. Dzięki temu różne części backendu mogą zapisywać historię operacji w jednolitym formacie. W aplikacji jest to wykorzystywane między innymi przy tworzeniu, aktualizowaniu, przenoszeniu i archiwizowaniu elementów.
+Kolejnym wspólnym mechanizmem jest funkcja ``\texttt{recordActivityEvent}'', zapisana w module ``\texttt{activity-events.ts}''. Przyjmuje ona identyfikator użytkownika, typ encji, identyfikator encji, nazwę akcji oraz opcjonalne metadane, a następnie tworzy dokument historii aktywności. W aplikacji ten zapis pojawia się między innymi przy tworzeniu, aktualizowaniu, przenoszeniu i archiwizowaniu elementów.
 
 \section{Implementacja API odpowiedzialnego za autoryzację}
 
@@ -1413,7 +1413,7 @@ W praktyce autoryzacja jest używana w handlerach API przez funkcję pobierając
 
 \chapter{Testy jednostkowe}
 
-\FirstParagraph Test jednostkowy sprawdza niewielki, wydzielony fragment programu, np. funkcję lub schemat walidacji, bez uruchamiania całego systemu. Testy jednostkowe służą więc do weryfikowania małych części aplikacji w kontrolowanych warunkach. Ich zadaniem jest szybkie wykrywanie błędów w logice programu oraz zabezpieczenie już działających funkcji przed przypadkowymi regresjami podczas dalszego rozwoju projektu.
+\FirstParagraph Test jednostkowy sprawdza niewielki fragment programu, na przykład funkcję, schemat walidacji albo logikę handlera, bez uruchamiania całego systemu. W projekcie takie testy potraktowano jako sposób kontroli najważniejszych reguł dotyczących tasków: poprawności danych wejściowych, reakcji API na błędne żądania oraz skutków ubocznych operacji, takich jak powiązanie taska z projektem.
 
 W aplikacji testy zostały uruchamiane za pomocą narzędzia Vitest, które jest dostosowane do testowania kodu JavaScript i TypeScript. Dokumentacja Vitest wskazuje, że test opisuje oczekiwane zachowanie wybranego fragmentu kodu, a funkcje ``\texttt{test}'' oraz ``\texttt{expect}'' pozwalają definiować sprawdzane przypadki i porównywać wynik działania programu z oczekiwanym rezultatem\footnote{Vitest, \emph{Writing Tests}, dokumentacja pisania testów w Vitest, [b.r.], dostęp: \url{https://vitest.dev/guide/learn/writing-tests.html} (03.08.2026).}. W kontekście aplikacji React podobną rolę pełnią narzędzia pozwalające renderować komponenty w środowisku testowym i sprawdzać widoczne dla użytkownika elementy interfejsu; dokumentacja React Testing Library opisuje m.in. funkcję ``\texttt{render}'', służącą do osadzania komponentu w kontenerze testowym\footnote{Testing Library, \emph{React Testing Library API}, dokumentacja API biblioteki React Testing Library, [b.r.], dostęp: \url{https://testing-library.com/docs/react-testing-library/api/} (03.08.2026).}.
 
@@ -1471,15 +1471,15 @@ Ostatni z dodanych screenów przedstawia test dynamicznego endpointu taska. Wery
 \chapter*{Podsumowanie i zakończenie}
 \addcontentsline{toc}{chapter}{Podsumowanie i zakończenie}
 
-\FirstParagraph Celem pracy było zaprojektowanie oraz zaimplementowanie aplikacji internetowej wspierającej indywidualną organizację zadań, checklist, notatek i projektów. W toku pracy omówiono potrzeby użytkownika indywidualnego, porównano wybrane aplikacje o podobnym przeznaczeniu, przedstawiono zastosowane technologie frontendowe i backendowe oraz opisano architekturę systemu. Następnie zaprezentowano projekt interfejsu użytkownika, scenariusze przypadków użycia, strukturę bazy danych, wybrane fragmenty implementacji oraz testy jednostkowe dotyczące funkcjonalności tasków. Założony cel pracy został osiągnięty, ponieważ przygotowano działającą aplikację pozwalającą użytkownikowi organizować dane w kilku powiązanych modułach i korzystać z nich z poziomu przeglądarki internetowej.
+\FirstParagraph Celem pracy było zaprojektowanie oraz zaimplementowanie aplikacji internetowej wspierającej indywidualną organizację zadań, checklist, notatek i projektów. Cel ten został zrealizowany: powstał system, w którym użytkownik może porządkować różne typy informacji, łączyć je z projektami, przypinać najważniejsze elementy do dashboardu i korzystać z aplikacji z poziomu przeglądarki internetowej.
 
-W wyniku wykonanych prac powstała funkcjonalna aplikacja klient-serwer, oparta na środowisku Next.js, bibliotece React, języku TypeScript oraz bazie danych MongoDB. System umożliwia tworzenie i organizowanie tasków, checklist, notatek oraz projektów, a także prezentowanie projektów w widoku listy lub tablicy kanban. Zaimplementowano również mechanizm przypinania najważniejszych elementów do dashboardu, obsługę logowania z wykorzystaniem zewnętrznych dostawców OAuth, walidację danych wejściowych oraz podstawowe testy zabezpieczające logikę związaną z taskami.
+Wykonana aplikacja działa w architekturze klient-serwer i wykorzystuje Next.js, React, TypeScript oraz MongoDB. System umożliwia tworzenie i organizowanie tasków, checklist, notatek oraz projektów, a projekty mogą być prezentowane w formie listy albo tablicy kanban. Wdrożono także przypinanie najważniejszych elementów do dashboardu, logowanie przez zewnętrznych dostawców OAuth, walidację danych wejściowych oraz testy obejmujące wybrane mechanizmy tasków.
 
-Przyjęta architektura pozwoliła oddzielić warstwę interfejsu użytkownika od logiki serwerowej i warstwy przechowywania danych. Endpointy API pełnią rolę pośrednika między frontendem a bazą danych, dzięki czemu możliwe jest sprawdzanie sesji użytkownika, ograniczanie dostępu do cudzych zasobów oraz walidowanie danych przed wykonaniem operacji zapisu. Dokumentowy model MongoDB okazał się dopasowany do charakteru aplikacji, ponieważ ułatwia przechowywanie elementów o elastycznej strukturze, takich jak projekty z własnymi kolumnami kanban, tagami i powiązanymi checklistami.
+Podział na frontend, endpointy API i bazę danych uporządkował odpowiedzialności poszczególnych części systemu. Frontend odpowiada za wygodę pracy i prezentację informacji, backend sprawdza sesję użytkownika oraz poprawność żądań, a MongoDB przechowuje dane w modelu dokumentowym. Takie rozwiązanie dobrze pasuje do projektów z własnymi kolumnami kanban, tagami i powiązanymi checklistami.
 
-Samodzielny wkład autora obejmował analizę wymagań, przygotowanie koncepcji aplikacji, zaprojektowanie struktury bazy danych, wykonanie interfejsu użytkownika, implementację logiki frontendowej i backendowej, konfigurację autoryzacji, przygotowanie scenariuszy przypadków użycia oraz opracowanie testów jednostkowych dla funkcjonalności tasków. Autor przygotował również opis architektury, diagramy, dokumentację implementacji oraz materiały graficzne wykorzystane w pracy.
+Samodzielny wkład autora obejmował analizę wymagań, przygotowanie koncepcji aplikacji, zaprojektowanie struktury bazy danych, wykonanie interfejsu użytkownika, implementację logiki frontendowej i backendowej, konfigurację autoryzacji, przygotowanie scenariuszy przypadków użycia oraz opracowanie testów jednostkowych dla funkcjonalności tasków. W ramach pracy przygotowano również opis architektury, diagramy, dokumentację implementacji i materiały graficzne wykorzystane w rozdziałach projektowych.
 
-Projekt może być dalej rozwijany między innymi przez rozbudowę testów integracyjnych, dodanie powiadomień, udoskonalenie wyszukiwania, rozwinięcie statystyk produktywności oraz przygotowanie wersji wdrożeniowej aplikacji. Możliwe byłoby także rozszerzenie systemu o współdzielenie projektów między użytkownikami, jednak taka funkcja wymagałaby dodatkowego modelu uprawnień oraz bardziej rozbudowanych mechanizmów kontroli dostępu. Dalszy rozwój mógłby obejmować również eksport danych, cykliczne taski, zaawansowane filtry oraz synchronizację z zewnętrznymi kalendarzami. Obecna wersja spełnia jednak główne założenie pracy, którym było przygotowanie przejrzystego narzędzia do indywidualnego zarządzania zadaniami i projektami.
+Projekt można dalej rozwijać w kilku kierunkach. Najbardziej naturalne byłoby rozszerzenie testów o scenariusze integracyjne, dodanie powiadomień, dopracowanie wyszukiwania oraz przygotowanie wersji wdrożeniowej aplikacji. W przyszłości możliwe byłoby także współdzielenie projektów między użytkownikami, ale taka funkcja wymagałaby osobnego modelu uprawnień i dokładniejszej kontroli dostępu. Obecna wersja spełnia główne założenie pracy, ponieważ dostarcza przejrzyste narzędzie do indywidualnego zarządzania zadaniami i projektami.
 
 \chapter*{Bibliografia}
 \addcontentsline{toc}{chapter}{Bibliografia}
