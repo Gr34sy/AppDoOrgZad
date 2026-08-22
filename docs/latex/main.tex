@@ -1169,11 +1169,7 @@ Alternatywny widok tasków projektu przyjmuje formę listy. W tym układzie zada
 
 \chapter{Implementacja kodu po stronie frontendu}
 
-\FirstParagraph Rozdział opisuje te fragmenty frontendu, które najmocniej wpływają na codzienną pracę z aplikacją: widok kanban w projekcie, przypięte elementy dashboardu oraz formularze tasków i projektów. Nie omawiano każdego komponentu osobno, lecz wybrano miejsca, w których najlepiej widać sposób łączenia stanu interfejsu, danych z backendu i reakcji na działania użytkownika.
-
-\section{Wspólne komponenty interfejsu}
-
-\FirstParagraph W warstwie frontendowej wydzielono komponenty używane w wielu modułach aplikacji. Dotyczy to przede wszystkim formularzy, kart elementów, sekcji listujących dane i przycisków akcji. Dzięki temu użytkownik spotyka podobny układ pól i podobne zachowanie kontrolek niezależnie od tego, czy tworzy task, projekt, notatkę czy checklistę.
+\FirstParagraph Rozdział opisuje te fragmenty frontendu, które najmocniej wpływają na codzienną pracę z aplikacją: widok kanban w projekcie, przypięte elementy dashboardu oraz formularze tasków i projektów. Nie omawiano każdego komponentu osobno, lecz wybrano miejsca, w których najlepiej widać sposób łączenia stanu interfejsu, danych z backendu i reakcji na działania użytkownika. Przed opisem konkretnych widoków warto jednak wskazać, że warstwa frontendowa została oparta na komponentach używanych w wielu modułach aplikacji. Dotyczy to przede wszystkim formularzy, kart elementów, sekcji listujących dane i przycisków akcji. Dzięki temu użytkownik spotyka podobny układ pól i podobne zachowanie kontrolek niezależnie od tego, czy tworzy task, projekt, notatkę czy checklistę.
 
 Przykładem takiego rozwiązania jest komponent ``\texttt{FormShell}'', wykorzystywany jako wspólna struktura formularzy tasków i projektów. Odpowiada on za układ nagłówka, obszaru pól, komunikatów oraz przycisków zapisu, dzięki czemu poszczególne formularze mogą skupiać się na własnych danych i logice wysyłania żądania. Podobną rolę pełni komponent ``\texttt{ObjectCard}'', który pozwala prezentować notatki, checklisty, taski i projekty w ujednoliconej formie karty z ikoną, tytułem, opisem oraz metadanymi.
 
