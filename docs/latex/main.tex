@@ -225,7 +225,7 @@ Rozdział szósty prezentuje projekt interfejsu użytkownika oraz scenariusze pr
 
 Rozdział siódmy opisuje wybrane elementy implementacji kodu warstwy interfejsu użytkownika. Skupiono się w nim na wspólnych komponentach interfejsu, realizacji widoku tablicy projektu, sekcji przypiętych elementów dashboardu oraz formularzy odpowiedzialnych za tworzenie i edycję tasków oraz projektów.
 
-Rozdział ósmy przedstawia wybrane elementy implementacji backendu. Opisano w nim handler API odpowiedzialny za pobieranie, tworzenie, aktualizowanie i archiwizowanie checklist, wspólne mechanizmy obsługi żądań API oraz konfigurację autoryzacji opartą na Auth.js, zewnętrznych dostawcach logowania i sesji użytkownika.
+Rozdział ósmy przedstawia wybrane elementy implementacji części serwerowej aplikacji. Opisano w nim handler API odpowiedzialny za pobieranie, tworzenie, aktualizowanie i archiwizowanie checklist, wspólne mechanizmy obsługi żądań API oraz konfigurację autoryzacji opartą na Auth.js, zewnętrznych dostawcach logowania i sesji użytkownika.
 
 Rozdział dziewiąty dotyczy testów jednostkowych. Wyjaśniono w nim rolę testów w projekcie oraz opisano przygotowane testy walidacji danych tasków i testy endpointów API odpowiedzialnych za obsługę tasków. Wskazano również, jaki zakres działania aplikacji został objęty sprawdzeniem.
 
@@ -233,15 +233,15 @@ Rozdział dziewiąty dotyczy testów jednostkowych. Wyjaśniono w nim rolę test
 
 \FirstParagraph Analizę wymagań rozpoczęto od określenia sytuacji, w których użytkownik korzysta z aplikacji samodzielnie, bez zespołu projektowego i bez formalnego procesu zarządzania pracą. W takim przypadku najważniejsze są: prosty zapis obowiązków, szybki powrót do aktualnie wykonywanych zadań oraz możliwość oddzielenia drobnych spraw od większych projektów. Narzędzia takie jak Trello, Asana czy ClickUp pokazują różne sposoby organizacji pracy, lecz wiele ich funkcji powstało z myślą o większej ilości użytkowników, raportowaniu i koordynacji zespołu.
 
-Użytkownik indywidualny nie potrzebuje licznych nakładek i dodatkowych funkcjonalności aplikacji, usprawniających pracę zespołową, natomiast ceni sobie prostotę. Aplikacja dla niego skierowana powinna przede wszystkim zapewniać responsywny, intuicyjny, czytelny i niezawodny interfejs, umożliwiający bezproblemowe nawigowanie po stronie. Narzędzie takie powinno także umożliwiać  organizację zadań w różnych formach, jak na przykład checklista\footnote{Checklista - uporządkowany zestaw elementów do wykonania, w którym poszczególne pozycje można oznaczać jako ukończone.} do sprawdzania zakupów, lub tablica z taskami w celu organizacji skomplikowanego projektu. Aplikacja powinna również oferować prosty i motywujący do działania interfejs graficzny.
+Użytkownik indywidualny nie potrzebuje licznych nakładek i dodatkowych funkcjonalności aplikacji, usprawniających pracę zespołową, natomiast ceni sobie prostotę. Aplikacja dla niego skierowana powinna przede wszystkim zapewniać responsywny, intuicyjny, czytelny i niezawodny interfejs, umożliwiający bezproblemowe nawigowanie po stronie. Narzędzie takie powinno także umożliwiać  organizację zadań w różnych formach, jak na przykład checklista\footnote{Checklista - uporządkowany zestaw elementów do wykonania, w którym poszczególne pozycje można oznaczać jako ukończone. Jako element organizacji zadań występuje między innymi w aplikacji Trello. Źródło: Atlassian, \emph{Trello}, strona internetowa aplikacji, [b.r.], \url{https://trello.com} (dostęp: 17.07.2026).} do sprawdzania zakupów, lub tablica z taskami\footnote{Task - z jęz. ang. zadanie; w niniejszej pracy termin oznacza element aplikacji tworzony przez użytkownika w celu opisania konkretnej czynności do wykonania. Jako element organizacji pracy występuje między innymi w aplikacji Trello. Źródło: Ibidem.} w celu organizacji skomplikowanego projektu. Aplikacja powinna również oferować prosty i motywujący do działania interfejs graficzny.
 
 Z punktu widzenia projektowanej aplikacji istotny problem stanowi rozproszenie informacji. Użytkownik może prowadzić osobną listę codziennych zadań, oddzielne notatki i osobny plan większego projektu, przez co część danych traci kontekst. Dlatego projekt skupia się również na możliwości przypinania i wyświetlania różnych elementów aplikacji w jednym miejscu.
 
 \section{Omówienie podobnych aplikacji}
 
-\FirstParagraph Asana\footnote{Asana, Inc., \emph{Asana}, strona internetowa aplikacji do zarządzania pracą, [b.r.], dostęp: \url{https://asana.com} (17.07.2026).}, ClickUp\footnote{ClickUp, \emph{ClickUp}, strona internetowa aplikacji do zarządzania projektami, [b.r.], dostęp: \url{https://clickup.com} (17.07.2026).} oraz Trello\footnote{Atlassian, \emph{Trello}, strona internetowa aplikacji kanban do zarządzania zadaniami, [b.r.], dostęp: \url{https://trello.com} (17.07.2026).} to przykładowe, popularne narzędzia do zarządzania projektami. Z perspektywy pojedynczego użytkownika ich przydatność zależy od złożoności potrzeb oraz preferowanego stylu pracy. \textbf{Trello} uchodzi za proste i intuicyjne narzędzie z przejrzystym interfejsem. \textbf{Asana} jest natomiast bardziej rozbudowana i wykorzystywana przede wszystkim do nadzoru nad złożonymi projektami zespołowymi. Z kolei \textbf{ClickUp} oferuje szeroki zakres funkcji, co może być atrakcyjne dla wymagających użytkowników indywidualnych, jednak duża liczba możliwości czyni tę aplikację skomplikowaną w obsłudze.
+\FirstParagraph Asana\footnote{Asana Inc., \emph{Asana}, strona internetowa aplikacji, [b.r.], \url{https://asana.com} (dostęp: 17.07.2026).}, ClickUp\footnote{ClickUp, \emph{ClickUp}, strona internetowa aplikacji, [b.r.], \url{https://clickup.com} (dostęp: 17.07.2026).} oraz Trello\footnote{Atlassian, \emph{Trello}, strona internetowa aplikacji, [b.r.], \url{https://trello.com} (dostęp: 17.07.2026).} to przykładowe, popularne narzędzia do zarządzania projektami. Z perspektywy pojedynczego użytkownika ich przydatność zależy od złożoności potrzeb oraz preferowanego stylu pracy. \textbf{Trello} uchodzi za proste i intuicyjne narzędzie z przejrzystym interfejsem. \textbf{Asana} jest natomiast bardziej rozbudowana i wykorzystywana przede wszystkim do nadzoru nad złożonymi projektami zespołowymi. Z kolei \textbf{ClickUp} oferuje szeroki zakres funkcji, co może być atrakcyjne dla wymagających użytkowników indywidualnych, jednak duża liczba możliwości czyni tę aplikację skomplikowaną w obsłudze.
 
-\textbf{Trello} wyróżnia się \textbf{prostotą i intuicyjnością} -- jest łatwe do opanowania dla początkujących, dzięki czemu idealnie nadaje się do podstawowego porządkowania. Jego jedyna forma prezentacji - kanban\footnote{Kanban - metoda wizualnego zarządzania pracą, w której zadania przedstawiane są na tablicy podzielonej na etapy realizacji.} sprzyja szybkiemu organizowaniu prostych projektów. Jednocześnie Trello pozostawia dużo przestrzeni użytkownikom bardziej wymagającym, poprzez możliwość integracji przeróżnych narzędzi zewnętrznych, tak zwanych "power-upów".
+\textbf{Trello} wyróżnia się \textbf{prostotą i intuicyjnością} -- jest łatwe do opanowania dla początkujących, dzięki czemu idealnie nadaje się do podstawowego porządkowania. Jego jedyna forma prezentacji - kanban\footnote{Kanban - metoda wizualnego zarządzania pracą, w której zadania przedstawiane są na tablicy podzielonej na etapy realizacji. Źródło: M. O. Ahmad, D. Dennehy, K. Conboy, M. Oivo, \emph{Kanban in Software Engineering: A Systematic Mapping Study}, ``Journal of Systems and Software'' 2018, Vol. 137, s. 96--113, \url{https://doi.org/10.1016/j.jss.2017.11.045} (dostęp: 31.07.2026).} sprzyja szybkiemu organizowaniu prostych projektów. Jednocześnie Trello pozostawia dużo przestrzeni użytkownikom bardziej wymagającym, poprzez możliwość integracji przeróżnych narzędzi zewnętrznych, tak zwanych "power-upów".
 
 \textbf{Asana}, zaprojektowana została z myślą o pracy zespołowej, dostarczając bardziej ustrukturyzowane podejście do zarządzania zadaniami i projektem. W darmowej wersji obcięte zostały niektóre funkcjonalności, jednak nie posiada ona limitów na ilość zadań, czy projektów. Wiele istotnych funkcji oferowanych przez tę aplikację nie jest przydatne dla użytkownika pojedynczego. Plusem Asany jest stosunkowa prostota w obsłudze oraz czytelność interfejsu, w zestawieniu z ilością oferowanych funkcji.
 
@@ -284,7 +284,7 @@ Na podstawie powyższych historii użytkownika opracowano szczegółowe scenariu
 
 \FirstParagraph Kanban jest metodą organizacji pracy opartą na wizualnym przedstawianiu zadań oraz etapów ich realizacji. W aplikacjach do zarządzania zadaniami przyjmuje najczęściej postać tablicy podzielonej na kolumny, które odpowiadają kolejnym stanom pracy. Zadania są przedstawiane jako karty, a ich przenoszenie pomiędzy kolumnami pozwala szybko ocenić, które elementy są dopiero planowane, które są aktualnie wykonywane, a które zostały już zakończone.
 
-W literaturze dotyczącej inżynierii oprogramowania kanban jest opisywany jako podejście wspierające ciągły przepływ pracy oraz stopniowe dostarczanie wartości użytkownikowi. Ahmad, Dennehy, Conboy i Oivo wskazują, że badania nad kanbanem w oprogramowaniu koncentrują się między innymi na widoczności pracy, ograniczaniu pracy w toku oraz praktykach usprawniających zarządzanie zadaniami\footnote{Ahmad M. O., Dennehy D., Conboy K., Oivo M., \emph{Kanban in Software Engineering: A Systematic Mapping Study}, ``Journal of Systems and Software'', vol. 137, 2018, s. 96--113, DOI: 10.1016/j.jss.2017.11.045, \url{https://doi.org/10.1016/j.jss.2017.11.045} (dostęp: 31.07.2026).}.
+W literaturze dotyczącej inżynierii oprogramowania kanban jest opisywany jako podejście wspierające ciągły przepływ pracy oraz stopniowe dostarczanie wartości użytkownikowi. Ahmad, Dennehy, Conboy i Oivo wskazują, że badania nad kanbanem w oprogramowaniu koncentrują się między innymi na widoczności pracy, ograniczaniu pracy w toku oraz praktykach usprawniających zarządzanie zadaniami\footnote{M. O. Ahmad, D. Dennehy, K. Conboy, M. Oivo, \emph{Kanban in Software Engineering: A Systematic Mapping Study}, ``Journal of Systems and Software'' 2018, Vol. 137, s. 96--113, \url{https://doi.org/10.1016/j.jss.2017.11.045} (dostęp: 31.07.2026).}.
 
 Zaletą tablicy kanban jest jej prostota. Użytkownik nie musi analizować długiej listy zadań ani otwierać każdego elementu osobno, aby sprawdzić postęp pracy. Wystarczy spojrzeć na układ kart w kolumnach. Dzięki temu metoda dobrze sprawdza się zarówno w pracy zespołowej, jak i w pracy indywidualnej, na przykład podczas planowania projektu, nauki, pisania pracy dyplomowej lub organizowania obowiązków domowych.
 
@@ -324,9 +324,10 @@ W zakresie bezpieczeństwa przewidziano integrację z zewnętrznymi dostawcami a
 
 Architektura aplikacji umożliwia późniejsze dodawanie kolejnych typów elementów i filtrów bez przebudowy całego systemu. W projekcie przewidziano także testy sprawdzające najważniejsze reguły związane z obsługą tasków, aby zmiany w kodzie nie naruszały podstawowych scenariuszy działania.
 
-\chapter{Frontend}
+\chapter[Frontend]{Frontend\footnotemark}
+\footnotetext{Frontend - termin pochodzący z jęz. ang., będący złożeniem słów ``front'' (przód, część widoczna) oraz ``end'' (część, warstwa), odnoszący się do tej części aplikacji, która jest bezpośrednio dostępna dla użytkownika.}
 
-\FirstParagraph Frontend\footnote{Frontend - termin pochodzący z języka angielskiego, będący złożeniem słów ``front'' (przód, część widoczna) oraz ``end'' (część, warstwa), odnoszący się do tej części aplikacji, która jest bezpośrednio dostępna dla użytkownika.} to część strony internetowej lub aplikacji, z którą użytkownik bezpośrednio wchodzi w interakcję. Obejmuje on wszystkie akcje, wykonujące się po stronie przeglądarki. Na stronie internetowej do frontendu zalicza się:
+\FirstParagraph Frontend to część strony internetowej lub aplikacji, z którą użytkownik bezpośrednio wchodzi w interakcję. Obejmuje on wszystkie akcje, wykonujące się po stronie przeglądarki. Na stronie internetowej do frontendu zalicza się:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -340,7 +341,7 @@ Architektura aplikacji umożliwia późniejsze dodawanie kolejnych typów elemen
   Responsywność - automatyczne dostosowywanie się aplikacji do różnych wielkości ekranu.
 \end{enumerate}
 
-Fundamentalne narzędzia używane do tworzenia frontendu to HTML\footnote{HTML - z jęz. ang. Hypertext Markup Language, czyli ``hipertekstowy język znaczników''. Dean J., \emph{Web Programming with HTML5, CSS, and JavaScript}, Jones \& Bartlett Learning, Burlington 2017, s. 7--15.}, CSS\footnote{Tamże, s. 73--75.} oraz JavaScript\footnote{Tamże, s. 311--313.}. HTML to język znaczników, odpowiadający za strukturę strony internetowej. Określa on semantyczny układ treści, takich jak nagłówki, akapity, listy, obrazy, czy formularze. HTML stanowi szkielet warstwy frontendowej aplikacji webowej, będąc interpretowanym przez przeglądarkę w celu prezentacji treści użytkownikowi. Poprawne i semantyczne rozmieszczenie znaczników HTML ma kluczowe znaczenie dla dostępności cyfrowej, ponieważ umożliwia prawidłową interpretację treści przez czytniki ekranu wykorzystywane przez osoby z niepełnosprawnościami wzroku.
+Fundamentalne narzędzia używane do tworzenia frontendu to HTML\footnote{HTML - z jęz. ang. Hypertext Markup Language, czyli ``hipertekstowy język znaczników''. Źródło: J. Dean, \emph{Web Programming with HTML5, CSS, and JavaScript}, Jones \& Bartlett Learning, Burlington 2017, s. 7--15.}, CSS\footnote{CSS - z jęz. ang. Cascading Style Sheets, czyli ``kaskadowe arkusze stylów''. Źródło: Ibidem, s. 73--75.} oraz JavaScript\footnote{Źródło: Ibidem, s. 311--313.}. HTML to język znaczników, odpowiadający za strukturę strony internetowej. Określa on semantyczny układ treści, takich jak nagłówki, akapity, listy, obrazy, czy formularze. HTML stanowi szkielet warstwy frontendowej aplikacji webowej, będąc interpretowanym przez przeglądarkę w celu prezentacji treści użytkownikowi. Poprawne i semantyczne rozmieszczenie znaczników HTML ma kluczowe znaczenie dla dostępności cyfrowej, ponieważ umożliwia prawidłową interpretację treści przez czytniki ekranu wykorzystywane przez osoby z niepełnosprawnościami wzroku.
 
 \textbf{CSS} jest językiem służącym do definiowania warstwy prezentacji stron internetowych. Odpowiada za wygląd i układ elementów HTML, w tym kolory, czcionki, odstępy, pozycjonowanie oraz animacje. Dzięki określonemu mechanizmowi dziedziczenia, CSS umożliwia spójne oraz elastyczne zarządzanie stylem w obrębie całej aplikacji webowej, a jego poprawne zastosowanie wspiera czytelność interfejsu oraz dostępność treści dla użytkowników.
 
@@ -350,15 +351,15 @@ Fundamentalne narzędzia używane do tworzenia frontendu to HTML\footnote{HTML -
 
 Biblioteki programistyczne to zbiory gotowych funkcji, klas oraz komponentów, które rozszerzają możliwości języków programowania i ułatwiają realizację określonych zadań. Ich celem jest ponowne wykorzystanie sprawdzonych rozwiązań oraz ograniczenie konieczności samodzielnego implementowania powtarzalnych mechanizmów. Pozwalają one na skrócenie czasu tworzenia oprogramowania oraz zwiększenie czytelności i niezawodności kodu. W kontekście technologii frontendowych biblioteki wspierają między innymi budowę interfejsu użytkownika, obsługę zdarzeń oraz zarządzanie danymi po stronie klienta. 
 
-Przykładem jest tutaj React\footnote{React, \emph{React: The Library for Web and Native Interfaces}, dokumentacja biblioteki React, [b.r.], dostęp: \url{https://react.dev} (28.01.2026).}, czyli biblioteka języka JavaScript. Zgodnie z dokumentacją biblioteki React, dostarcza ona narzędzia pozwalające między innymi tworzyć komponenty nadające się do ponownego użycia w różnych sekcjach aplikacji. W ten sposób można przygotować na przykład przycisk lub nagłówek bez potrzeby wielokrotnego przepisywania tego samego kodu. Takie podejście oszczędza czas oraz poprawia przejrzystość kodu. Z tego powodu w projekcie zdecydowano się na wykorzystanie tej biblioteki.
+Przykładem jest tutaj React\footnote{\emph{React: The Library for Web and Native Interfaces}, dokumentacja biblioteki React, [b.r.], \url{https://react.dev} (dostęp: 28.01.2026).}, czyli biblioteka języka JavaScript. Zgodnie z dokumentacją biblioteki React, dostarcza ona narzędzia pozwalające między innymi tworzyć komponenty nadające się do ponownego użycia w różnych sekcjach aplikacji. W ten sposób można przygotować na przykład przycisk lub nagłówek bez potrzeby wielokrotnego przepisywania tego samego kodu. Takie podejście oszczędza czas oraz poprawia przejrzystość kodu. Z tego powodu w projekcie zdecydowano się na wykorzystanie tej biblioteki.
 
-Obok bibliotek, rozwinęło się dużo narzędzi programistycznych zwanych frameworkami\footnote{Framework - z języka angielskiego, jest złożeniem słów ``frame'' (rama) oraz ``work'' (praca, struktura). Dosłownie oznacza "ramę konstrukcyjną" lub "szkielet".}. Różnica pomiędzy biblioteką a frameworkiem dotyczy przede wszystkim stopnia kontroli nad przepływem aplikacji. Biblioteka dostarcza zestaw narzędzi i funkcji, które są wywoływane bezpośrednio przez programistę w wybranym miejscu. Framework natomiast narzuca określoną strukturę projektu oraz sposób działania aplikacji, przejmując kontrolę nad jej przepływem i wymuszając pewne ramy, których programista musi przestrzegać.
+Obok bibliotek, rozwinęło się dużo narzędzi programistycznych zwanych frameworkami\footnote{Framework - z jęz. ang., jest złożeniem słów ``frame'' (rama) oraz ``work'' (praca, struktura). Dosłownie oznacza "ramę konstrukcyjną" lub "szkielet".}. Różnica pomiędzy biblioteką a frameworkiem dotyczy przede wszystkim stopnia kontroli nad przepływem aplikacji. Biblioteka dostarcza zestaw narzędzi i funkcji, które są wywoływane bezpośrednio przez programistę w wybranym miejscu. Framework natomiast narzuca określoną strukturę projektu oraz sposób działania aplikacji, przejmując kontrolę nad jej przepływem i wymuszając pewne ramy, których programista musi przestrzegać.
 
 \section{Komponenty w React}
 
 \FirstParagraph Komponenty w React stanowią podstawowy element budowy interfejsu użytkownika i umożliwiają podział aplikacji na mniejsze, niezależne moduły. Takie podejście redukuje powielanie kodu oraz ułatwia jego testowanie i utrzymanie. Modułowa struktura aplikacji opartej na React zwiększa również skalowalność projektu. Istotnym ułatwieniem w tworzeniu komponentów jest składnia JavaScript Extension, czyli JSX.
 
-HTML jest językiem deklaratywnym służącym do opisu struktury dokumentu, natomiast JavaScript odpowiada za logikę i manipulację tą strukturą przez wywoływane funkcje. W klasycznym podejściu HTML i JavaScript są rozdzielone - pierwszy język definiuje widok, a drugi modyfikuje go poprzez interakcję z DOM\footnote{DOM - z jęz. ang. Document Object Model, to hierarchiczna reprezentacja struktury dokumentu HTML w postaci drzewa obiektów. Umożliwia on językom programowania, takim jak JavaScript, dynamiczny dostęp do elementów strony oraz ich modyfikację w czasie działania aplikacji.}. Aby zmodyfikować DOM przy użyciu czystego JavaScriptu, należy skorzystać z wielu funkcji odpowiedzialnych za tworzenie, wyszukiwanie i aktualizowanie elementów dokumentu. JSX pozwala uprościć ten proces i opisywać strukturę interfejsu w sposób deklaratywny wewnątrz plików JavaScript. Znacznie ułatwia to definiowanie, utrzymanie oraz ponowne wykorzystanie komponentów. Dodatkowo składnia JSX jest podczas procesu budowania aplikacji transpilowana do czystego JavaScriptu, dzięki czemu React może efektywnie zarządzać komponentami, ich stanem oraz ponownym renderowaniem. Poniższy przykład wyjaśnia, jak w React działa JavaScript Extension.
+HTML jest językiem deklaratywnym służącym do opisu struktury dokumentu, natomiast JavaScript odpowiada za logikę i manipulację tą strukturą przez wywoływane funkcje. W klasycznym podejściu HTML i JavaScript są rozdzielone - pierwszy język definiuje widok, a drugi modyfikuje go poprzez interakcję z DOM\footnote{DOM - z jęz. ang. Document Object Model, to hierarchiczna reprezentacja struktury dokumentu HTML w postaci drzewa obiektów. Dean opisuje DOM jako model wszystkich części dokumentu strony w formie węzłów drzewa. Źródło: J. Dean, \emph{Web Programming with HTML5, CSS, and JavaScript}, Jones \& Bartlett Learning, Burlington 2017, s. 322.}. Aby zmodyfikować DOM przy użyciu czystego JavaScriptu, należy skorzystać z wielu funkcji odpowiedzialnych za tworzenie, wyszukiwanie i aktualizowanie elementów dokumentu. JSX pozwala uprościć ten proces i opisywać strukturę interfejsu w sposób deklaratywny wewnątrz plików JavaScript. Znacznie ułatwia to definiowanie, utrzymanie oraz ponowne wykorzystanie komponentów. Dodatkowo składnia JSX jest podczas procesu budowania aplikacji transpilowana do czystego JavaScriptu, dzięki czemu React może efektywnie zarządzać komponentami, ich stanem oraz ponownym renderowaniem. Poniższy przykład wyjaśnia, jak w React działa JavaScript Extension.
 
 \begin{figure}[H]
   \centering
@@ -394,7 +395,7 @@ W projektowanej aplikacji podejście komponentowe zastosowano między innymi w f
 
 \section{React Hooks}
 
-\FirstParagraph Mechanizm hooków\footnote{React, \emph{Built-in React Hooks}, dokumentacja hooków biblioteki React, [b.r.], dostęp: \url{https://react.dev/reference/react/hooks} (16.08.2026).} umożliwia przechowywanie danych pomiędzy kolejnymi wywołaniami funkcji komponentu, mimo że sama funkcja jest wykonywana od nowa przy każdym renderowaniu. Każdy hook jest wywoływany bezpośrednio w ciele funkcji komponentu, dzięki czemu React może jednoznacznie przypisać jego działanie do danego komponentu oraz zachować odpowiednie wartości pomiędzy kolejnymi wywołaniami tej funkcji. Kolejność wywołań hooków ma kluczowe znaczenie, ponieważ na jej podstawie React identyfikuje, które dane należą do danego hooka.
+\FirstParagraph Mechanizm hooków\footnote{\emph{Built-in React Hooks}, dokumentacja hooków biblioteki React, [b.r.], \url{https://react.dev/reference/react/hooks} (dostęp: 16.08.2026).} umożliwia przechowywanie danych pomiędzy kolejnymi wywołaniami funkcji komponentu, mimo że sama funkcja jest wykonywana od nowa przy każdym renderowaniu. Każdy hook jest wywoływany bezpośrednio w ciele funkcji komponentu, dzięki czemu React może jednoznacznie przypisać jego działanie do danego komponentu oraz zachować odpowiednie wartości pomiędzy kolejnymi wywołaniami tej funkcji. Kolejność wywołań hooków ma kluczowe znaczenie, ponieważ na jej podstawie React identyfikuje, które dane należą do danego hooka.
 
 W odróżnieniu od zwykłych zmiennych lokalnych, które są tracone po zakończeniu wykonania funkcji, wartości zarządzane przez hooki są przechowywane poza samą funkcją, lecz udostępniane jej ponownie przy każdej aktualizacji interfejsu użytkownika. Dzięki temu komponent funkcyjny może być ponownie wykonywany, zachowując ciągłość danych oraz logiki aplikacji.
 
@@ -427,7 +428,7 @@ W aplikacji hooki wykorzystano przede wszystkim w komponentach interaktywnych. `
 
 \section{Tailwind CSS}
 
-\FirstParagraph Tailwind CSS\footnote{Tailwind Labs, \emph{Tailwind CSS}, dokumentacja frameworka CSS, [b.r.], dostęp: \url{https://tailwindcss.com} (28.01.2026).} jest frameworkiem służącym do stylowania interfejsów użytkownika za pomocą gotowych klas CSS, używanych bezpośrednio w znacznikach HTML lub komponentach React. Tailwind CSS umożliwia szybkie budowanie spójnych i responsywnych układów bez konieczności pisania osobnych arkuszy stylów dla każdego komponentu. Technologia ta jest stosowana w celu zwiększenia produktywności, ograniczenia duplikacji kodu CSS oraz łatwiejszego skalowania warstwy prezentacyjnej aplikacji.
+\FirstParagraph Tailwind CSS\footnote{Tailwind Labs, \emph{Tailwind CSS}, dokumentacja frameworka CSS, [b.r.], \url{https://tailwindcss.com} (dostęp: 28.01.2026).} jest frameworkiem służącym do stylowania interfejsów użytkownika za pomocą gotowych klas CSS, używanych bezpośrednio w znacznikach HTML lub komponentach React. Tailwind CSS umożliwia szybkie budowanie spójnych i responsywnych układów bez konieczności pisania osobnych arkuszy stylów dla każdego komponentu. Technologia ta jest stosowana w celu zwiększenia produktywności, ograniczenia duplikacji kodu CSS oraz łatwiejszego skalowania warstwy prezentacyjnej aplikacji.
 
 \begin{figure}[H]
   \centering
@@ -439,7 +440,7 @@ Jak widać na obrazie, całe stylowanie realizowane jest poprzez tak zwane klasy
 
 \section{TypeScript}
 
-\FirstParagraph Kolejną technologią zastosowaną w projekcie jest TypeScript\footnote{Microsoft, \emph{TypeScript Documentation}, dokumentacja języka TypeScript, [b.r.], dostęp: \url{https://www.typescriptlang.org/docs/} (25.07.2026).}, czyli nadzbiór języka JavaScript. Rozszerza on JavaScript o system typów, interfejsy oraz mechanizmy kontroli poprawności kodu na etapie kompilacji. Kod TypeScript nie jest bezpośrednio interpretowany przez przeglądarkę, lecz przed uruchomieniem musi zostać transpilowany do standardowego JavaScriptu, zachowując pełną kompatybilność ze środowiskiem wykonawczym.
+\FirstParagraph Kolejną technologią zastosowaną w projekcie jest TypeScript\footnote{Microsoft, \emph{TypeScript Documentation}, dokumentacja języka TypeScript, [b.r.], \url{https://www.typescriptlang.org/docs/} (dostęp: 25.07.2026).}, czyli nadzbiór języka JavaScript. Rozszerza on JavaScript o system typów, interfejsy oraz mechanizmy kontroli poprawności kodu na etapie kompilacji. Kod TypeScript nie jest bezpośrednio interpretowany przez przeglądarkę, lecz przed uruchomieniem musi zostać transpilowany do standardowego JavaScriptu, zachowując pełną kompatybilność ze środowiskiem wykonawczym.
 
 W projekcie TypeScript został wykorzystany przede wszystkim po to, aby jawnie opisać dane przekazywane między komponentami, formularzami i endpointami API. Statyczne typowanie pomaga wykrywać część pomyłek jeszcze podczas pracy nad kodem, na przykład niezgodny typ pola, brak wymaganej właściwości albo błędny argument funkcji. Ma to znaczenie szczególnie w miejscach, w których ten sam obiekt taska lub projektu przechodzi przez formularz, walidację, handler API i model bazy danych.
 
@@ -449,21 +450,22 @@ Jak dokładnie działa TypeScript, można wytłumaczyć na następującym przyk�
 
 W projekcie TypeScript został użyty do opisu typów danych przekazywanych do komponentów, formularzy, funkcji pomocniczych oraz endpointów API. Dzięki temu struktury takie jak task, checklista, projekt, pin czy element formularza mają jasno określone pola, co zmniejsza ryzyko pomyłek podczas rozwijania aplikacji.
 
-\chapter{Backend}
+\chapter[Backend]{Backend\footnotemark}
+\footnotetext{Backend - termin pochodzący z jęz. ang., będący złożeniem słów ``back'' (tył, zaplecze) oraz ``end'' (część, warstwa), odnoszący się do części aplikacji niedostępnej dla użytkownika.}
 
-\FirstParagraph Backend\footnote{Backend - termin pochodzący z języka angielskiego, będący złożeniem słów ``back'' (tył, zaplecze) oraz ``end'' (część, warstwa), odnoszący się do części aplikacji niedostępnej dla użytkownika.} to warstwa aplikacji działająca po stronie serwera i odpowiedzialna za przetwarzanie danych oraz komunikację z bazą danych lub innymi systemami. Backend nie jest bezpośrednio widoczny dla użytkownika końcowego. Obsługuje m.in. autoryzację, walidację danych, realizację reguł biznesowych oraz udostępnianie danych frontendowi za pomocą API\footnote{API - skrót z języka angielskiego, oznaczający Application Programming Interface.}.
+\FirstParagraph Backend to warstwa aplikacji działająca po stronie serwera i odpowiedzialna za przetwarzanie danych oraz komunikację z bazą danych lub innymi systemami. Backend nie jest bezpośrednio widoczny dla użytkownika końcowego. Obsługuje m.in. autoryzację, walidację danych, realizację reguł biznesowych oraz udostępnianie danych frontendowi za pomocą API\footnote{API - skrót z jęz. ang., oznaczający Application Programming Interface.}.
 
 API natomiast to zestaw reguł, metod i struktur danych umożliwiających komunikację pomiędzy różnymi systemami informatycznymi lub ich częściami. Określa, w jaki sposób aplikacje mogą wymieniać dane oraz wywoływać określone funkcje, bez konieczności znajomości wewnętrznej implementacji drugiej strony. API pełni rolę pośrednika pomiędzy frontendem a backendem. Frontend wysyła żądania lub zapytania, natomiast backend przetwarza je, zwracając później odpowiedź.
 
 \section{Next.js}
 
-\FirstParagraph Next.js\footnote{Vercel, \emph{Next.js Docs}, dokumentacja frameworka Next.js, [b.r.], dostęp: \url{https://nextjs.org/docs} (29.01.2026).} jest frameworkiem opartym na bibliotece React, przeznaczonym do tworzenia pełnostosowych aplikacji webowych. Interfejs użytkownika budowany jest przy użyciu komponentów React, natomiast Next.js dostarcza dodatkowe funkcje oraz mechanizmy optymalizacyjne. Framework automatycznie konfiguruje narzędzia niskiego poziomu, takie jak bundlery oraz kompilatory, dzięki czemu programista może skupić się na tworzeniu aplikacji i szybkim wdrażaniu jej do użytku.
+\FirstParagraph Next.js\footnote{Vercel, \emph{Next.js Docs}, dokumentacja frameworka Next.js, [b.r.], \url{https://nextjs.org/docs} (dostęp: 29.01.2026).} jest frameworkiem opartym na bibliotece React, przeznaczonym do tworzenia pełnostosowych aplikacji webowych. Interfejs użytkownika budowany jest przy użyciu komponentów React, natomiast Next.js dostarcza dodatkowe funkcje oraz mechanizmy optymalizacyjne. Framework automatycznie konfiguruje narzędzia niskiego poziomu, takie jak bundlery oraz kompilatory, dzięki czemu programista może skupić się na tworzeniu aplikacji i szybkim wdrażaniu jej do użytku.
 
 Next.js rozszerza możliwości React o funkcje takie jak renderowanie zawartości po stronie serwera, routing oparty na strukturze plików, optymalizację obrazów oraz wygodne tworzenie endpointów API. Umożliwia również budowę aplikacji przyjaznych dla wyszukiwarek internetowych, ponieważ część treści może zostać przygotowana przed wysłaniem strony do przeglądarki. Dzięki temu framework łączy w jednym projekcie warstwę interfejsu użytkownika i wybrane mechanizmy backendowe.
 
-W projekcie zdecydowano się na wykorzystanie Next.js, ponieważ framework ogranicza potrzebę utrzymywania osobnego projektu backendowego i ułatwia rozwijanie aplikacji jako jednej spójnej całości. W decyzji wykorzystania Nexta istotna była także możliwość prostego połączenia z biblioteką Auth.js\footnote{Auth.js, \emph{Auth.js}, dokumentacja biblioteki do obsługi uwierzytelniania, [b.r.], dostęp: \url{https://authjs.dev} (17.07.2026).}, która pozwala zabezpieczać widoki i endpointy bez tworzenia całego mechanizmu logowania od podstaw.
+W projekcie zdecydowano się na wykorzystanie Next.js, ponieważ framework ogranicza potrzebę utrzymywania osobnego projektu backendowego i ułatwia rozwijanie aplikacji jako jednej spójnej całości. W decyzji wykorzystania Nexta istotna była także możliwość prostego połączenia z biblioteką Auth.js\footnote{Auth.js, \emph{Auth.js}, dokumentacja biblioteki do obsługi uwierzytelniania, [b.r.], \url{https://authjs.dev} (dostęp: 17.07.2026).}, która pozwala zabezpieczać widoki i endpointy bez tworzenia całego mechanizmu logowania od podstaw.
 
-Dodatkową zaletą Next.js jest wsparcie dla SEO, w tym lepszej indeksowalności strony dzięki renderowaniu treści po stronie serwera oraz możliwości zarządzania metadanymi dokumentu. Duże znaczenie ma również opcja wygodnego rozwijania widoków użytkownika i kodu serwerowego w tym samym środowisku technologicznym.
+Dodatkową zaletą Next.js jest wsparcie dla SEO\footnote{SEO - z jęz. ang. Search Engine Optimization, czyli optymalizacja strony pod kątem wyszukiwarek internetowych. Dean wskazuje, że określony sposób budowy strony może wpływać na to, czy treść zostanie uwzględniona przez mechanizmy indeksujące wyszukiwarek. Źródło: J. Dean, \emph{Web Programming with HTML5, CSS, and JavaScript}, Jones \& Bartlett Learning, Burlington 2017, s. 305.}, w tym lepszej indeksowalności strony dzięki renderowaniu treści po stronie serwera oraz możliwości zarządzania metadanymi dokumentu. Duże znaczenie ma również opcja wygodnego rozwijania widoków użytkownika i kodu serwerowego w tym samym środowisku technologicznym.
 
 \section{Routing}
 
@@ -487,9 +489,9 @@ Next.js wspiera ograniczanie powtarzania tych samych zapytań w obrębie rendero
 
 \section{API w Next.js}
 
-\FirstParagraph Ścieżki API w Next.js to mechanizm, umożliwiający definiowanie endpointów\footnote{Endpoint - z jęz. ang. punkt końcowy, ...} API bezpośrednio w projekcie Next.js. Punkty końcowe można tworzyć poprzez umieszczenie plików w katalogu ``\texttt{pages/api}'', a każda taka funkcja obsługuje żądania HTTP i zwraca odpowiedź w modelu ``\texttt{request/response}''\footnote{Interfejs typu request/response -- model komunikacji pomiędzy klientem a serwerem, w którym klient wysyła żądanie (request) zawierające określone dane lub operację, a serwer przetwarza je i zwraca odpowiedź (response) z wynikiem działania, danymi lub informacją o błędzie.}.
+\FirstParagraph Ścieżki API w Next.js to mechanizm, umożliwiający definiowanie endpointów\footnote{Endpoint - z jęz. ang. punkt końcowy; w kontekście API oznacza konkretny adres lub ścieżkę, pod którą aplikacja udostępnia określoną operację albo zasób.} API bezpośrednio w projekcie Next.js. Punkty końcowe można tworzyć poprzez umieszczenie plików w katalogu ``\texttt{pages/api}'', a każda taka funkcja obsługuje żądania HTTP i zwraca odpowiedź w modelu ``\texttt{request/response}''\footnote{Interfejs typu request/response -- model komunikacji pomiędzy klientem a serwerem, w którym klient wysyła żądanie (request) zawierające określone dane lub operację, a serwer przetwarza je i zwraca odpowiedź (response) z wynikiem działania, danymi lub informacją o błędzie. Dean opisuje analogiczny przepływ przy przetwarzaniu formularzy po stronie serwera: dane formularza są przesyłane do serwera, serwer wykonuje obliczenia i odsyła odpowiedź do klienta. Źródło: J. Dean, \emph{Web Programming with HTML5, CSS, and JavaScript}, Jones \& Bartlett Learning, Burlington 2017, s. 324.}.
 
-W nowszym podejściu odpowiednikiem ścieżek API są tzw. ``\texttt{Route Handlers}''\footnote{Vercel, \emph{Route Handlers}, dokumentacja Next.js dotycząca obsługi endpointów, [b.r.], dostęp: \url{https://nextjs.org/docs/app/getting-started/route-handlers} (16.08.2026).}, definiowane w katalogu ``\texttt{app}'' i pliku ``\texttt{route.js}''. W tym modelu obsługa metod HTTP realizowana jest przez eksport funkcji takich jak ``\texttt{GET}'', ``\texttt{POST}'', ``\texttt{PUT}'' czy ``\texttt{DELETE}'', co pozwala tworzyć endpointy w sposób bardziej zbliżony do standardowych interfejsów typu ``\texttt{request/response}''. W implementowanej aplikacji wykorzystano właśnie ten model, a poszczególne endpointy zapisano w plikach ``\texttt{route.ts}'' wewnątrz katalogu ``\texttt{app}''.
+W nowszym podejściu odpowiednikiem ścieżek API są tzw. ``\texttt{Route Handlers}''\footnote{Vercel, \emph{Route Handlers}, dokumentacja Next.js dotycząca obsługi endpointów, [b.r.], \url{https://nextjs.org/docs/app/getting-started/route-handlers} (dostęp: 16.08.2026).}, definiowane w katalogu ``\texttt{app}'' i pliku ``\texttt{route.js}''. W tym modelu obsługa metod HTTP realizowana jest przez eksport funkcji takich jak ``\texttt{GET}'', ``\texttt{POST}'', ``\texttt{PUT}'' czy ``\texttt{DELETE}'', co pozwala tworzyć endpointy w sposób bardziej zbliżony do standardowych interfejsów typu ``\texttt{request/response}''. W implementowanej aplikacji wykorzystano właśnie ten model, a poszczególne endpointy zapisano w plikach ``\texttt{route.ts}'' wewnątrz katalogu ``\texttt{app}''.
 
 Zastosowanie API Routes obejmuje m.in. obsługę formularzy, operacje CRUD, integracje z usługami zewnętrznymi, czy realizację logiki po stronie serwera, która nie powinna być wykonywana w przeglądarce. Istotną zaletą jest fakt, że kod endpointów nie trafia do klienta, dzięki czemu możliwe jest bezpieczniejsze przetwarzanie danych oraz użycie zmiennych środowiskowych po stronie serwera.
 
@@ -501,6 +503,8 @@ Takie podejście ułatwia utrzymanie spójności logiki biznesowej. Jeżeli kilk
 
 \FirstParagraph W Next.js autentykację i autoryzację można wdrożyć poprzez integrację z dostawcą OAuth\footnote{OAuth - z jęz. ang. Open Authorization, to standard protokołu autoryzacji umożliwiający aplikacjom uzyskanie dostępu do zasobów użytkownika w innym systemie bez konieczności przekazywania jego hasła. Zamiast tego wykorzystywane są specjalne tokeny dostępu, które określają zakres przyznanych uprawnień.} przy użyciu biblioteki Auth.js. Rozwiązanie to pozwala skonfigurować logowanie przez zewnętrznych dostawców, takich jak Google czy GitHub. Biblioteka automatycznie obsługuje sesje użytkownika, przekazywanie tokenów oraz proces powrotu użytkownika do aplikacji po zakończonym logowaniu.
 
+Auth.js działa jako warstwa pośrednia pomiędzy aplikacją Next.js a zewnętrznym dostawcą tożsamości. Po stronie aplikacji programista definiuje dostawców logowania, strategię sesji, adapter bazy danych oraz callbacki, które pozwalają dopisać do sesji informacje potrzebne w dalszej części systemu\footnote{Auth.js, \emph{Auth.js}, op. cit.}. Dzięki temu mechanizm logowania nie musi być implementowany ręcznie od podstaw, a aplikacja może korzystać z ustandaryzowanego przepływu obejmującego przekierowanie użytkownika, obsługę odpowiedzi zwrotnej i utworzenie sesji.
+
 Autentykacja polega na potwierdzeniu tożsamości użytkownika, natomiast autoryzacja określa, do jakich zasobów i operacji użytkownik ma dostęp po zalogowaniu. W aplikacji do zarządzania zadaniami rozróżnienie to ma duże znaczenie, ponieważ samo zalogowanie użytkownika nie powinno jeszcze oznaczać dostępu do cudzych projektów, checklist, notatek lub tasków.
 
 Po zalogowaniu aplikacja może kontrolować dostęp do zasobów na podstawie informacji z sesji, np. identyfikatora użytkownika, ról lub uprawnień. W praktyce każdy endpoint obsługujący dane powinien sprawdzać, czy żądanie pochodzi od zalogowanego użytkownika oraz czy wskazany dokument należy właśnie do niego. Pozwala to ograniczyć dostęp do wybranych stron i endpointów API oraz zmniejsza ryzyko nieautoryzowanej modyfikacji danych.
@@ -509,11 +513,11 @@ Po zalogowaniu aplikacja może kontrolować dostęp do zasobów na podstawie inf
 
 \FirstParagraph Baza danych to system służący do trwałego przechowywania, organizowania oraz zarządzania danymi, wykorzystywanymi przez aplikację. Umożliwia ona zapisywanie informacji w ustrukturyzowanej formie, ich wyszukiwanie, modyfikację oraz usuwanie, zapewniając jednocześnie spójność, integralność i bezpieczeństwo przechowywanych informacji. Najczęściej stosuje się bazy relacyjne lub nierelacyjne, w zależności od charakteru przetwarzanych danych.
 
-Relacyjne bazy danych to systemy, przechowujące dane w postaci tabel, składających się z wierszy i kolumn, powiązanych ze sobą za pomocą relacji. Wykorzystują one ustrukturyzowany schemat danych oraz język zapytań SQL, co zapewnia wysoką spójność i integralność informacji. Sprawdzają się szczególnie w aplikacjach, które wymagają precyzyjnych zależności między danymi.
+Relacyjne bazy danych to systemy, przechowujące dane w postaci tabel, składających się z wierszy i kolumn, powiązanych ze sobą za pomocą relacji. Wykorzystują one ustrukturyzowany schemat danych oraz język zapytań SQL\footnote{SQL - z jęz. ang. Structured Query Language, co oznacza ustrukturyzowany język zapytań.}, co zapewnia wysoką spójność i integralność informacji. Sprawdzają się szczególnie w aplikacjach, które wymagają precyzyjnych zależności między danymi.
 
 Bezrelacyjne bazy danych, zwane bazami noSQL, przechowują dane w bardziej elastycznej formie. Mogą to na przykład być dokumenty, pary klucz--wartość, grafy lub kolekcje. Takie bazy nie wymagają sztywno zdefiniowanego schematu, co ułatwia skalowanie oraz pracę z dużymi i zróżnicowanymi zbiorami danych.
 
-Poniższy rysunek ogólnie pokazuje udział frontendu, backendu i bazy danych w procesie pobierania oraz prezentowania informacji użytkownikowi.
+Poniższy rysunek ogólnie pokazuje udział frontendu, backendu i bazy danych w procesie pobierania oraz prezentowania informacji użytkownikowi. Baza danych uzupełnia frontend i backend, ponieważ przechowuje stan aplikacji pomiędzy kolejnymi działaniami użytkownika. Frontend odpowiada za pokazanie wyniku w czytelnej formie, backend kontroluje żądanie i przygotowuje operację, natomiast baza zwraca dane, które następnie mogą zostać przekształcone w widok strony. Dzięki temu przedstawiony na rysunku przepływ nie kończy się na samej komunikacji klienta z serwerem, lecz obejmuje również trwałe źródło informacji potrzebnych do zbudowania odpowiedzi.
 
 \begin{figure}[H]
   \centering
@@ -523,7 +527,7 @@ Poniższy rysunek ogólnie pokazuje udział frontendu, backendu i bazy danych w 
 
 \section{MySQL}
 
-\FirstParagraph MySQL\footnote{Oracle, \emph{MySQL Documentation}, dokumentacja systemu zarządzania bazą danych MySQL, [b.r.], dostęp: \url{https://dev.mysql.com/doc/} (25.07.2026).} należy do najczęściej wykorzystywanych technologii bazodanowych w aplikacjach internetowych ze względu na wysoką wydajność, stabilność, łatwość konfiguracji oraz szerokie wsparcie społeczności i narzędzi programistycznych. Ten typ bazy danych wykorzystuje język SQL do definiowania struktury danych, wykonywania zapytań oraz zarządzania integralnością informacji.
+\FirstParagraph MySQL\footnote{Oracle, \emph{MySQL Documentation}, dokumentacja systemu zarządzania bazą danych MySQL, [b.r.], \url{https://dev.mysql.com/doc/} (dostęp: 25.07.2026).} należy do najczęściej wykorzystywanych technologii bazodanowych w aplikacjach internetowych ze względu na wysoką wydajność, stabilność, łatwość konfiguracji oraz szerokie wsparcie społeczności i narzędzi programistycznych. Ten typ bazy danych wykorzystuje język SQL do definiowania struktury danych, wykonywania zapytań oraz zarządzania integralnością informacji.
 
 Dane w MySQL przechowywane są w tabelach złożonych z wierszy -- tak zwanych rekordów i kolumn, zwanych atrybutami. Relacje pomiędzy tabelami realizowane są za pomocą kluczy głównych i obcych, co pozwala zachować spójność danych oraz minimalizować redundancję. Klucz główny to kolumna lub zestaw kolumn, których wartość jednoznacznie identyfikuje każdy rekord w tabeli. Wartości klucza głównego muszą być unikalne i nie mogą przyjmować wartości pustych (null). Natomiast klucz obcy to kolumna lub zestaw kolumn w tabeli, odwołujący się do klucza głównego w innej tabeli. Służy on do tworzenia powiązań między danymi, np. przypisania zamówienia do konkretnego użytkownika. Mechanizm kluczy obcych wymusza spójność relacyjną, zapobiegając wprowadzaniu odwołań do nieistniejących rekordów. MySQL obsługuje transakcje, indeksowanie oraz mechanizmy buforowania, co zapewnia bezpieczne i szybkie operacje odczytu oraz zapisu.
 
@@ -534,12 +538,12 @@ MySQL został opisany jako punkt odniesienia dla technologii finalnie wykorzysta
 
 \section{MongoDB}
 
-\FirstParagraph MongoDB\footnote{MongoDB, Inc., \emph{Welcome to the MongoDB Docs}, dokumentacja systemu MongoDB, [b.r.], dostęp: \url{https://www.mongodb.com/docs/} (02.02.2026).} jest nierelacyjnym systemem zarządzania bazą danych, którego podstawową różnicą względem relacyjnych rozwiązań, jest sposób przechowywania informacji. Technologia ta wykorzystuje model dokumentowy, w którym dane zapisywane są w elastycznych strukturach przypominających format JSON\footnote{JSON - z jęz. ang. JavaScript Object Notation, tekstowy format zapisu i wymiany danych oparty na strukturze obiektów oraz tablic, wykorzystywany w komunikacji między aplikacjami.}. Oznacza to brak sztywno zdefiniowanego schematu tabel oraz większą swobodę w organizacji informacji.W MongoDB powiązane informacje mogą być zapisywane w obrębie jednego dokumentu albo łączone przez identyfikatory innych dokumentów. W projekcie wykorzystano oba podejścia: część danych, na przykład elementy checklisty, jest zagnieżdżona, natomiast relacje między taskami, projektami, notatkami i przypięciami są realizowane przez identyfikatory.
+\FirstParagraph MongoDB\footnote{MongoDB, Inc., \emph{Welcome to the MongoDB Docs}, dokumentacja systemu MongoDB, [b.r.], \url{https://www.mongodb.com/docs/} (dostęp: 02.02.2026).} jest nierelacyjnym systemem zarządzania bazą danych, którego podstawową różnicą względem relacyjnych rozwiązań, jest sposób przechowywania informacji. Technologia ta wykorzystuje model dokumentowy, w którym dane zapisywane są w elastycznych strukturach przypominających format JSON\footnote{JSON - z jęz. ang. JavaScript Object Notation, tekstowy format zapisu i wymiany danych oparty na strukturze obiektów oraz tablic, wykorzystywany w komunikacji między aplikacjami.}. Oznacza to brak sztywno zdefiniowanego schematu tabel oraz większą swobodę w organizacji informacji.W MongoDB powiązane informacje mogą być zapisywane w obrębie jednego dokumentu albo łączone przez identyfikatory innych dokumentów. W projekcie wykorzystano oba podejścia: część danych, na przykład elementy checklisty, jest zagnieżdżona, natomiast relacje między taskami, projektami, notatkami i przypięciami są realizowane przez identyfikatory.
 
 Jako że system MongoDB zapisuje dane w kolekcjach składających się z dokumentów,  każdy taki dokument może posiadać inną strukturę oraz zestaw pól, co pozwala na łatwe rozszerzanie modelu danych bez konieczności modyfikowania schematu całej bazy. Natomiast komunikacja z bazą odbywa się poprzez zapytania realizowane w formie obiektów lub metod API, zamiast klasycznych zapytań w języku SQL.
 
 W projekcie aplikacji stworzonym na potrzeby niniejszej pracy inżynierskiej, kluczowe znaczenie ma łatwość rozbudowy funkcjonalności oraz możliwość obsługi dynamicznie zmieniających się struktur informacji. Z tego względu zdecydowano się na zastosowanie bazy dokumentowej MongoDB zamiast klasycznej relacyjnej bazy danych.
-W systemie zarządzania zadaniami pojedyncze obiekty, takie jak projekt lub zadanie, mogą posiadać zróżnicowane właściwości. Model dokumentowy MongoDB pozwala przechowywać takie dane bez konieczności tworzenia wielu tabel i relacji. Ułatwia to modyfikację struktury danych w trakcie rozwoju aplikacji, bez potrzeby przeprowadzania kosztownych migracji schematu.Korzystne dla rozwoju aplikacji jest także to, że dane przechowywane w Mongo nie mają wyłącznie tabelarycznego charakteru. Projekt może posiadać własne kolumny kanban, taski mogą zawierać różne zestawy powiązań, a checklista składa się z tablicy elementów. Model dokumentowy ułatwia zapis takich struktur bez projektowania wielu tabel pomocniczych. Wybrana technologia dobrze współpracuje również z aplikacją pisaną w TypeScripcie oraz Next.js, ponieważ dokumenty mogą być obsługiwane w kodzie jako obiekty. W projekcie dodatkową warstwą porządkującą strukturę danych są modele Mongoose, opisujące pola dokumentów i pozwalają zachować kontrolę nad zapisem mimo elastycznego charakteru bazy.
+W systemie zarządzania zadaniami pojedyncze obiekty, takie jak projekt lub zadanie, mogą posiadać zróżnicowane właściwości. Model dokumentowy MongoDB pozwala przechowywać takie dane bez konieczności tworzenia wielu tabel i relacji. Ułatwia to modyfikację struktury danych w trakcie rozwoju aplikacji, bez potrzeby przeprowadzania kosztownych migracji schematu. Korzystne dla rozwoju aplikacji jest także to, że dane przechowywane w Mongo nie mają wyłącznie tabelarycznego charakteru. Projekt może posiadać własne kolumny kanban, taski mogą zawierać różne zestawy powiązań, a checklista składa się z tablicy elementów. Model dokumentowy ułatwia zapis takich struktur bez projektowania wielu tabel pomocniczych. Wybrana technologia dobrze współpracuje również z aplikacją pisaną w TypeScripcie oraz Next.js, ponieważ dokumenty mogą być obsługiwane w kodzie jako obiekty. W projekcie dodatkową warstwą porządkującą strukturę danych są modele Mongoose\footnote{Mongoose, \emph{Schemas}, dokumentacja biblioteki Mongoose dotycząca schematów danych, [b.r.], \url{https://mongoosejs.com/docs/guide.html} (dostęp: 16.08.2026).}, opisujące pola dokumentów i pozwalające zachować kontrolę nad zapisem mimo elastycznego charakteru bazy.
 
 \chapter{Architektura aplikacji}
 
@@ -561,7 +565,7 @@ Aplikację internetową można zasadniczo podzielić na trzy warstwy: prezentacj
   \caption[Diagram warstw aplikacji internetowej]{Diagram, przedstawiający warstwy aplikacji internetowej. Źródło: Albiorix Technology, \url{https://www.albiorixtech.com/wp-content/uploads/2025/12/web-application-architecture-layers.jpg} (dostęp: 03.02.2026).}
 \end{figure}
 
-Przeglądarka (\textit{browser}) to środowisko uruchomieniowe po stronie klienta, w którym działa aplikacja frontendowa. Użytkownik korzysta z systemu poprzez przeglądarkę, która renderuje interfejs i wysyła żądania do serwera. Ponadto umożliwia wykonywanie kodu JavaScriptu, obsługuje interakcje z systemem, wyświetla interfejs użytkownika oraz może komunikować się z backendem za pomocą protokołów HTTP lub HTTPS\footnote{HTTP (HyperText Transfer Protocol) -- protokół komunikacyjny warstwy aplikacji wykorzystywany do przesyłania danych pomiędzy klientem a serwerem w sieci WWW. Jego rozszerzona, bardziej bezpieczna wersja, wykorzystująca mechanizmy szyfrowania to protokół HTTPS (HyperText Transfer Protocol Secure).}.
+Przeglądarka (\textit{browser}) to środowisko uruchomieniowe po stronie klienta, w którym działa aplikacja frontendowa. Użytkownik korzysta z systemu poprzez przeglądarkę, która renderuje interfejs i wysyła żądania do serwera. Ponadto umożliwia wykonywanie kodu JavaScriptu, obsługuje interakcje z systemem, wyświetla interfejs użytkownika oraz może komunikować się z backendem za pomocą protokołów HTTP lub HTTPS\footnote{HTTP (HyperText Transfer Protocol) -- protokół komunikacyjny warstwy aplikacji wykorzystywany do przesyłania danych pomiędzy klientem a serwerem w sieci WWW. Jego rozszerzona, bardziej bezpieczna wersja, wykorzystująca mechanizmy szyfrowania to protokół HTTPS (HyperText Transfer Protocol Secure). Źródło: J. Dean, \emph{Web Programming with HTML5, CSS, and JavaScript}, Jones \& Bartlett Learning, Burlington 2017, s. 6, 221.}.
 
 Warstwa prezentacji odpowiada za interfejs użytkownika (UI) oraz sposób prezentacji danych. Wyświetla widoki formularzy, zbiera dane wejściowe, które potem mogą zostać przesłane w postaci zapytań do bazy danych oraz zajmuje się podstawową walidacją formularzy. Odpowiada również za wysyłanie zapytań do backendu.
 
@@ -599,7 +603,7 @@ Przepływ danych można rozpisać na poszczególne kroki:
 
 Najważniejszą ideą architektoniczną jest przede wszystkim separacja warstw, zapewniająca oprócz uporządkowanej struktury, bezpieczeństwo przez brak bezpośredniego dostępu klienta do bazy danych. Oprócz niej takie rozwiązanie gwarantuje modularność, wynikającą z osobnych serwisów dla każdego typu zasobu oraz ułatwia skalowalność aplikacji.
 
-Kolejne diagramy, powstałe na etapie projektowania architektury, przygotowano z wykorzystaniem informacji z artykułu Canva: DFD\footnote{Canva, \emph{Creating a Data Flow Diagram: How-tos, Templates, and Tips}, artykuł dotyczący tworzenia diagramów przepływu danych, [b.r.], dostęp: \url{https://www.canva.com/online-whiteboard/data-flow-diagrams/} (03.02.2026).}. Pokazują one, jak dane przemieszczają się w systemie między źródłami, procesami oraz magazynami danych. Są to tak zwane diagramy przepływu danych.
+Kolejne diagramy, powstałe na etapie projektowania architektury, przygotowano z wykorzystaniem informacji z artykułu Canva: DFD\footnote{Canva, \emph{Creating a Data Flow Diagram: How-tos, Templates, and Tips}, artykuł dotyczący tworzenia diagramów przepływu danych, [b.r.], \url{https://www.canva.com/online-whiteboard/data-flow-diagrams/} (dostęp: 03.02.2026).}. Pokazują one, jak dane przemieszczają się w systemie między źródłami, procesami oraz magazynami danych. Są to tak zwane diagramy przepływu danych.
 
 \begin{figure}[H]
   \centering
@@ -619,7 +623,7 @@ Diagram przepływu danych poziomu 1 przedstawia szczegółową dekompozycję sys
 
 \section{Struktura bazy danych aplikacji}
 
-\FirstParagraph W aplikacji zastosowano bazę danych MongoDB oraz bibliotekę Mongoose\footnote{Mongoose, \emph{Schemas}, dokumentacja biblioteki Mongoose dotycząca schematów danych, [b.r.], dostęp: \url{https://mongoosejs.com/docs/guide.html} (16.08.2026).}, która została wykorzystana do opisania struktury dokumentów domenowych. Połączenie z bazą jest realizowane przez moduł odpowiedzialny za utrzymywanie współdzielonego połączenia Mongoose, natomiast mechanizm logowania OAuth korzysta dodatkowo z adaptera MongoDB dla NextAuth. Dzięki temu dane logowania oraz dane aplikacyjne są przechowywane w tej samej bazie, ale obsługiwane przez odrębne warstwy aplikacji.
+\FirstParagraph W aplikacji zastosowano bazę danych MongoDB oraz bibliotekę Mongoose, która została wykorzystana do opisania struktury dokumentów domenowych. Połączenie z bazą jest realizowane przez moduł odpowiedzialny za utrzymywanie współdzielonego połączenia Mongoose, natomiast mechanizm logowania OAuth korzysta dodatkowo z adaptera MongoDB dla NextAuth\footnote{NextAuth to biblioteka wykorzystywana w aplikacjach Next.js do obsługi logowania, sesji użytkownika oraz integracji z zewnętrznymi dostawcami tożsamości. Projekt NextAuth.js jest obecnie rozwijany w ramach szerszego ekosystemu Auth.js. Źródło: Auth.js, \emph{Auth.js Core Reference}, dokumentacja callbacków biblioteki Auth.js, [b.r.], \url{https://authjs.dev/reference/core\#callbacks} (dostęp: 16.08.2026).}. Dzięki temu dane logowania oraz dane aplikacyjne są przechowywane w tej samej bazie, ale obsługiwane przez odrębne warstwy aplikacji.
 
 Podstawową zasadą modelu danych jest przypisanie dokumentów do konkretnego użytkownika. Notatki, checklisty, zadania, projekty, przypięcia oraz zdarzenia aktywności zawierają pole ``\texttt{ownerId}'', które wskazuje właściciela dokumentu. Preferencje interfejsu użytkownika korzystają z pola ``\texttt{userId}''. Każda operacja pobierania, aktualizacji lub archiwizacji danych wykonywana jest z uwzględnieniem identyfikatora aktualnie zalogowanego użytkownika, co zabezpiecza aplikację przed dostępem do cudzych zasobów.
 
@@ -638,7 +642,7 @@ Typ ``\texttt{Date}'' zapisany jest wielką literą, ponieważ w kontekście Mon
 
 Zapisy z nawiasami kwadratowymi, takie jak ``\texttt{string[]}'', ``\texttt{ObjectId[]}'' albo ``\texttt{object[]}'', oznaczają tablice wartości danego typu. Przykładowo ``\texttt{string[]}'' oznacza tablicę tekstów, czyli wiele wartości typu ``\texttt{string}''. Pole ``\texttt{tags}'' może więc przechowywać kilka tagów o typie danych string, pole ``\texttt{checklistIds}'' może przechowywać wiele identyfikatorów checklist, a pole ``\texttt{kanbanColumns}'' zawiera tablicę obiektów opisujących kolumny tablicy kanban.
 
-Warstwa autoryzacji tworzy cztery kolekcje. Są to ``\texttt{users}'', ``\texttt{accounts}'', ``\texttt{sessions}'' oraz ``\texttt{verification\_tokens}''. Najważniejsze z punktu widzenia działania aplikacji są kolekcje ``\texttt{users}'' i ``\texttt{accounts}'', ponieważ przechowują użytkowników oraz powiązania z zewnętrznymi dostawcami logowania, takimi jak Google i GitHub. Sesja użytkownika jest obsługiwana z użyciem strategii JWT\footnote{JWT - z języka angielskiego JSON Web Token, czyli tekstowy token służący do bezpiecznego przekazywania informacji między systemami w postaci podpisanego obiektu JSON.}, jednak identyfikator użytkownika pochodzący z NextAuth stanowi podstawę powiązań z dokumentami domenowymi.
+Warstwa autoryzacji tworzy cztery kolekcje. Są to ``\texttt{users}'', ``\texttt{accounts}'', ``\texttt{sessions}'' oraz ``\texttt{verification\_tokens}''. Najważniejsze z punktu widzenia działania aplikacji są kolekcje ``\texttt{users}'' i ``\texttt{accounts}'', ponieważ przechowują użytkowników oraz powiązania z zewnętrznymi dostawcami logowania, takimi jak Google i GitHub. Sesja użytkownika jest obsługiwana z użyciem strategii JWT\footnote{JWT - z jęz. ang. JSON Web Token, czyli tekstowy token służący do bezpiecznego przekazywania informacji między systemami w postaci podpisanego obiektu JSON.}, jednak identyfikator użytkownika pochodzący z NextAuth stanowi podstawę powiązań z dokumentami domenowymi.
 
 Kolekcja ``\texttt{accounts}'' pełni funkcję technicznego powiązania pomiędzy użytkownikiem zapisanym w kolekcji ``\texttt{users}'' a kontem pochodzącym od zewnętrznego dostawcy logowania. Pole ``\texttt{userId}'' wskazuje dokument użytkownika, natomiast pola ``\texttt{provider}'' i ``\texttt{providerAccountId}'' określają, z jakiego dostawcy OAuth pochodzi dane konto oraz jaki identyfikator użytkownik posiada u tego dostawcy. Dzięki temu jedna osoba może być poprawnie rozpoznawana przez system po zalogowaniu z użyciem zewnętrznej usługi.
 
@@ -683,102 +687,102 @@ Usuwanie większości elementów domenowych zostało zrealizowane jako archiwiza
 
 \chapter{Projekt interfejsu użytkownika}
 
-\FirstParagraph Projekt interfejsu użytkownika podporządkowano prostemu przepływowi pracy. Najpierw rozpisano scenariusze przypadków użycia, a dopiero później przygotowano widoki, które odpowiadają tym czynnościom.Główną uwagę podczas tworzenia interfejsu graficznego skupiono na umożliwieniu użytkownikowi szybkiego przejścia od strony głównej do taska, checklisty, notatki albo projektu
+\FirstParagraph Projekt interfejsu użytkownika podporządkowano prostemu przepływowi pracy. Najpierw rozpisano scenariusze przypadków użycia, a dopiero później przygotowano widoki, które odpowiadają tym czynnościom. Główną uwagę podczas tworzenia interfejsu graficznego skupiono na umożliwieniu użytkownikowi szybkiego przejścia od strony głównej do taska, checklisty, notatki albo projektu.
 
 \section{Scenariusze przypadków użycia}
 
-\FirstParagraph \textbf{1) Przypięcie elementu do strony głównej}
+\FirstParagraph \noindent \textbf{1) Przypięcie elementu do strony głównej.}
 
-\textbf{Aktor:} Użytkownik indywidualny
+\noindent \textbf{Aktor:} Użytkownik indywidualny.
 
-\textbf{Cel:} Szybki dostęp do śledzonych tasków, notatek, checklist i projektów z poziomu strony głównej.
+\noindent \textbf{Cel:} Szybki dostęp do śledzonych tasków, notatek, checklist i projektów z poziomu strony głównej.
 
-\textbf{Warunki wstępne:} Użytkownik jest zalogowany; element istnieje.
+\noindent \textbf{Warunki wstępne:} Użytkownik jest zalogowany; element istnieje.
 
-\textbf{Scenariusz podstawowy:}
+\noindent \textbf{Scenariusz podstawowy:}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  Użytkownik otwiera jedną z list elementów, na przykład tasków, checklist lub projektów
+  Użytkownik otwiera jedną z list elementów, na przykład tasków, checklist lub projektów.
 \item
-  Użytkownik wybiera konkretny element
+  Użytkownik wybiera konkretny element.
 \item
-  Użytkownik widzi, że element nie jest przypięty, ponieważ ikona pinezki jest pusta w środku
+  Użytkownik widzi, że element nie jest przypięty, ponieważ ikona pinezki jest pusta w środku.
 \item
-  Użytkownik klika ikonę i dodaje element do przypiętych
+  Użytkownik klika ikonę i dodaje element do przypiętych.
 \item
-  System oznacza element jako „przypięty'' poprzez zmianę ikony pinezki na wypełnioną
+  System oznacza element jako „przypięty'' poprzez zmianę ikony pinezki na wypełnioną.
 \item
   System wyświetla element w sekcji ``przypięte'' na stronie głównej.
 \end{enumerate}
 
-\textbf{Scenariusze alternatywne / wyjątki:}
+\noindent \textbf{Scenariusze alternatywne:}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  \textbf{Element już jest przypięty}\\
+  \textbf{Element już jest przypięty.}\\
   3a. System informuje użytkownika, że element jest już przypięty, poprzez wypełnioną ikonę pinezki.\\
   4a. Użytkownik może kliknąć ikonę w celu odpięcia elementu od ekranu głównego.
 \end{enumerate}
 
-\textbf{Warunki końcowe:} Element jest widoczny w sekcji „przypięte'' na stronie głównej
+\noindent \textbf{Warunki końcowe:} Element jest widoczny w sekcji „przypięte'' na stronie głównej.
 
 \vspace{\baselineskip}
 
-\textbf{2) Utworzenie nowego taska z parametrami}
+\noindent \textbf{2) Utworzenie nowego taska z parametrami.}
 
-\textbf{Aktor:} Pracownik biurowy
+\noindent \textbf{Aktor:} Pracownik biurowy.
 
-\textbf{Cel:} Uporządkowanie pracy poprzez utworzenie taska z właściwościami
+\noindent \textbf{Cel:} Uporządkowanie pracy poprzez utworzenie taska z właściwościami.
 
-\textbf{Warunki wstępne:} Użytkownik jest zalogowany
+\noindent \textbf{Warunki wstępne:} Użytkownik jest zalogowany.
 
-\textbf{Scenariusz podstawowy:}
+\noindent \textbf{Scenariusz podstawowy:}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  Użytkownik wybiera z paska bocznego zakładkę ``zadania''
+  Użytkownik wybiera z paska bocznego zakładkę ``zadania''.
 \item
-  Użytkownik zostaje przekierowany na stronę z taskami
+  Użytkownik zostaje przekierowany na stronę z taskami.
 \item
-  Użytkownik wybiera ikonę z plusem, znajdującą się obok istniejących tasków
+  Użytkownik wybiera ikonę z plusem, znajdującą się obok istniejących tasków.
 \item
-  System otwiera formularz tworzenia taska
+  System otwiera formularz tworzenia taska.
 \item
-  Użytkownik wpisuje nazwę taska
+  Użytkownik wpisuje nazwę taska.
 \item
-  Użytkownik uzupełnia opis taska
+  Użytkownik uzupełnia opis taska.
 \item
-  Użytkownik wybiera priorytet z rozwijanej listy wyboru
+  Użytkownik wybiera priorytet z rozwijanej listy wyboru.
 \item
-  Użytkownik ustawia datę realizacji taska
+  Użytkownik ustawia datę realizacji taska.
 \item
-  Użytkownik zapisuje task
+  Użytkownik zapisuje task.
 \item
-  System tworzy task i wyświetla go na liście tasków
+  System tworzy task i wyświetla go na liście tasków.
 \end{enumerate}
 
-\textbf{Scenariusze alternatywne / wyjątki:}
+\noindent \textbf{Scenariusze alternatywne:}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  \textbf{Brak opisu}\\
+  \textbf{Brak opisu.}\\
   6a. Użytkownik pomija opis; system zapisuje task bez opisu.
 \item
-  \textbf{Brak wymaganych danych (np. nazwy)}\\
+  \textbf{Brak wymaganych danych (np. nazwy).}\\
   5a. Użytkownik pomija nazwę taska.\\
   9a. System blokuje zapis i wskazuje brakujące pola.
 \item
-  \textbf{Niepoprawna data realizacji}\\
+  \textbf{Niepoprawna data realizacji.}\\
   8a. Użytkownik ustawia datę z przeszłości.\\
   9a. System blokuje zapis i wskazuje błędną datę.
 \end{enumerate}
 
-\textbf{Warunki końcowe:} Dodany task wraz z opisem, priorytetem i datą realizacji pojawia się na liście tasków.
+\noindent \textbf{Warunki końcowe:} Dodany task wraz z opisem, priorytetem i datą realizacji pojawia się na liście tasków.
 
 \begin{figure}[H]
   \centering
@@ -790,63 +794,63 @@ Na diagramie zaprezentowano sekwencję działań wykonywanych podczas przypinani
 
 \vspace{\baselineskip}
 
-\textbf{3) Utworzenie checklisty zakupów z możliwością odhaczania pozycji}
+\noindent \textbf{3) Utworzenie checklisty zakupów z możliwością odhaczania pozycji.}
 
-\textbf{Aktor:} Głowa rodziny
+\noindent \textbf{Aktor:} Głowa rodziny.
 
-\textbf{Cel:} Nie zapomnieć produktów w sklepie
+\noindent \textbf{Cel:} Nie zapomnieć produktów w sklepie.
 
-\textbf{Warunki wstępne:} Użytkownik jest zalogowany
+\noindent \textbf{Warunki wstępne:} Użytkownik jest zalogowany.
 
-\textbf{Scenariusz podstawowy:}
+\noindent \textbf{Scenariusz podstawowy:}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  Użytkownik przechodzi do strony ``szybkie notatki''
+  Użytkownik przechodzi do strony ``szybkie notatki''.
 \item
-  Użytkownik wybiera ikonę z plusem, znajdującą się obok istniejących elementów
+  Użytkownik wybiera ikonę z plusem, znajdującą się obok istniejących elementów.
 \item
-  Użytkownik wybiera, czy chce dodać notatkę, czy checklistę
+  Użytkownik wybiera, czy chce dodać notatkę, czy checklistę.
 \item
-  System otwiera formularz tworzenia checklisty
+  System otwiera formularz tworzenia checklisty.
 \item
-  Użytkownik ustawia nazwę checklisty
+  Użytkownik ustawia nazwę checklisty.
 \item
-  Użytkownik dodaje pozycje w checkliście (np. mleko, chleb, warzywa)
+  Użytkownik dodaje pozycje w checkliście (np. mleko, chleb, warzywa).
 \item
   System zapisuje checklistę i wyświetla ją użytkownikowi.
 \item
-  W sklepie użytkownik otwiera checklistę
+  W sklepie użytkownik otwiera checklistę.
 \item
-  Użytkownik odhacza kolejne pozycje
+  Użytkownik odhacza kolejne pozycje.
 \item
-  System zapisuje, które przedmioty w checkliście zostały odhaczone
+  System zapisuje, które przedmioty w checkliście zostały odhaczone.
 \end{enumerate}
 
-\textbf{Scenariusze alternatywne / wyjątki:}
+\noindent \textbf{Scenariusze alternatywne:}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  \textbf{Dodanie pozycji w trakcie zakupów}\\
+  \textbf{Dodanie pozycji w trakcie zakupów.}\\
   7a. Użytkownik dodaje nową pozycję.\\
   8a. System aktualizuje checklistę.
 \end{enumerate}
 
-\textbf{Warunki końcowe:} Checklista zakupów istnieje, a pozycje mogą być odhaczane i zapisywane.
+\noindent \textbf{Warunki końcowe:} Checklista zakupów istnieje, a pozycje mogą być odhaczane i zapisywane.
 
 \vspace{\baselineskip}
 
-\textbf{4) Tworzenie notatki}
+\noindent \textbf{4) Tworzenie notatki.}
 
-\textbf{Aktor:} Pracownik nadzorujący dostawy w restauracji
+\noindent \textbf{Aktor:} Pracownik nadzorujący dostawy w restauracji.
 
-\textbf{Cel:} Utworzenie notatki zawierającej informacje o przebiegu dostawy oraz liczbie palet zwróconych przez restaurację.
+\noindent \textbf{Cel:} Utworzenie notatki zawierającej informacje o przebiegu dostawy oraz liczbie palet zwróconych przez restaurację.
 
-\textbf{Warunki wstępne:} Użytkownik jest zalogowany w systemie; użytkownik ma dostęp do sekcji notatek.
+\noindent \textbf{Warunki wstępne:} Użytkownik jest zalogowany w systemie; użytkownik ma dostęp do sekcji notatek.
 
-\textbf{Scenariusz podstawowy:}
+\noindent \textbf{Scenariusz podstawowy:}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -874,100 +878,100 @@ Na diagramie zaprezentowano sekwencję działań wykonywanych podczas przypinani
   System wyświetla utworzoną notatkę na liście notatek.
 \end{enumerate}
 
-\textbf{Scenariusze alternatywne / wyjątki:}
+\noindent \textbf{Scenariusze alternatywne:}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  \textbf{Brak treści notatki}\\
+  \textbf{Brak treści notatki.}\\
   6a. Użytkownik pomija wpisanie treści notatki.\\
   9a. System zapisuje notatkę z samym tytułem.
 \item
-  \textbf{Brak wymaganej nazwy notatki}\\
+  \textbf{Brak wymaganej nazwy notatki.}\\
   5a. Użytkownik nie wpisuje tytułu notatki.\\
   9a. System blokuje zapis i informuje użytkownika o konieczności podania tytułu.
 \item
-  \textbf{Dodanie powiązania z innym elementem}\\
+  \textbf{Dodanie powiązania z innym elementem.}\\
   8a. Użytkownik wybiera element aplikacji, z którym notatka ma zostać powiązana, np. task, projekt lub checklistę.\\
   9a. System zapisuje notatkę wraz z informacją o powiązanym elemencie.
 \item
-  \textbf{Anulowanie tworzenia notatki}\\
+  \textbf{Anulowanie tworzenia notatki.}\\
   4a. System wyświetla formularz tworzenia notatki.\\
   5a. Użytkownik rezygnuje z dodawania notatki i wraca do listy notatek.\\
   6a. System nie zapisuje żadnych danych i ponownie wyświetla listę notatek.
 \end{enumerate}
 
-\textbf{Warunki końcowe:} Notatka zostaje utworzona i jest widoczna na liście notatek. Użytkownik może później otworzyć jej podgląd, edytować treść, dodać tagi lub powiązać ją z innymi elementami aplikacji.
+\noindent \textbf{Warunki końcowe:} Notatka zostaje utworzona i jest widoczna na liście notatek. Użytkownik może później otworzyć jej podgląd, edytować treść, dodać tagi lub powiązać ją z innymi elementami aplikacji.
 
 \vspace{\baselineskip}
 
-\textbf{5) Utworzenie projektu i zarządzanie taskami w widoku tablicy}
+\noindent \textbf{5) Utworzenie projektu i zarządzanie taskami w widoku tablicy.}
 
-\textbf{Aktor:} Student
+\noindent \textbf{Aktor:} Student.
 
-\textbf{Cel:} Organizacja pisania pracy dyplomowej poprzez projekt i powiązane taski
+\noindent \textbf{Cel:} Organizacja pisania pracy dyplomowej poprzez projekt i powiązane taski.
 
-\textbf{Warunki wstępne:} Użytkownik jest zalogowany
+\noindent \textbf{Warunki wstępne:} Użytkownik jest zalogowany.
 
-\textbf{Scenariusz podstawowy:}
+\noindent \textbf{Scenariusz podstawowy:}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  Użytkownik przechodzi do strony z projektami
+  Użytkownik przechodzi do strony z projektami.
 \item
-  Użytkownik wybiera ikonę z plusem, znajdującą się obok istniejących projektów
+  Użytkownik wybiera ikonę z plusem, znajdującą się obok istniejących projektów.
 \item
-  System otwiera formularz tworzenia projektu
+  System otwiera formularz tworzenia projektu.
 \item
-  Użytkownik ustawia nazwę projektu
+  Użytkownik ustawia nazwę projektu.
 \item
-  Użytkownik ustawia datę realizacji projektu
+  Użytkownik ustawia datę realizacji projektu.
 \item
-  Użytkownik dodaje opis projektu
+  Użytkownik dodaje opis projektu.
 \item
-  Użytkownik chce dodać taski do projektu
+  Użytkownik chce dodać taski do projektu.
 \item
-  System otwiera użytkownikowi formularz dodawania tasków
+  System otwiera użytkownikowi formularz dodawania tasków.
 \item
-  Użytkownik wybiera, czy dodać istniejący już task, czy stworzyć nowy
+  Użytkownik wybiera, czy dodać istniejący już task, czy stworzyć nowy.
 \item
-  Użytkownik dodaje kilka tasków do projektu
+  Użytkownik dodaje kilka tasków do projektu.
 \item
-  Użytkownik ustawia statusy poszczególnym taskom
+  Użytkownik ustawia statusy poszczególnym taskom.
 \item
-  Użytkownik zapisuje projekt
+  Użytkownik zapisuje projekt.
 \item
-  Użytkownik uruchamia stronę projektu i przegląda jego opis
+  Użytkownik uruchamia stronę projektu i przegląda jego opis.
 \item
-  Użytkownik przełącza widok tasków z listy na tablicę
+  Użytkownik przełącza widok tasków z listy na tablicę.
 \item
   System wyświetla kolumny statusów oraz karty tasków.
 \item
-  Użytkownik przeciąga karty między kolumnami, zmieniając w ten sposób ich status
+  Użytkownik przeciąga karty między kolumnami, zmieniając w ten sposób ich status.
 \item
   System zapisuje zmiany statusów.
 \end{enumerate}
 
-\textbf{Scenariusze alternatywne / wyjątki:}
+\noindent \textbf{Scenariusze alternatywne:}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  \textbf{Brak daty realizacji}\\
+  \textbf{Brak daty realizacji.}\\
   6a. Użytkownik pomija wypełnianie daty realizacji.\\
   12a. System zapisuje projekt bez daty realizacji.
 \item
-  \textbf{Brak wymaganych danych (np. nazwy)}\\
+  \textbf{Brak wymaganych danych (np. nazwy).}\\
   4a. Użytkownik pomija nazwę projektu.\\
   12a. System blokuje zapis i wskazuje brakujące pola.
 \item
-  \textbf{Niepoprawna data realizacji}\\
+  \textbf{Niepoprawna data realizacji.}\\
   5a. Użytkownik ustawia datę z przeszłości.\\
   12a. System blokuje zapis i wskazuje błędną datę.
 \end{enumerate}
 
-\textbf{Warunki końcowe:} Projekt istnieje z opisem, datą i innymi wypełnionymi parametrami, a system może wyświetlać taski zarówno w formie listy, jak i tablicy.
+\noindent \textbf{Warunki końcowe:} Projekt istnieje z opisem, datą i innymi wypełnionymi parametrami, a system może wyświetlać taski zarówno w formie listy, jak i tablicy.
 
 \section{Widoki użytkownika aplikacji}
 
@@ -1213,7 +1217,7 @@ W pliku ``\texttt{route.ts}'' zdefiniowano metody ``\texttt{GET}'' oraz ``\textt
 
 Po pozytywnej weryfikacji użytkownika wykonywane jest połączenie z bazą danych przez funkcję ``\texttt{connectDatabase}''. Następnie model ``\texttt{Checklist}'' wyszukuje dokumenty spełniające warunki ``\texttt{ownerId}'' oraz ``\texttt{archivedAt: null}''. Oznacza to, że użytkownik otrzymuje tylko własne checklisty, które nie zostały wcześniej zarchiwizowane. Wyniki są sortowane według pola ``\texttt{position}'', a następnie według daty aktualizacji, dzięki czemu interfejs może prezentować elementy w ustalonej kolejności.
 
-Metoda ``\texttt{POST}'' odpowiada za utworzenie nowej checklisty. Treść żądania jest odczytywana za pomocą funkcji ``\texttt{parseJsonBody}'', która jednocześnie korzysta ze schematu walidacji ``\texttt{checklistCreateSchema}''\footnote{Zod, \emph{Defining schemas}, dokumentacja biblioteki Zod dotycząca definiowania schematów walidacji, [b.r.], dostęp: \url{https://zod.dev/api?id=property} (16.08.2026).}. Schemat waliduje tytuł checklisty, elementy checklisty, typ i identyfikator elementu nadrzędnego oraz pozycję. W przypadku niepoprawnych danych handler zwraca odpowiedź błędu i nie wykonuje zapisu w bazie danych.
+Metoda ``\texttt{POST}'' odpowiada za utworzenie nowej checklisty. Treść żądania jest odczytywana za pomocą funkcji ``\texttt{parseJsonBody}'', która jednocześnie korzysta ze schematu walidacji ``\texttt{checklistCreateSchema}''\footnote{Zod, \emph{Defining schemas}, dokumentacja biblioteki Zod dotycząca definiowania schematów walidacji, [b.r.], \url{https://zod.dev/api?id=property} (dostęp: 16.08.2026).}. Schemat waliduje tytuł checklisty, elementy checklisty, typ i identyfikator elementu nadrzędnego oraz pozycję. W przypadku niepoprawnych danych handler zwraca odpowiedź błędu i nie wykonuje zapisu w bazie danych.
 
 Przed utworzeniem dokumentu dane są przekazywane do funkcji ``\texttt{sanitizeMutation}''. Jej zadaniem jest ograniczenie zapisywanych wartości do pól dopuszczonych przez logikę aplikacji. Następnie model ``\texttt{Checklist}'' tworzy dokument z danymi użytkownika oraz identyfikatorem właściciela. Po poprawnym zapisie wywoływana jest funkcja ``\texttt{recordActivityEvent}'', która rejestruje zdarzenie utworzenia checklisty w historii aktywności.
 
@@ -1286,11 +1290,11 @@ Kolejnym wspólnym mechanizmem jest funkcja ``\texttt{recordActivityEvent}'', za
 
 \FirstParagraph Mechanizm autoryzacji został oparty na bibliotece Auth.js, używanej w projekcie przez pakiet NextAuth. Główny handler autoryzacji znajduje się w dynamicznej ścieżce API przeznaczonej dla NextAuth. Plik ten tworzy handler NextAuth na podstawie konfiguracji ``\texttt{authOptions}'', a następnie udostępnia go dla metod ``\texttt{GET}'' i ``\texttt{POST}''. Dzięki temu biblioteka może obsługiwać zarówno rozpoczęcie logowania, jak i odpowiedzi zwrotne od dostawców OAuth. Konfiguracja ``\texttt{authOptions}'' została umieszczona w pliku ``\texttt{src/lib/auth.ts}''. Zdefiniowano w nim listę dostawców logowania OAuth, obejmującą Google oraz GitHub. Każdy dostawca posiada identyfikator, nazwę, dane klienta pobierane ze zmiennych środowiskowych oraz funkcję tworzącą konfigurację providera. Aplikacja uruchamia tylko tych dostawców, dla których dostępne są wymagane dane ``\texttt{clientId}'' i ``\texttt{clientSecret}''.
 
-W przypadku logowania z użyciem zewnętrznych dostawców ważne jest nie tylko samo przekazanie użytkownika do usługi logowania, ale również poprawne obsłużenie odpowiedzi zwrotnej, tokenów oraz powiązania konta z lokalnym użytkownikiem aplikacji. Sun i Beznosov, analizując systemy jednokrotnego logowania oparte na OAuth, zwracają uwagę, że wiele problemów bezpieczeństwa wynika nie z idei protokołu, lecz z decyzji implementacyjnych podejmowanych przez twórców aplikacji\footnote{Sun S.-T., Beznosov K., \emph{The Devil is in the (Implementation) Details: An Empirical Analysis of OAuth SSO Systems}, w: \emph{Proceedings of the 2012 ACM Conference on Computer and Communications Security}, 2012, s. 378--390, DOI: 10.1145/2382196.2382238, \url{https://doi.org/10.1145/2382196.2382238} (dostęp: 31.07.2026).}. Z tego względu w projekcie autoryzacja została skupiona w jednym module konfiguracyjnym, a pozostałe handlery API korzystają z jednolitej funkcji zwracającej identyfikator aktualnego użytkownika.
+W przypadku logowania z użyciem zewnętrznych dostawców ważne jest nie tylko samo przekazanie użytkownika do usługi logowania, ale również poprawne obsłużenie odpowiedzi zwrotnej, tokenów oraz powiązania konta z lokalnym użytkownikiem aplikacji. Sun i Beznosov, analizując systemy jednokrotnego logowania oparte na OAuth, zwracają uwagę, że wiele problemów bezpieczeństwa wynika nie z idei protokołu, lecz z decyzji implementacyjnych podejmowanych przez twórców aplikacji\footnote{S.-T. Sun, K. Beznosov, \emph{The Devil is in the (Implementation) Details: An Empirical Analysis of OAuth SSO Systems}, [w:] \emph{Proceedings of the 2012 ACM Conference on Computer and Communications Security}, 2012, s. 378--390, DOI: 10.1145/2382196.2382238, \url{https://doi.org/10.1145/2382196.2382238} (dostęp: 31.07.2026).}. Z tego względu w projekcie autoryzacja została skupiona w jednym module konfiguracyjnym, a pozostałe handlery API korzystają z jednolitej funkcji zwracającej identyfikator aktualnego użytkownika.
 
 Do przechowywania danych autoryzacyjnych wykorzystano adapter MongoDB. Adapter zapisuje w bazie informacje o użytkownikach i powiązanych kontach zewnętrznych, dzięki czemu aplikacja może rozpoznawać tę samą osobę po kolejnych logowaniach. Dane te są przechowywane w kolekcjach technicznych tworzonych przez mechanizm NextAuth, niezależnie od domenowych kolekcji aplikacji, takich jak taski, checklisty czy projekty.
 
-W konfiguracji zastosowano strategię ``\texttt{jwt}'' oraz callback ``\texttt{session}''\footnote{Auth.js, \emph{Auth.js Core Reference}, dokumentacja callbacków biblioteki Auth.js, [b.r.], dostęp: \url{https://authjs.dev/reference/core\#callbacks} (16.08.2026).}. Jak opisano w podrozdziale 3.5, sesja służy do rozpoznania zalogowanego użytkownika; w implementacji callback dopisuje identyfikator użytkownika do obiektu ``\texttt{session.user.id}'', aby pozostałe części backendu mogły korzystać z jednolitego sposobu identyfikacji właściciela danych.
+W konfiguracji zastosowano strategię ``\texttt{jwt}'' oraz callback ``\texttt{session}''. Jak opisano w podrozdziale 3.5, sesja służy do rozpoznania zalogowanego użytkownika; w implementacji callback dopisuje identyfikator użytkownika do obiektu ``\texttt{session.user.id}'', aby pozostałe części backendu mogły korzystać z jednolitego sposobu identyfikacji właściciela danych.
 
 \begin{figure}[H]
   \centering
@@ -1307,7 +1311,7 @@ W praktyce autoryzacja jest używana w handlerach API przez funkcję pobierając
 
 \FirstParagraph Test jednostkowy sprawdza niewielki fragment programu, na przykład funkcję, schemat walidacji albo logikę handlera, bez uruchamiania całego systemu. W projekcie takie testy potraktowano jako sposób kontroli najważniejszych reguł dotyczących tasków: poprawności danych wejściowych, reakcji API na błędne żądania oraz skutków ubocznych operacji, takich jak powiązanie taska z projektem.
 
-W aplikacji testy zostały uruchamiane za pomocą narzędzia Vitest, które jest dostosowane do testowania kodu JavaScript i TypeScript. Dokumentacja Vitest wskazuje, że test opisuje oczekiwane zachowanie wybranego fragmentu kodu, a funkcje ``\texttt{test}'' oraz ``\texttt{expect}'' pozwalają definiować sprawdzane przypadki i porównywać wynik działania programu z oczekiwanym rezultatem\footnote{Vitest, \emph{Writing Tests}, dokumentacja pisania testów w Vitest, [b.r.], dostęp: \url{https://vitest.dev/guide/learn/writing-tests.html} (03.08.2026).}. W kontekście aplikacji React podobną rolę pełnią narzędzia pozwalające renderować komponenty w środowisku testowym i sprawdzać widoczne dla użytkownika elementy interfejsu; dokumentacja React Testing Library opisuje m.in. funkcję ``\texttt{render}'', służącą do osadzania komponentu w kontenerze testowym\footnote{Testing Library, \emph{React Testing Library API}, dokumentacja API biblioteki React Testing Library, [b.r.], dostęp: \url{https://testing-library.com/docs/react-testing-library/api/} (03.08.2026).}.
+W aplikacji testy zostały uruchamiane za pomocą narzędzia Vitest, które jest dostosowane do testowania kodu JavaScript i TypeScript. Dokumentacja Vitest wskazuje, że test opisuje oczekiwane zachowanie wybranego fragmentu kodu, a funkcje ``\texttt{test}'' oraz ``\texttt{expect}'' pozwalają definiować sprawdzane przypadki i porównywać wynik działania programu z oczekiwanym rezultatem\footnote{Vitest, \emph{Writing Tests}, dokumentacja pisania testów w Vitest, [b.r.], \url{https://vitest.dev/guide/learn/writing-tests.html} (dostęp: 03.08.2026).}. W kontekście aplikacji React podobną rolę pełnią narzędzia pozwalające renderować komponenty w środowisku testowym i sprawdzać widoczne dla użytkownika elementy interfejsu; dokumentacja React Testing Library opisuje m.in. funkcję ``\texttt{render}'', służącą do osadzania komponentu w kontenerze testowym\footnote{Testing Library, \emph{React Testing Library API}, dokumentacja API biblioteki React Testing Library, [b.r.], \url{https://testing-library.com/docs/react-testing-library/api/} (dostęp: 03.08.2026).}.
 
 Testy przygotowane w projekcie uruchamiane są poleceniem ``\texttt{npm test}'', które wykonuje skrypt ``\texttt{vitest run}''. Zakres testów obejmuje wybrane, kluczowe fragmenty związane z taskami: walidację danych oraz obsługę endpointów API. Nie jest to pełny zestaw testów całej aplikacji, ponieważ nie obejmuje wszystkich komponentów interfejsu, scenariuszy end-to-end ani integracji z rzeczywistą bazą danych. Stanowi natomiast podstawowe zabezpieczenie najważniejszych reguł biznesowych dotyczących tworzenia, aktualizacji, pobierania i archiwizowania tasków.
 
@@ -1380,7 +1384,7 @@ Projekt można dalej rozwijać w kilku kierunkach. Najbardziej naturalne byłoby
 
 \begin{list}{}{\setlength{\leftmargin}{0pt}\setlength{\itemindent}{0pt}\setlength{\labelwidth}{0pt}\setlength{\labelsep}{0pt}\setlength{\itemsep}{0.5\baselineskip}}
 
-\item {\RaggedRight Ahmad M. O., Dennehy D., Conboy K., Oivo M., \emph{Kanban in Software Engineering: A Systematic Mapping Study}, ``Journal of Systems and Software'' 2018, Vol. 137, s. 96--113, DOI: 10.1016/j.jss.2017.11.045, dostęp: \url{https://doi.org/10.1016/j.jss.2017.11.045} (31.07.2026).\par}
+\item {\RaggedRight Ahmad M. O., Dennehy D., Conboy K., Oivo M., \emph{Kanban in Software Engineering: A Systematic Mapping Study}, ``Journal of Systems and Software'' 2018, Vol. 137, s. 96--113, dostęp: \url{https://doi.org/10.1016/j.jss.2017.11.045} (31.07.2026).\par}
 
 \item {\RaggedRight Albiorix Technology, \emph{Web Application Architecture Layers}, grafika przedstawiająca warstwy architektury aplikacji internetowej, [b.r.], dostęp: \url{https://www.albiorixtech.com/wp-content/uploads/2025/12/web-application-architecture-layers.jpg} (03.02.2026).\par}
 
