@@ -50,6 +50,7 @@
 \setcounter{tocdepth}{2}
 \counterwithout{figure}{chapter}
 \counterwithout{table}{chapter}
+\counterwithout{footnote}{chapter}
 
 \captionsetup{
   font={footnotesize},
@@ -133,7 +134,7 @@
 \newcommand{\supervisor}{dr Leszek Grocholski}
 \newcommand{\thesiscity}{Wrocław}
 \newcommand{\thesisyear}{2026}
-\newcommand{\titlepagelogo}{assets/image1.png}
+\newcommand{\titlepagelogo}{title-logo.png}
 \DeclareRobustCommand{\propername}[1]{\textit{#1}}
 \DeclareRobustCommand{\programname}[1]{\textit{#1}}
 \DeclareRobustCommand{\functionname}[1]{\textit{#1}}
@@ -233,7 +234,7 @@ Rozdział dziewiąty dotyczy testów jednostkowych. Wyjaśniono w nim rolę test
 
 \FirstParagraph Analizę wymagań rozpoczęto od określenia sytuacji, w których użytkownik korzysta z aplikacji samodzielnie, bez zespołu projektowego i bez formalnego procesu zarządzania pracą. W takim przypadku najważniejsze są: prosty zapis obowiązków, szybki powrót do aktualnie wykonywanych zadań oraz możliwość oddzielenia drobnych spraw od większych projektów. Narzędzia takie jak Trello, Asana czy ClickUp pokazują różne sposoby organizacji pracy, lecz wiele ich funkcji powstało z myślą o większej ilości użytkowników, raportowaniu i koordynacji zespołu.
 
-Użytkownik indywidualny nie potrzebuje licznych nakładek i dodatkowych funkcjonalności aplikacji, usprawniających pracę zespołową, natomiast ceni sobie prostotę. Aplikacja dla niego skierowana powinna przede wszystkim zapewniać responsywny, intuicyjny, czytelny i niezawodny interfejs, umożliwiający bezproblemowe nawigowanie po stronie. Narzędzie takie powinno także umożliwiać  organizację zadań w różnych formach, jak na przykład checklista\footnote{Checklista - uporządkowany zestaw elementów do wykonania, w którym poszczególne pozycje można oznaczać jako ukończone. Jako element organizacji zadań występuje między innymi w aplikacji Trello. Źródło: Atlassian, \emph{Trello}, strona internetowa aplikacji, [b.r.], \url{https://trello.com} (dostęp: 17.07.2026).} do sprawdzania zakupów, lub tablica z taskami\footnote{Task - z jęz. ang. zadanie; w niniejszej pracy termin oznacza element aplikacji tworzony przez użytkownika w celu opisania konkretnej czynności do wykonania. Jako element organizacji pracy występuje między innymi w aplikacji Trello. Źródło: Ibidem.} w celu organizacji skomplikowanego projektu. Aplikacja powinna również oferować prosty i motywujący do działania interfejs graficzny.
+Użytkownik indywidualny nie potrzebuje licznych nakładek i dodatkowych funkcjonalności aplikacji, usprawniających pracę zespołową, natomiast ceni sobie prostotę. Aplikacja dla niego skierowana powinna przede wszystkim zapewniać responsywny, intuicyjny, czytelny i niezawodny interfejs, umożliwiający bezproblemowe nawigowanie po stronie. Narzędzie takie powinno także umożliwiać  organizację zadań w różnych formach, jak na przykład checklista\footnote{Checklista - uporządkowany zestaw elementów do wykonania, w którym poszczególne pozycje można oznaczać jako ukończone. Jako element organizacji zadań występuje między innymi w aplikacji Trello. Źródło: Atlassian, \emph{Trello}, strona internetowa aplikacji, [b.r.], \url{https://trello.com} (dostęp: 17.07.2026).} do sprawdzania zakupów, lub tablica z taskami\footnote{Task - z jęz. ang. zadanie; w niniejszej pracy termin oznacza konkretny element aplikacji tworzony przez użytkownika w celu opisania czynności do wykonania. W pozostałych, ogólnych kontekstach stosowane jest polskie określenie ``zadanie''. Jako element organizacji pracy task występuje między innymi w aplikacji Trello. Źródło: Ibidem.} w celu organizacji skomplikowanego projektu. Aplikacja powinna również oferować prosty i motywujący do działania interfejs graficzny.
 
 Z punktu widzenia projektowanej aplikacji istotny problem stanowi rozproszenie informacji. Użytkownik może prowadzić osobną listę codziennych zadań, oddzielne notatki i osobny plan większego projektu, przez co część danych traci kontekst. Dlatego projekt skupia się również na możliwości przypinania i wyświetlania różnych elementów aplikacji w jednym miejscu.
 
@@ -241,7 +242,7 @@ Z punktu widzenia projektowanej aplikacji istotny problem stanowi rozproszenie i
 
 \FirstParagraph Asana\footnote{Asana Inc., \emph{Asana}, strona internetowa aplikacji, [b.r.], \url{https://asana.com} (dostęp: 17.07.2026).}, ClickUp\footnote{ClickUp, \emph{ClickUp}, strona internetowa aplikacji, [b.r.], \url{https://clickup.com} (dostęp: 17.07.2026).} oraz Trello\footnote{Atlassian, \emph{Trello}, strona internetowa aplikacji, [b.r.], \url{https://trello.com} (dostęp: 17.07.2026).} to przykładowe, popularne narzędzia do zarządzania projektami. Z perspektywy pojedynczego użytkownika ich przydatność zależy od złożoności potrzeb oraz preferowanego stylu pracy. \textbf{Trello} uchodzi za proste i intuicyjne narzędzie z przejrzystym interfejsem. \textbf{Asana} jest natomiast bardziej rozbudowana i wykorzystywana przede wszystkim do nadzoru nad złożonymi projektami zespołowymi. Z kolei \textbf{ClickUp} oferuje szeroki zakres funkcji, co może być atrakcyjne dla wymagających użytkowników indywidualnych, jednak duża liczba możliwości czyni tę aplikację skomplikowaną w obsłudze.
 
-\textbf{Trello} wyróżnia się \textbf{prostotą i intuicyjnością} -- jest łatwe do opanowania dla początkujących, dzięki czemu idealnie nadaje się do podstawowego porządkowania. Jego jedyna forma prezentacji - kanban\footnote{Kanban - metoda wizualnego zarządzania pracą, w której zadania przedstawiane są na tablicy podzielonej na etapy realizacji. Źródło: M. O. Ahmad, D. Dennehy, K. Conboy, M. Oivo, \emph{Kanban in Software Engineering: A Systematic Mapping Study}, ``Journal of Systems and Software'' 2018, Vol. 137, s. 96--113, \url{https://doi.org/10.1016/j.jss.2017.11.045} (dostęp: 31.07.2026).} sprzyja szybkiemu organizowaniu prostych projektów. Jednocześnie Trello pozostawia dużo przestrzeni użytkownikom bardziej wymagającym, poprzez możliwość integracji przeróżnych narzędzi zewnętrznych, tak zwanych "power-upów".
+\textbf{Trello} wyróżnia się \textbf{prostotą i intuicyjnością} -- jest łatwe do opanowania dla początkujących, dzięki czemu idealnie nadaje się do podstawowego porządkowania. Jego jedyna forma prezentacji - Kanban\footnote{Kanban - metoda wizualnego zarządzania pracą, w której zadania przedstawiane są na tablicy podzielonej na etapy realizacji. Źródło: M. O. Ahmad, D. Dennehy, K. Conboy, M. Oivo, \emph{Kanban in Software Engineering: A Systematic Mapping Study}, ``Journal of Systems and Software'' 2018, Vol. 137, s. 96--113, \url{https://doi.org/10.1016/j.jss.2017.11.045} (dostęp: 31.07.2026).} sprzyja szybkiemu organizowaniu prostych projektów. Jednocześnie Trello pozostawia dużo przestrzeni użytkownikom bardziej wymagającym, poprzez możliwość integracji przeróżnych narzędzi zewnętrznych, tak zwanych "power-upów".
 
 \textbf{Asana}, zaprojektowana została z myślą o pracy zespołowej, dostarczając bardziej ustrukturyzowane podejście do zarządzania zadaniami i projektem. W darmowej wersji obcięte zostały niektóre funkcjonalności, jednak nie posiada ona limitów na ilość zadań, czy projektów. Wiele istotnych funkcji oferowanych przez tę aplikację nie jest przydatne dla użytkownika pojedynczego. Plusem Asany jest stosunkowa prostota w obsłudze oraz czytelność interfejsu, w zestawieniu z ilością oferowanych funkcji.
 
@@ -251,8 +252,8 @@ Poniżej znajduje się porównanie najważniejszych wybranych funkcjonalności o
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{assets/Porównanie Aplikacji.png}
-  \caption{Tabela, porównująca Trello, Asanę oraz ClickUp.}
+  \includegraphics[width=\textwidth]{imported-media/media/image1.png}
+  \caption{Tabela, porównująca Trello, Asanę oraz ClickUp}
 \end{figure}
 
 Ostateczny wybór zależy od indywidualnych preferencji i potrzeb. Dla typowego użytkownika indywidualnego z prostą listą zadań lub małym projektem Trello może okazać się najwygodniejsze, podczas gdy \textbf{Asana} sprawdzi się tam, gdzie potrzebne jest bardziej formalne planowanie projektów. \textbf{ClickUp} będzie użyteczny w przypadku potrzeby wszechstronnego i elastycznego narzędzia do uporządkowania wielu różnorodnych zadań.
@@ -267,15 +268,15 @@ Poniżej zebrano pięć historii, które wyznaczają główne ścieżki pracy u�
 
 \begin{enumerate}
 \item
-  Jako użytkownik indywidualny, chcę mieć możliwość przypięcia niektórych elementów do strony głównej w celu szybszego dostępu.
+  Jako użytkownik indywidualny chcę mieć możliwość przypięcia niektórych elementów do strony głównej w celu szybszego dostępu.
 \item
-  Jako pracownik biurowy, potrzebuję utworzyć kilka zadań wraz z opisami, określonymi priorytetami oraz czasem ich realizacji, w celu efektywniejszej pracy.
+  Jako pracownik biurowy potrzebuję utworzyć kilka zadań wraz z opisami, określonymi priorytetami oraz czasem ich realizacji w celu efektywniejszej pracy.
 \item
-  Jako głowa rodziny, potrzebuję utworzyć checklistę zakupów, aby w sklepie niczego nie zapomnieć.
+  Jako głowa rodziny potrzebuję utworzyć checklistę zakupów, aby w sklepie niczego nie zapomnieć.
 \item
-  Jako pracownik nadzorujący dostawy w restauracji, potrzebuję utworzyć notatkę z informacją odnośnie przebiegu dostawy oraz ilości palet zwróconych przez restaurację.
+  Jako pracownik nadzorujący dostawy w restauracji potrzebuję utworzyć notatkę z informacją odnośnie przebiegu dostawy oraz ilości palet zwróconych przez restaurację.
 \item
-  Jako student potrzebuję utworzyć projekt, zawierający datę realizacji, opis oraz listę tasków z możliwością nadawania im różnych statusów i wyświetlania w formie tablicy, by nie pogubić się podczas pisania pracy dyplomowej.
+  Jako student potrzebuję utworzyć projekt zawierający datę realizacji, opis oraz listę tasków z możliwością nadawania im różnych statusów i wyświetlania w formie tablicy, by nie pogubić się podczas pisania pracy dyplomowej.
 \end{enumerate}
 
 Na podstawie powyższych historii użytkownika opracowano szczegółowe scenariusze przypadków użycia, opisujące sposób interakcji użytkownika z systemem w konkretnych sytuacjach. Znajdują się one w szóstym rozdziale pracy.
@@ -284,15 +285,15 @@ Na podstawie powyższych historii użytkownika opracowano szczegółowe scenariu
 
 \FirstParagraph Kanban jest metodą organizacji pracy opartą na wizualnym przedstawianiu zadań oraz etapów ich realizacji. W aplikacjach do zarządzania zadaniami przyjmuje najczęściej postać tablicy podzielonej na kolumny, które odpowiadają kolejnym stanom pracy. Zadania są przedstawiane jako karty, a ich przenoszenie pomiędzy kolumnami pozwala szybko ocenić, które elementy są dopiero planowane, które są aktualnie wykonywane, a które zostały już zakończone.
 
-W literaturze dotyczącej inżynierii oprogramowania kanban jest opisywany jako podejście wspierające ciągły przepływ pracy oraz stopniowe dostarczanie wartości użytkownikowi. Ahmad, Dennehy, Conboy i Oivo wskazują, że badania nad kanbanem w oprogramowaniu koncentrują się między innymi na widoczności pracy, ograniczaniu pracy w toku oraz praktykach usprawniających zarządzanie zadaniami\footnote{M. O. Ahmad, D. Dennehy, K. Conboy, M. Oivo, \emph{Kanban in Software Engineering: A Systematic Mapping Study}, ``Journal of Systems and Software'' 2018, Vol. 137, s. 96--113, \url{https://doi.org/10.1016/j.jss.2017.11.045} (dostęp: 31.07.2026).}.
+W literaturze dotyczącej inżynierii oprogramowania Kanban jest opisywany jako podejście wspierające ciągły przepływ pracy oraz stopniowe dostarczanie wartości użytkownikowi. Ahmad, Dennehy, Conboy i Oivo wskazują, że badania nad Kanbanem w oprogramowaniu koncentrują się między innymi na widoczności pracy, ograniczaniu pracy w toku oraz praktykach usprawniających zarządzanie zadaniami\footnote{M. O. Ahmad, D. Dennehy, K. Conboy, M. Oivo, \emph{Kanban in Software Engineering: A Systematic Mapping Study}, ``Journal of Systems and Software'' 2018, Vol. 137, s. 96--113, \url{https://doi.org/10.1016/j.jss.2017.11.045} (dostęp: 31.07.2026).}.
 
-Zaletą tablicy kanban jest jej prostota. Użytkownik nie musi analizować długiej listy zadań ani otwierać każdego elementu osobno, aby sprawdzić postęp pracy. Wystarczy spojrzeć na układ kart w kolumnach. Dzięki temu metoda dobrze sprawdza się zarówno w pracy zespołowej, jak i w pracy indywidualnej, na przykład podczas planowania projektu, nauki, pisania pracy dyplomowej lub organizowania obowiązków domowych.
+Zaletą tablicy Kanban jest jej prostota. Użytkownik nie musi analizować długiej listy zadań ani otwierać każdego elementu osobno, aby sprawdzić postęp pracy. Wystarczy spojrzeć na układ kart w kolumnach. Dzięki temu metoda dobrze sprawdza się zarówno w pracy zespołowej, jak i w pracy indywidualnej, na przykład podczas planowania projektu, nauki, pisania pracy dyplomowej lub organizowania obowiązków domowych.
 
-Przykładowa tablica kanban może wyglądać następująco:
+Przykładowa tablica Kanban może wyglądać następująco:
 
 \begin{table}[H]
   \centering
-  \caption{Przykładowa tablica kanban}
+  \caption{Przykładowa tablica Kanban}
   \begin{tabular}{|>{\raggedright\arraybackslash}p{2.55cm}|>{\raggedright\arraybackslash}p{2.55cm}|>{\raggedright\arraybackslash}p{2.55cm}|>{\raggedright\arraybackslash}p{2.55cm}|>{\raggedright\arraybackslash}p{2.55cm}|}
     \hline
     \textbf{Backlog} & \textbf{Do zrobienia} & \textbf{W trakcie} & \textbf{Testowanie} & \textbf{Zrobione} \\
@@ -306,7 +307,7 @@ Przykładowa tablica kanban może wyglądać następująco:
 
 Kolumna \textit{Backlog} przechowuje pomysły lub zadania, które nie zostały jeszcze wybrane do realizacji. Kolumna \textit{Do zrobienia} zawiera elementy zaplanowane jako najbliższe prace. Kolumna \textit{W trakcie} pokazuje zadania aktualnie wykonywane, natomiast \textit{Testowanie} grupuje elementy wymagające sprawdzenia przed uznaniem ich za ukończone. Ostatnia kolumna, \textit{Zrobione}, zawiera zadania zakończone.
 
-W projektowanej aplikacji tablica kanban została wykorzystana w widoku projektu. Projekt zawiera własne kolumny, zawierające statusy realizacji zadań, a powiązane z nim zadania są przenoszone pomiędzy nimi. Takie rozwiązanie ułatwia kontrolowanie postępu pracy i pozwala użytkownikowi szybko zobaczyć, które zadania wymagają jeszcze uwagi.
+W projektowanej aplikacji tablica Kanban została wykorzystana w widoku projektu. Projekt zawiera własne kolumny, zawierające statusy realizacji zadań, a powiązane z nim zadania są przenoszone pomiędzy nimi. Takie rozwiązanie ułatwia kontrolowanie postępu pracy i pozwala użytkownikowi szybko zobaczyć, które zadania wymagają jeszcze uwagi.
 
 \section{Najważniejsze funkcje aplikacji}
 
@@ -314,7 +315,7 @@ W projektowanej aplikacji tablica kanban została wykorzystana w widoku projektu
 
 Podstawową funkcjonalnością systemu jest umożliwienie użytkownikowi kompleksowego zarządzania elementami organizacyjnymi, którymi są checklisty, notatki, taski oraz projekty. Aplikacja wspiera pełen zestaw operacji CRUD\footnote{CRUD (z jęz. ang. Create, Read, Update, Delete) - zestaw podstawowych operacji wykonywanych na danych w systemach informatycznych, obejmujący ich tworzenie, odczyt, modyfikację oraz usuwanie.}, co pozwala na swobodne dodawanie elementów, ich edycję oraz usuwanie w zależności od potrzeb użytkownika.
 
-Istotnym wymaganiem systemu jest możliwość prezentacji projektów w formie tablicy kanban, z własnymi kolumnami statusów oraz możliwością przenoszenia zadań pomiędzy tymi kolumnami.
+Istotnym wymaganiem systemu jest możliwość prezentacji projektów w formie tablicy Kanban, z własnymi kolumnami statusów oraz możliwością przenoszenia zadań pomiędzy tymi kolumnami.
 
 Dodatkowo aplikacja udostępnia panel strony głównej, określany jako dashboard, na którym wyświetlane są przypięte przez użytkownika dowolne elementy, takie jak na przykład checklisty. Funkcja ta umożliwia szybki dostęp do najważniejszych informacji bez konieczności przeszukiwania całej aplikacji. System pozwala także wzbogacać zadania i projekty o dodatkowe dane, takie jak opis, tagi tematyczne, poziom priorytetu czy przewidywany czas realizacji. Dzięki temu użytkownik może lepiej organizować pracę, filtrować elementy oraz ustalać kolejność wykonywania obowiązków.
 
@@ -332,13 +333,13 @@ Architektura aplikacji umożliwia późniejsze dodawanie kolejnych typów elemen
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  Układ strony - poszczególne elementy, jak sekcje, nagłówki, przyciski;
+  układ strony - poszczególne elementy, jak sekcje, nagłówki, przyciski;
 \item
-  Wygląd strony - czcionki, kolory, animacje;
+  wygląd strony - czcionki, kolory, animacje;
 \item
-  Interakcje - wypełnianie formularzy, obsługa klikania elementów strony, menu nawigacyjne;
+  interakcje - wypełnianie formularzy, obsługa klikania elementów strony, menu nawigacyjne;
 \item
-  Responsywność - automatyczne dostosowywanie się aplikacji do różnych wielkości ekranu.
+  responsywność - automatyczne dostosowywanie się aplikacji do różnych wielkości ekranu.
 \end{enumerate}
 
 Fundamentalne narzędzia używane do tworzenia frontendu to HTML\footnote{HTML - z jęz. ang. Hypertext Markup Language, czyli ``hipertekstowy język znaczników''. Źródło: J. Dean, \emph{Web Programming with HTML5, CSS, and JavaScript}, Jones \& Bartlett Learning, Burlington 2017, s. 7--15.}, CSS\footnote{CSS - z jęz. ang. Cascading Style Sheets, czyli ``kaskadowe arkusze stylów''. Źródło: Ibidem, s. 73--75.} oraz JavaScript\footnote{Źródło: Ibidem, s. 311--313.}. HTML to język znaczników, odpowiadający za strukturę strony internetowej. Określa on semantyczny układ treści, takich jak nagłówki, akapity, listy, obrazy, czy formularze. HTML stanowi szkielet warstwy frontendowej aplikacji webowej, będąc interpretowanym przez przeglądarkę w celu prezentacji treści użytkownikowi. Poprawne i semantyczne rozmieszczenie znaczników HTML ma kluczowe znaczenie dla dostępności cyfrowej, ponieważ umożliwia prawidłową interpretację treści przez czytniki ekranu wykorzystywane przez osoby z niepełnosprawnościami wzroku.
@@ -391,7 +392,7 @@ Jeśli chodzi o komponenty funkcyjne, to są one zwykłymi funkcjami JavaScript,
   \caption{Fragment kodu przedstawiający funkcyjny komponent ``\texttt{Button}''}
 \end{figure}
 
-W projektowanej aplikacji podejście komponentowe zastosowano między innymi w formularzach, kartach elementów, widoku dashboardu oraz tablicy kanban. Dzięki temu powtarzalne fragmenty interfejsu, takie jak przyciski, pola formularzy, karty tasków i sekcje listujące dane, mogły zostać wydzielone do osobnych komponentów i użyte w kilku miejscach aplikacji.
+W projektowanej aplikacji podejście komponentowe zastosowano między innymi w formularzach, kartach elementów, widoku dashboardu oraz tablicy Kanban. Dzięki temu powtarzalne fragmenty interfejsu, takie jak przyciski, pola formularzy, karty tasków i sekcje listujące dane, mogły zostać wydzielone do osobnych komponentów i użyte w kilku miejscach aplikacji.
 
 \section{React Hooks}
 
@@ -415,16 +416,16 @@ W powyższym przykładzie:
 
 \begin{itemize}
 \item
-  zmienna ``\texttt{count}'' przechowuje aktualny stan licznika,
+  zmienna ``\texttt{count}'' przechowuje aktualny stan licznika;
 \item
-  funkcja ``\texttt{setCount}'' odpowiada za aktualizację stanu,
+  funkcja ``\texttt{setCount}'' odpowiada za aktualizację stanu;
 \item
-  wywołanie funkcji ``\texttt{setCount}'' powoduje zmianę danych oraz odświeżenie widoku komponentu na stronie
+  wywołanie funkcji ``\texttt{setCount}'' powoduje zmianę danych oraz odświeżenie widoku komponentu na stronie.
 \end{itemize}
 
 Takie podejście zapewnia enkapsulację danych wewnątrz komponentu oraz precyzyjne sterowanie jego zachowaniem. Dzięki hookom zarządzanie stanem staje się czytelne i ściśle powiązane z zakresem funkcji komponentu, co ułatwia rozwój i utrzymanie aplikacji.
 
-W aplikacji hooki wykorzystano przede wszystkim w komponentach interaktywnych. ``\texttt{useState}'' przechowuje stan formularzy, filtrów, sortowania oraz przeciąganych tasków, ``\texttt{useMemo}'' służy do wyliczania przefiltrowanych list i kolumn kanban, a ``\texttt{useEffect}'' synchronizuje stan komponentu z danymi przekazanymi z serwera.
+W aplikacji hooki wykorzystano przede wszystkim w komponentach interaktywnych. ``\texttt{useState}'' przechowuje stan formularzy, filtrów, sortowania oraz przeciąganych tasków, ``\texttt{useMemo}'' służy do wyliczania przefiltrowanych list i kolumn Kanban, a ``\texttt{useEffect}'' synchronizuje stan komponentu z danymi przekazanymi z serwera.
 
 \section{Tailwind CSS}
 
@@ -436,7 +437,7 @@ W aplikacji hooki wykorzystano przede wszystkim w komponentach interaktywnych. `
   \caption{Przykładowe użycie Tailwind CSS, pochodzące z oficjalnej strony frameworka (dostęp: 28.01.2026)}
 \end{figure}
 
-Jak widać na obrazie, całe stylowanie realizowane jest poprzez tak zwane klasy narzędziowe (po angielsku utility classes) Tailwinda, bez użycia osobnych plików CSS. Dla przykładu klasa ``\texttt{flex}'' nadana znacznikowi ``\texttt{div}'' jest odpowiednikiem zapisu ``\texttt{display: flex;}'' w CSS. W projekcie aplikacji Tailwind CSS wykorzystano, ponieważ ogranicza potrzebę definiowania własnych klas CSS oraz umożliwia szybkie tworzenie responsywnych i spójnych komponentów. Eliminuje także potrzebę przechodzenia do osobnych plików stylów w celu sprawdzenia struktury wizualnej znacznika lub komponentu. W projekcie Tailwind został użyty między innymi do przygotowania układów formularzy, kart elementów, bocznej nawigacji, widoku dashboardu oraz tablicy kanban. Klasy narzędziowe pozwoliły zachować spójne odstępy, kolory, responsywność i warianty trybu ciemnego bez tworzenia osobnych plików stylów dla każdego widoku.
+Jak widać na obrazie, całe stylowanie realizowane jest poprzez tak zwane klasy narzędziowe (po angielsku utility classes) Tailwinda, bez użycia osobnych plików CSS. Dla przykładu klasa ``\texttt{flex}'' nadana znacznikowi ``\texttt{div}'' jest odpowiednikiem zapisu ``\texttt{display: flex;}'' w CSS. W projekcie aplikacji Tailwind CSS wykorzystano, ponieważ ogranicza potrzebę definiowania własnych klas CSS oraz umożliwia szybkie tworzenie responsywnych i spójnych komponentów. Eliminuje także potrzebę przechodzenia do osobnych plików stylów w celu sprawdzenia struktury wizualnej znacznika lub komponentu. W projekcie Tailwind został użyty między innymi do przygotowania układów formularzy, kart elementów, bocznej nawigacji, widoku dashboardu oraz tablicy Kanban. Klasy narzędziowe pozwoliły zachować spójne odstępy, kolory, responsywność i warianty trybu ciemnego bez tworzenia osobnych plików stylów dla każdego widoku.
 
 \section{TypeScript}
 
@@ -522,7 +523,7 @@ Poniższy rysunek ogólnie pokazuje udział frontendu, backendu i bazy danych w 
 \begin{figure}[H]
   \centering
   \includegraphics[width=5.7792in,height=2.98542in]{imported-media/media/image8.png}
-  \caption[Przedstawienie procesu wyświetlania danych użytkownikowi aplikacji internetowej]{Przedstawienie procesu, umożliwiającego wyświetlenie danych użytkownikowi aplikacji internetowej. Źródło: \url{https://d1zruf9db62p8s.cloudfront.net/2025/08/Frontend-vs-Backend.webp} (dostęp: 02.02.2026).}
+  \caption[Przedstawienie procesu wyświetlania danych użytkownikowi aplikacji internetowej]{Przedstawienie procesu, umożliwiającego wyświetlenie danych użytkownikowi aplikacji internetowej. Źródło: \url{https://d1zruf9db62p8s.cloudfront.net/2025/08/Frontend-vs-Backend.webp} (dostęp: 02.02.2026)}
 \end{figure}
 
 \section{MySQL}
@@ -543,7 +544,7 @@ MySQL został opisany jako punkt odniesienia dla technologii finalnie wykorzysta
 Jako że system MongoDB zapisuje dane w kolekcjach składających się z dokumentów,  każdy taki dokument może posiadać inną strukturę oraz zestaw pól, co pozwala na łatwe rozszerzanie modelu danych bez konieczności modyfikowania schematu całej bazy. Natomiast komunikacja z bazą odbywa się poprzez zapytania realizowane w formie obiektów lub metod API, zamiast klasycznych zapytań w języku SQL.
 
 W projekcie aplikacji stworzonym na potrzeby niniejszej pracy inżynierskiej, kluczowe znaczenie ma łatwość rozbudowy funkcjonalności oraz możliwość obsługi dynamicznie zmieniających się struktur informacji. Z tego względu zdecydowano się na zastosowanie bazy dokumentowej MongoDB zamiast klasycznej relacyjnej bazy danych.
-W systemie zarządzania zadaniami pojedyncze obiekty, takie jak projekt lub zadanie, mogą posiadać zróżnicowane właściwości. Model dokumentowy MongoDB pozwala przechowywać takie dane bez konieczności tworzenia wielu tabel i relacji. Ułatwia to modyfikację struktury danych w trakcie rozwoju aplikacji, bez potrzeby przeprowadzania kosztownych migracji schematu. Korzystne dla rozwoju aplikacji jest także to, że dane przechowywane w Mongo nie mają wyłącznie tabelarycznego charakteru. Projekt może posiadać własne kolumny kanban, taski mogą zawierać różne zestawy powiązań, a checklista składa się z tablicy elementów. Model dokumentowy ułatwia zapis takich struktur bez projektowania wielu tabel pomocniczych. Wybrana technologia dobrze współpracuje również z aplikacją pisaną w TypeScripcie oraz Next.js, ponieważ dokumenty mogą być obsługiwane w kodzie jako obiekty. W projekcie dodatkową warstwą porządkującą strukturę danych są modele Mongoose\footnote{Mongoose, \emph{Schemas}, dokumentacja biblioteki Mongoose dotycząca schematów danych, [b.r.], \url{https://mongoosejs.com/docs/guide.html} (dostęp: 16.08.2026).}, opisujące pola dokumentów i pozwalające zachować kontrolę nad zapisem mimo elastycznego charakteru bazy.
+W systemie zarządzania zadaniami pojedyncze obiekty, takie jak projekt lub zadanie, mogą posiadać zróżnicowane właściwości. Model dokumentowy MongoDB pozwala przechowywać takie dane bez konieczności tworzenia wielu tabel i relacji. Ułatwia to modyfikację struktury danych w trakcie rozwoju aplikacji, bez potrzeby przeprowadzania kosztownych migracji schematu. Korzystne dla rozwoju aplikacji jest także to, że dane przechowywane w Mongo nie mają wyłącznie tabelarycznego charakteru. Projekt może posiadać własne kolumny Kanban, taski mogą zawierać różne zestawy powiązań, a checklista składa się z tablicy elementów. Model dokumentowy ułatwia zapis takich struktur bez projektowania wielu tabel pomocniczych. Wybrana technologia dobrze współpracuje również z aplikacją pisaną w TypeScripcie oraz Next.js, ponieważ dokumenty mogą być obsługiwane w kodzie jako obiekty. W projekcie dodatkową warstwą porządkującą strukturę danych są modele Mongoose\footnote{Mongoose, \emph{Schemas}, dokumentacja biblioteki Mongoose dotycząca schematów danych, [b.r.], \url{https://mongoosejs.com/docs/guide.html} (dostęp: 16.08.2026).}, opisujące pola dokumentów i pozwalające zachować kontrolę nad zapisem mimo elastycznego charakteru bazy.
 
 \chapter{Architektura aplikacji}
 
@@ -555,6 +556,8 @@ W projekcie podział klient-serwer ma przede wszystkim znaczenie bezpieczeństwa
 
 Takie rozdzielenie ułatwia również rozwijanie projektu, ponieważ zmiana wyglądu formularza nie musi oznaczać zmiany modelu danych, a dopisanie kolejnego endpointu nie wymaga przebudowy całego interfejsu.
 
+W projekcie wykorzystano zestaw technologii dobrany do aplikacji internetowej działającej w architekturze klient-serwer. Warstwę interfejsu zbudowano przy użyciu React, TypeScriptu i Tailwind CSS, ponieważ takie połączenie ułatwia tworzenie komponentów, kontrolę typów oraz spójne stylowanie widoków. Za część serwerową odpowiada Next.js z mechanizmem Route Handlers, co pozwala obsługiwać endpointy API w tym samym projekcie co frontend. Dane aplikacji zapisano w MongoDB z użyciem Mongoose, gdyż dokumentowy model bazy dobrze pasuje do elastycznych struktur tasków, checklist, projektów, notatek i przypięć. Logowanie użytkownika oparto na Auth.js/NextAuth oraz dostawcach OAuth, dzięki czemu aplikacja nie musi przechowywać haseł lokalnie.
+
 \section{Omówienie warstw aplikacji}
 
 Aplikację internetową można zasadniczo podzielić na trzy warstwy: prezentacji (frontend), logiki aplikacji (backend) oraz danych. Na poniżej przedstawionym schemacie zaprezentowano klasyczną, trójwarstwową architekturę aplikacji internetowej. Poszczególne warstwy odpowiadają za różne obszary odpowiedzialności systemu, co zwiększa modularność, bezpieczeństwo oraz łatwość utrzymania oprogramowania.
@@ -562,7 +565,7 @@ Aplikację internetową można zasadniczo podzielić na trzy warstwy: prezentacj
 \begin{figure}[H]
   \centering
   \includegraphics[width=6.10236in,height=4.11111in]{imported-media/media/image9.png}
-  \caption[Diagram warstw aplikacji internetowej]{Diagram, przedstawiający warstwy aplikacji internetowej. Źródło: Albiorix Technology, \url{https://www.albiorixtech.com/wp-content/uploads/2025/12/web-application-architecture-layers.jpg} (dostęp: 03.02.2026).}
+  \caption[Diagram warstw aplikacji internetowej]{Diagram, przedstawiający warstwy aplikacji internetowej. Źródło: Albiorix Technology, \url{https://www.albiorixtech.com/wp-content/uploads/2025/12/web-application-architecture-layers.jpg} (dostęp: 03.02.2026)}
 \end{figure}
 
 Przeglądarka (\textit{browser}) to środowisko uruchomieniowe po stronie klienta, w którym działa aplikacja frontendowa. Użytkownik korzysta z systemu poprzez przeglądarkę, która renderuje interfejs i wysyła żądania do serwera. Ponadto umożliwia wykonywanie kodu JavaScriptu, obsługuje interakcje z systemem, wyświetla interfejs użytkownika oraz może komunikować się z backendem za pomocą protokołów HTTP lub HTTPS\footnote{HTTP (HyperText Transfer Protocol) -- protokół komunikacyjny warstwy aplikacji wykorzystywany do przesyłania danych pomiędzy klientem a serwerem w sieci WWW. Jego rozszerzona, bardziej bezpieczna wersja, wykorzystująca mechanizmy szyfrowania to protokół HTTPS (HyperText Transfer Protocol Secure). Źródło: J. Dean, \emph{Web Programming with HTML5, CSS, and JavaScript}, Jones \& Bartlett Learning, Burlington 2017, s. 6, 221.}.
@@ -582,7 +585,7 @@ Za magazynowanie danych w sposób trwały odpowiada warstwa przechowywania danyc
 \begin{figure}[H]
   \centering
   \includegraphics[width=5.53778in,height=3.10511in]{imported-media/media/image10.png}
-  \caption{Prosty diagram komponentów internetowej aplikacji do zarządzania zadaniami.}
+  \caption{Prosty diagram komponentów internetowej aplikacji do zarządzania zadaniami}
 \end{figure}
 
 Przepływ danych można rozpisać na poszczególne kroki:
@@ -608,7 +611,7 @@ Kolejne diagramy, powstałe na etapie projektowania architektury, przygotowano z
 \begin{figure}[H]
   \centering
   \includegraphics[width=5.53039in,height=3.10322in]{imported-media/media/image11.png}
-  \caption{Diagram przepływu danych poziomu 0, przedstawiający system jako jeden proces wraz z relacjami z otoczeniem.}
+  \caption{Diagram przepływu danych poziomu 0, przedstawiający system jako jeden proces wraz z relacjami z otoczeniem}
 \end{figure}
 
 Diagram przepływu danych poziomu 0 przedstawia aplikację do zarządzania zadaniami jako pojedynczy, logiczny proces, przetwarzający dane pomiędzy użytkownikiem, zewnętrznym, dostawcą autentykacji oraz bazą danych. Użytkownik inicjuje operacje takie jak logowanie oraz zarządzanie zadaniami, projektami, notatkami i checklistami, natomiast system przetwarza te żądania, komunikuje się z bazą danych oraz zwraca odpowiednie wyniki. Diagram ten obrazuje granice systemu oraz jego relacje z otoczeniem, pomijając szczegóły wewnętrznej struktury aplikacji, które przedstawiane są na kolejnym rysunku.
@@ -629,8 +632,8 @@ Podstawową zasadą modelu danych jest przypisanie dokumentów do konkretnego u�
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.82\textheight,keepaspectratio]{assets/schemat-bazy-danych.png}
-  \caption{Schemat struktury bazy danych aplikacji.}
+  \includegraphics[width=\textwidth,height=0.82\textheight,keepaspectratio]{imported-media/media/image13.png}
+  \caption{Schemat struktury bazy danych aplikacji}
   \label{fig:schemat-bazy-danych-aplikacji}
 \end{figure}
 
@@ -640,7 +643,7 @@ W schemacie zastosowano oznaczenie ``\texttt{ObjectId}'', które oznacza specjal
 
 Typ ``\texttt{Date}'' zapisany jest wielką literą, ponieważ w kontekście MongoDB, Mongoose oraz JavaScriptu jest to nazwa specjalnego typu obiektowego reprezentującego datę i czas. Zapis ma więc charakter techniczny i odpowiada nazwie typu, a nie zwykłemu słowu opisowemu. Z tego samego powodu na diagramie widoczne są zapisy takie jak ``\texttt{Date | null}'', które oznaczają, że pole może zawierać datę albo wartość pustą. Przykładem jest ``\texttt{archivedAt}'', które pozostaje puste dla aktywnego dokumentu, a po archiwizacji otrzymuje datę wykonania tej operacji.
 
-Zapisy z nawiasami kwadratowymi, takie jak ``\texttt{string[]}'', ``\texttt{ObjectId[]}'' albo ``\texttt{object[]}'', oznaczają tablice wartości danego typu. Przykładowo ``\texttt{string[]}'' oznacza tablicę tekstów, czyli wiele wartości typu ``\texttt{string}''. Pole ``\texttt{tags}'' może więc przechowywać kilka tagów o typie danych string, pole ``\texttt{checklistIds}'' może przechowywać wiele identyfikatorów checklist, a pole ``\texttt{kanbanColumns}'' zawiera tablicę obiektów opisujących kolumny tablicy kanban.
+Zapisy z nawiasami kwadratowymi, takie jak ``\texttt{string[]}'', ``\texttt{ObjectId[]}'' albo ``\texttt{object[]}'', oznaczają tablice wartości danego typu. Przykładowo ``\texttt{string[]}'' oznacza tablicę tekstów, czyli wiele wartości typu ``\texttt{string}''. Pole ``\texttt{tags}'' może więc przechowywać kilka tagów o typie danych string, pole ``\texttt{checklistIds}'' może przechowywać wiele identyfikatorów checklist, a pole ``\texttt{kanbanColumns}'' zawiera tablicę obiektów opisujących kolumny tablicy Kanban.
 
 Warstwa autoryzacji tworzy cztery kolekcje. Są to ``\texttt{users}'', ``\texttt{accounts}'', ``\texttt{sessions}'' oraz ``\texttt{verification\_tokens}''. Najważniejsze z punktu widzenia działania aplikacji są kolekcje ``\texttt{users}'' i ``\texttt{accounts}'', ponieważ przechowują użytkowników oraz powiązania z zewnętrznymi dostawcami logowania, takimi jak Google i GitHub. Sesja użytkownika jest obsługiwana z użyciem strategii JWT\footnote{JWT - z jęz. ang. JSON Web Token, czyli tekstowy token służący do bezpiecznego przekazywania informacji między systemami w postaci podpisanego obiektu JSON.}, jednak identyfikator użytkownika pochodzący z NextAuth stanowi podstawę powiązań z dokumentami domenowymi.
 
@@ -650,9 +653,9 @@ Główne dane aplikacji zostały podzielone na kolekcje ``\texttt{notes}'', ``\t
 
 Checklisty są przechowywane w kolekcji ``\texttt{checklists}''. Każda checklista posiada tytuł, pozycję, opcjonalne powiązanie z rodzicem oraz tablicę elementów. Elementy checklisty zostały osadzone bezpośrednio w dokumencie checklisty, ponieważ są odczytywane i aktualizowane razem z nią. Pojedynczy element zawiera nazwę, informację o ukończeniu, datę ukończenia oraz pozycję. Checklista może funkcjonować samodzielnie albo być powiązana z zadaniem lub projektem przez pola ``\texttt{parentType}'' i ``\texttt{parentId}''.
 
-Zadania są zapisywane w kolekcji ``\texttt{tasks}''. Dokument zadania zawiera tytuł, opis, priorytet, status, termin wykonania, tagi, pozycję, datę ukończenia oraz datę archiwizacji. Zadanie może być samodzielnym elementem listy zadań albo częścią projektu. W drugim przypadku pole ``\texttt{projectId}'' wskazuje projekt, do którego należy zadanie. Status zadania jest przechowywany w polu ``\texttt{statusId}''. W widoku tablicy kanban odpowiada on identyfikatorowi jednej z kolumn projektu. Zadanie może mieć również powiązane checklisty, których identyfikatory są przechowywane w tablicy ``\texttt{checklistIds}''.
+Zadania są zapisywane w kolekcji ``\texttt{tasks}''. Dokument zadania zawiera tytuł, opis, priorytet, status, termin wykonania, tagi, pozycję, datę ukończenia oraz datę archiwizacji. Zadanie może być samodzielnym elementem listy zadań albo częścią projektu. W drugim przypadku pole ``\texttt{projectId}'' wskazuje projekt, do którego należy zadanie. Status zadania jest przechowywany w polu ``\texttt{statusId}''. W widoku tablicy Kanban odpowiada on identyfikatorowi jednej z kolumn projektu. Zadanie może mieć również powiązane checklisty, których identyfikatory są przechowywane w tablicy ``\texttt{checklistIds}''.
 
-Projekty są przechowywane w kolekcji ``\texttt{projects}''. Dokument projektu zawiera tytuł, opis, priorytet, status cyklu życia, termin, tagi, pozycję, listę zadań, checklisty oraz konfigurację widoku zadań. W projekcie przechowywana jest tablica ``\texttt{kanbanColumns}'', opisująca kolumny tablicy kanban. Każda kolumna ma identyfikator, nazwę, kolor, pozycję oraz informację, czy jest to stan zakończony. Domyślny zestaw kolumn obejmuje ``\texttt{backlog}'', ``\texttt{todo}'', ``\texttt{in\_progress}'', ``\texttt{testing}'' oraz ``\texttt{done}''. Pole ``\texttt{taskView}'' określa, czy zadania projektu są prezentowane jako lista, czy jako tablica kanban. 
+Projekty są przechowywane w kolekcji ``\texttt{projects}''. Dokument projektu zawiera tytuł, opis, priorytet, status cyklu życia, termin, tagi, pozycję, listę zadań, checklisty oraz konfigurację widoku zadań. W projekcie przechowywana jest tablica ``\texttt{kanbanColumns}'', opisująca kolumny tablicy Kanban. Każda kolumna ma identyfikator, nazwę, kolor, pozycję oraz informację, czy jest to stan zakończony. Domyślny zestaw kolumn obejmuje ``\texttt{backlog}'', ``\texttt{todo}'', ``\texttt{in\_progress}'', ``\texttt{testing}'' oraz ``\texttt{done}''. Pole ``\texttt{taskView}'' określa, czy zadania projektu są prezentowane jako lista, czy jako tablica Kanban. 
 
 Relacja pomiędzy projektami i zadaniami jest utrzymywana dwukierunkowo na poziomie aplikacji. Główne powiązanie znajduje się w zadaniu, w polu ``\texttt{projectId}''. Projekt przechowuje dodatkowo tablicę ``\texttt{taskIds}'', która zawiera identyfikatory powiązanych zadań. Podczas tworzenia zadania z przypisanym projektem backend sprawdza, czy projekt istnieje, nie jest zarchiwizowany i należy do aktualnego użytkownika. Następnie identyfikator zadania jest dopisywany do projektu. Przy zmianie projektu lub archiwizacji zadania identyfikator jest usuwany ze starego projektu.
 
@@ -666,17 +669,17 @@ Najważniejsze relacje logiczne w bazie danych można przedstawić następująco
 
 \begin{itemize}
 \item
-  użytkownik jest właścicielem notatek, checklist, zadań, projektów, przypięć i zdarzeń aktywności,
+  użytkownik jest właścicielem notatek, checklist, zadań, projektów, przypięć i zdarzeń aktywności;
 \item
-  użytkownik posiada jeden dokument preferencji interfejsu,
+  użytkownik posiada jeden dokument preferencji interfejsu;
 \item
-  zadanie może należeć do projektu przez pole ``\texttt{projectId}'',
+  zadanie może należeć do projektu przez pole ``\texttt{projectId}'';
 \item
-  projekt przechowuje pomocniczą listę zadań w tablicy ``\texttt{taskIds}'',
+  projekt przechowuje pomocniczą listę zadań w tablicy ``\texttt{taskIds}'';
 \item
-  zadanie i projekt mogą mieć powiązane checklisty,
+  zadanie i projekt mogą mieć powiązane checklisty;
 \item
-  notatka może wskazywać inne elementy aplikacji przez tablicę ``\texttt{linkedItems}'',
+  notatka może wskazywać inne elementy aplikacji przez tablicę ``\texttt{linkedItems}'';
 \item
   przypięcie wskazuje dowolny obsługiwany typ elementu przez pola ``\texttt{targetType}'' i ``\texttt{targetId}''.
 \end{itemize}
@@ -786,7 +789,7 @@ Usuwanie większości elementów domenowych zostało zrealizowane jako archiwiza
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=4.9in]{imported-media/media/image13.png}
+  \includegraphics[width=4.9in]{imported-media/media/image14.png}
   \caption{Diagram UML, wizualizujący scenariusz przypięcia taska}
 \end{figure}
 
@@ -973,12 +976,12 @@ Na diagramie zaprezentowano sekwencję działań wykonywanych podczas przypinani
 
 \section{Widoki użytkownika aplikacji}
 
-\FirstParagraph W podrozdziale pokazano widoki odpowiadające wybranym scenariuszom przypadków użycia. Są to ekrany związane z przypięciem checklisty do strony głównej, utworzeniem taska oraz przygotowaniem projektu, którego zadania można oglądać jako tablicę kanban albo listę. Przy opisie zwrócono uwagę przede wszystkim na rozmieszczenie elementów, czytelność stanu interfejsu i informacje, które użytkownik otrzymuje bez konieczności przechodzenia do innych miejsc aplikacji.
+\FirstParagraph W podrozdziale pokazano widoki odpowiadające wybranym scenariuszom przypadków użycia. Są to ekrany związane z przypięciem checklisty do strony głównej, utworzeniem taska oraz przygotowaniem projektu, którego zadania można oglądać jako tablicę Kanban albo listę. Przy opisie zwrócono uwagę przede wszystkim na rozmieszczenie elementów, czytelność stanu interfejsu i informacje, które użytkownik otrzymuje bez konieczności przechodzenia do innych miejsc aplikacji.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/Scenariusz 1 SS 1.png}
-  \caption{Widok, przedstawiający checklistę, z możliwością przypięcia jej do ekranu głównego.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image15.png}
+  \caption{Widok, przedstawiający checklistę, z możliwością przypięcia jej do ekranu głównego}
   \label{fig:scenariusz-1-checklista-przypiecie}
 \end{figure}
 
@@ -986,8 +989,8 @@ Pierwszy ekran scenariusza pokazuje szczegóły checklisty. Najważniejsze miejs
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/Scenariusz 1 SS 2.png}
-  \caption{Widok przedstawiający zachowanie przycisku ``Przypnij'' po przypięciu checklisty do ekranu głównego.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image16.png}
+  \caption{Widok przedstawiający zachowanie przycisku ``Przypnij'' po przypięciu checklisty do ekranu głównego}
   \label{fig:scenariusz-1-przycisk-przypnij}
 \end{figure}
 
@@ -995,8 +998,8 @@ Po wykonaniu akcji przypięcia zmienia się wygląd przycisku widocznego przy ch
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/Scenariusz 1 SS 3.png}
-  \caption{Widok przedstawiający elementy przypięte do ekranu głównego.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image17.png}
+  \caption{Widok przedstawiający elementy przypięte do ekranu głównego}
   \label{fig:scenariusz-1-przypiete-elementy}
 \end{figure}
 
@@ -1004,8 +1007,8 @@ Sekcja przypiętych elementów na dashboardzie została zorganizowana w formie k
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/Scenariusz 2 SS 1.png}
-  \caption{Widok, przedstawiający stronę z taskami użytkownika.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image18.png}
+  \caption{Widok, przedstawiający stronę z taskami użytkownika}
   \label{fig:scenariusz-2-taski}
 \end{figure}
 
@@ -1013,8 +1016,8 @@ Główna strona tasków użytkownika wykorzystuje stały układ z boczną nawiga
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/Scenariusz 2 SS 2.png}
-  \caption{Widok, przedstawiający formularz kreacji taska.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image19.png}
+  \caption{Widok, przedstawiający formularz kreacji taska}
   \label{fig:scenariusz-2-formularz-taska}
 \end{figure}
 
@@ -1022,8 +1025,8 @@ Formularz tworzenia taska uporządkowano w kolejności takiej, by na samej górz
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/Scenariusz 5 SS 1.png}
-  \caption{Widok przedstawiający pierwszą część formularza kreacji projektu.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image20.png}
+  \caption{Widok przedstawiający pierwszą część formularza kreacji projektu}
   \label{fig:scenariusz-5-formularz-projektu-pierwsza-czesc}
 \end{figure}
 
@@ -1031,17 +1034,17 @@ Pierwsza część formularza projektu skupia się na podstawowych danych opisowy
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/Scenariusz 5 SS 2.png}
-  \caption{Widok przedstawiający drugą część formularza kreacji projektu.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image21.png}
+  \caption{Widok przedstawiający drugą część formularza kreacji projektu}
   \label{fig:scenariusz-5-formularz-projektu-druga-czesc}
 \end{figure}
 
-W drugiej części formularza użytkownik może skonfigurować kolumny tablicy kanban. Każda kolumna jest przedstawiona jako osobny wiersz z nazwą, kolorem, oznaczeniem stanu zakończonego oraz przyciskami zmiany kolejności i usunięcia. Dzięki temu struktura przyszłej tablicy projektu jest widoczna jeszcze przed zapisaniem projektu.
+W drugiej części formularza użytkownik może skonfigurować kolumny tablicy Kanban. Każda kolumna jest przedstawiona jako osobny wiersz z nazwą, kolorem, oznaczeniem stanu zakończonego oraz przyciskami zmiany kolejności i usunięcia. Dzięki temu struktura przyszłej tablicy projektu jest widoczna jeszcze przed zapisaniem projektu.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/Scenariusz 5 SS 3 .png}
-  \caption{Widok, przedstawiający opcję dodawania tasków do projektu.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image22.png}
+  \caption{Widok, przedstawiający opcję dodawania tasków do projektu}
   \label{fig:scenariusz-5-dodawanie-taskow}
 \end{figure}
 
@@ -1049,35 +1052,35 @@ Sekcja dodawania tasków pozwala uzupełnić taski bezpośrednio podczas tworzen
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/Scenariusz 5 SS 4.png}
-  \caption{Widok, przedstawiający tablicę kanban projektu.}
-  \label{fig:scenariusz-5-tablica-kanban}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image23.png}
+  \caption{Widok, przedstawiający tablicę Kanban projektu}
+  \label{fig:scenariusz-5-tablica-Kanban}
 \end{figure}
 
-Widok tablicy kanban prezentuje projekt jako zestaw kolumn odpowiadających statusom zadań. Zadania są rozmieszczone w kolumnach, a kolorowe oznaczenia nagłówków pomagają odróżnić poszczególne etapy pracy. Karty tasków zawierają najważniejsze informacje, takie jak tytuł i priorytet, a przyciski przejścia do poprzedniej lub następnej kolumny wspierają zmianę statusu zadania.
+Widok tablicy Kanban prezentuje projekt jako zestaw kolumn odpowiadających statusom zadań. Zadania są rozmieszczone w kolumnach, a kolorowe oznaczenia nagłówków pomagają odróżnić poszczególne etapy pracy. Karty tasków zawierają najważniejsze informacje, takie jak tytuł i priorytet, a przyciski przejścia do poprzedniej lub następnej kolumny wspierają zmianę statusu zadania.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{assets/Scenariusz 5 SS 5.png}
-  \caption{Widok, przedstawiający taski projektów w formie listy.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image24.png}
+  \caption{Widok, przedstawiający taski projektów w formie listy}
   \label{fig:scenariusz-5-lista-taskow-projektu}
 \end{figure}
 
-Alternatywny widok tasków projektu przyjmuje formę listy. W tym układzie zadania są pokazane jako poziome wiersze, dzięki czemu użytkownik może szybko przejrzeć ich nazwy, priorytety oraz aktualne statusy. Przełącznik pomiędzy widokiem kanban i listą znajduje się nad obszarem tasków, co pozwala dobrać sposób prezentacji danych do aktualnego trybu pracy.
+Alternatywny widok tasków projektu przyjmuje formę listy. W tym układzie zadania są pokazane jako poziome wiersze, dzięki czemu użytkownik może szybko przejrzeć ich nazwy, priorytety oraz aktualne statusy. Przełącznik pomiędzy widokiem Kanban i listą znajduje się nad obszarem tasków, co pozwala dobrać sposób prezentacji danych do aktualnego trybu pracy.
 
 \chapter{Implementacja kodu po stronie frontendu}
 
-\FirstParagraph Rozdział opisuje fragmenty frontendu, które najbardziej wpływają na codzienną pracę z aplikacją: widok kanban w projekcie, przypięte elementy dashboardu oraz formularze tasków i projektów. Wybrano miejsca, w których najlepiej widać sposób łączenia stanu interfejsu, danych z backendu i reakcji na działania użytkownika. Przed opisem konkretnych widoków warto jednak wskazać, że warstwa frontendowa została oparta na komponentach używanych w wielu modułach aplikacji. Dotyczy to przede wszystkim formularzy, kart elementów, sekcji listujących dane i przycisków akcji. Dzięki temu użytkownik spotyka podobny układ pól i podobne zachowanie kontrolek niezależnie od tego, czy tworzy task, projekt, notatkę czy checklistę. Pozwala to zachować spójność interfejsu aplikacji, co korzystnie wpływa na intuicyjność obsługi.
+\FirstParagraph Rozdział opisuje fragmenty frontendu, które najbardziej wpływają na codzienną pracę z aplikacją: widok Kanban w projekcie, przypięte elementy dashboardu oraz formularze tasków i projektów. Wybrano miejsca, w których najlepiej widać sposób łączenia stanu interfejsu, danych z backendu i reakcji na działania użytkownika. Przed opisem konkretnych widoków warto jednak wskazać, że warstwa frontendowa została oparta na komponentach używanych w wielu modułach aplikacji. Dotyczy to przede wszystkim formularzy, kart elementów, sekcji listujących dane i przycisków akcji. Dzięki temu użytkownik spotyka podobny układ pól i podobne zachowanie kontrolek niezależnie od tego, czy tworzy task, projekt, notatkę czy checklistę. Pozwala to zachować spójność interfejsu aplikacji, co korzystnie wpływa na intuicyjność obsługi.
 
 Przykładem takiego rozwiązania jest komponent ``\texttt{FormShell}'', wykorzystywany jako wspólna struktura formularzy tasków i projektów. Odpowiada on za układ nagłówka, obszaru pól, komunikatów oraz przycisków zapisu, dzięki czemu poszczególne formularze mogą skupiać się na własnych danych i logice wysyłania żądania. Podobną rolę pełni komponent ``\texttt{ObjectCard}'', który pozwala prezentować notatki, checklisty, taski i projekty w ujednoliconej formie karty z ikoną, tytułem, opisem oraz metadanymi.
 
 Wspólne komponenty pojawiają się także przy tagach i wyborze powiązanych elementów. Edytor tagów działa tak samo w formularzu taska i projektu, a komponenty wyboru checklist oraz notatek porządkują sposób łączenia danych. W rezultacie zmiana wyglądu lub zachowania jednego powtarzalnego elementu może zostać wykonana w jednym miejscu, zamiast w kilku osobnych formularzach.
 
-\section{Implementacja widoku kanban}
+\section{Implementacja widoku Kanban}
 
-\FirstParagraph Widok kanban zaimplementowano w komponencie ``\texttt{ProjectKanbanBoard}'', zapisanym w pliku ``\texttt{project-kanban-board.tsx}''. Komponent odpowiada za ułożenie kolumn statusów, pokazanie kart tasków oraz obsługę przenoszenia ich między etapami pracy. Dane wejściowe obejmują identyfikator projektu, listę kolumn i listę tasków, dlatego komponent nie musi samodzielnie pobierać danych z bazy. Jego rola jest ograniczona do prezentacji i obsługi interakcji na otrzymanym zestawie informacji.
+\FirstParagraph Widok Kanban zaimplementowano w komponencie ``\texttt{ProjectKanbanBoard}'', zapisanym w pliku ``\texttt{project-kanban-board.tsx}''. Komponent odpowiada za ułożenie kolumn statusów, pokazanie kart tasków oraz obsługę przenoszenia ich między etapami pracy. Dane wejściowe obejmują identyfikator projektu, listę kolumn i listę tasków, dlatego komponent nie musi samodzielnie pobierać danych z bazy. Jego rola jest ograniczona do prezentacji i obsługi interakcji na otrzymanym zestawie informacji.
 
-Każda kolumna kanban jest reprezentowana przez obiekt zawierający identyfikator, nazwę, kolor oraz informację, czy dane zadanie zostało zakończone. Zadanie zawiera między innymi identyfikator, tytuł, opis, priorytet, aktualny status, pozycję, termin oraz tagi. Relacja pomiędzy zadaniem i kolumną jest realizowana przez pole ``\texttt{statusId}''. Jeżeli ``\texttt{statusId}'' zadania jest równe identyfikatorowi kolumny, karta zadania zostaje wyrenderowana właśnie w tej kolumnie.
+Każda kolumna Kanban jest reprezentowana przez obiekt zawierający identyfikator, nazwę, kolor oraz informację, czy dane zadanie zostało zakończone. Zadanie zawiera między innymi identyfikator, tytuł, opis, priorytet, aktualny status, pozycję, termin oraz tagi. Relacja pomiędzy zadaniem i kolumną jest realizowana przez pole ``\texttt{statusId}''. Jeżeli ``\texttt{statusId}'' zadania jest równe identyfikatorowi kolumny, karta zadania zostaje wyrenderowana właśnie w tej kolumnie.
 
 Lokalny stan tablicy przechowywany jest przy użyciu hooków ``\texttt{useState}''. Obejmuje on aktualne taski, kolumny, identyfikator przeciąganego taska, aktywną kolumnę upuszczania oraz dane edytowanej kolumny. Hook ``\texttt{useEffect}'' synchronizuje ten stan z danymi przekazanymi przez stronę projektu, co jest potrzebne po odświeżeniu danych przez router albo po zapisaniu zmian w bazie.
 
@@ -1085,8 +1088,8 @@ Lista kolumn powstaje w ``\texttt{useMemo}'', ponieważ zależy od konfiguracji 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/frontend/1.png}
-  \caption{Fragment kodu przedstawiający wyliczanie kolumn widoku kanban.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image25.png}
+  \caption{Fragment kodu przedstawiający wyliczanie kolumn widoku Kanban}
   \label{fig:frontend-ordered-columns}
 \end{figure}
 
@@ -1098,8 +1101,8 @@ Za właściwą zmianę statusu odpowiada funkcja ``\texttt{moveTask}''. Po wybra
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/frontend/2.png}
-  \caption{Fragment kodu przedstawiający zmianę statusu taska w widoku kanban.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image26.png}
+  \caption{Fragment kodu przedstawiający zmianę statusu taska w widoku Kanban}
   \label{fig:frontend-move-task}
 \end{figure}
 
@@ -1107,9 +1110,9 @@ Kod funkcji ``\texttt{moveTask}'' pokazuje połączenie logiki interfejsu z zapi
 
 Istotnym elementem implementacji jest również edycja kolumn. Użytkownik może kliknąć nagłówek kolumny, zmienić jej nazwę, kolor oraz oznaczyć ją jako kolumnę końcową. Po zapisaniu zmian, komponent wysyła żądanie ``\texttt{PATCH}'' do endpointu ``\texttt{/api/projects/\{projectId\}}'', przekazując zaktualizowaną tablicę ``\texttt{kanbanColumns}''. Każda kolumna otrzymuje także pozycję wynikającą z kolejności w tablicy. Po poprawnym zapisie wykonywana jest funkcja ``\texttt{router.refresh()}'', która odświeża dane projektu.
 
-Widok kanban jest osadzony w komponencie ``\texttt{ProjectTaskView}''. Ten komponent pozwala przełączać sposób prezentacji zadań między widokiem ``\texttt{kanban}'' a widokiem ``\texttt{listy}''. Wybrany tryb jest zapisywany w projekcie przez żądanie ``\texttt{PATCH}'' do endpointu projektu, w polu ``\texttt{taskView}''. Dzięki temu wybór użytkownika nie jest wyłącznie stanem tymczasowym w przeglądarce, ale częścią konfiguracji projektu przechowywaną w bazie danych. Dodatkowo dla tablicy kanban dostępny jest tryb rozszerzony, który wyświetla tablicę na całym ekranie i ułatwia pracę z większą liczbą zadań.
+Widok Kanban jest osadzony w komponencie ``\texttt{ProjectTaskView}''. Ten komponent pozwala przełączać sposób prezentacji zadań między widokiem ``\texttt{Kanban}'' a widokiem ``\texttt{listy}''. Wybrany tryb jest zapisywany w projekcie przez żądanie ``\texttt{PATCH}'' do endpointu projektu, w polu ``\texttt{taskView}''. Dzięki temu wybór użytkownika nie jest wyłącznie stanem tymczasowym w przeglądarce, ale częścią konfiguracji projektu przechowywaną w bazie danych. Dodatkowo dla tablicy Kanban dostępny jest tryb rozszerzony, który wyświetla tablicę na całym ekranie i ułatwia pracę z większą liczbą zadań.
 
-Karty zadań w widoku kanban zawierają najważniejsze informacje potrzebne do szybkiej oceny pracy: tytuł, skrócony opis, priorytet, termin oraz tagi. Priorytety są wyróżnione kolorami, a termin jest prezentowany razem z ikoną kalendarza. Każda karta jest linkiem do szczegółów zadania, dzięki czemu użytkownik może szybko przejść z ogólnego widoku projektu do edycji konkretnego elementu.
+Karty zadań w widoku Kanban zawierają najważniejsze informacje potrzebne do szybkiej oceny pracy: tytuł, skrócony opis, priorytet, termin oraz tagi. Priorytety są wyróżnione kolorami, a termin jest prezentowany razem z ikoną kalendarza. Każda karta jest linkiem do szczegółów zadania, dzięki czemu użytkownik może szybko przejść z ogólnego widoku projektu do edycji konkretnego elementu.
 
 \section{Implementacja sekcji przypiętych elementów dashboardu}
 
@@ -1127,8 +1130,8 @@ Za właściwą listę przypiętych elementów odpowiada komponent ``\texttt{Pinn
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/frontend/3.png}
-  \caption{Fragment kodu przedstawiający filtrowanie i sortowanie przypiętych elementów.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image27.png}
+  \caption{Fragment kodu przedstawiający filtrowanie i sortowanie przypiętych elementów}
   \label{fig:frontend-pinned-search}
 \end{figure}
 
@@ -1143,8 +1146,8 @@ Po zakończeniu operacji aktualizowany jest też lokalny identyfikator przypięc
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/frontend/4.png}
-  \caption{Fragment kodu przedstawiający obsługę przypinania i odpinania elementów.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image28.png}
+  \caption{Fragment kodu przedstawiający obsługę przypinania i odpinania elementów}
   \label{fig:frontend-pin-toggle}
 \end{figure}
 
@@ -1154,18 +1157,18 @@ W efekcie sekcja przypiętych elementów pełni rolę spersonalizowanego skrótu
 
 \FirstParagraph Formularz taska znajduje się w komponencie ``\texttt{TaskForm}'' w pliku ``\texttt{task-form.tsx}''. Ten sam komponent obsługuje tworzenie i edycję, ponieważ tryb działania przekazywany jest w parametrze ``\texttt{mode}''. Rozwiązanie ogranicza powielanie kodu: układ pól, podstawowa walidacja i wysyłanie danych do API są wspólne dla obu widoków.
 
-Struktura formularza została osadzona w komponencie ``\texttt{FormShell}'', który zapewnia wspólny układ wizualny dla formularzy aplikacji. Wewnątrz formularza umieszczono pola odpowiadające najważniejszym właściwościom taska: tytuł, opis, priorytet, status, projekt, termin wykonania oraz tagi. Część pól jest prezentowana warunkowo. Jeżeli użytkownik przypisze task do projektu, formularz pobiera dostępne statusy z kolumn kanban danego projektu i pozwala wybrać właściwą kolumnę. Jeżeli task nie należy do projektu, wykorzystywane są podstawowe statusy tasków osobistych.
+Struktura formularza została osadzona w komponencie ``\texttt{FormShell}'', który zapewnia wspólny układ wizualny dla formularzy aplikacji. Wewnątrz formularza umieszczono pola odpowiadające najważniejszym właściwościom taska: tytuł, opis, priorytet, status, projekt, termin wykonania oraz tagi. Część pól jest prezentowana warunkowo. Jeżeli użytkownik przypisze task do projektu, formularz pobiera dostępne statusy z kolumn Kanban danego projektu i pozwala wybrać właściwą kolumnę. Jeżeli task nie należy do projektu, wykorzystywane są podstawowe statusy tasków osobistych.
 
-Komponent przechowuje stan formularza za pomocą hooków ``\texttt{useState}''. W stanie znajdują się między innymi komunikaty błędów, informacja o trwającym zapisie, wybrane tagi, powiązane checklisty, powiązane notatki, nowe tytuły checklist oraz identyfikator wybranego projektu. Dodatkowo zastosowano ``\texttt{useMemo}'', aby wyliczać aktualnie wybrany projekt i listę jego statusów tylko wtedy, gdy zmienią się dane wejściowe formularza. Funkcja ``\texttt{useEffect}'' pilnuje natomiast, aby po zmianie projektu wybrany status nadal należał do dostępnych kolumn kanban.
+Komponent przechowuje stan formularza za pomocą hooków ``\texttt{useState}''. W stanie znajdują się między innymi komunikaty błędów, informacja o trwającym zapisie, wybrane tagi, powiązane checklisty, powiązane notatki, nowe tytuły checklist oraz identyfikator wybranego projektu. Dodatkowo zastosowano ``\texttt{useMemo}'', aby wyliczać aktualnie wybrany projekt i listę jego statusów tylko wtedy, gdy zmienią się dane wejściowe formularza. Funkcja ``\texttt{useEffect}'' pilnuje natomiast, aby po zmianie projektu wybrany status nadal należał do dostępnych kolumn Kanban.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/frontend/Rozbudowa 1.png}
-  \caption{Fragment kodu przedstawiający stan formularza taska oraz dopasowanie statusów do wybranego projektu.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image29.png}
+  \caption{Fragment kodu przedstawiający stan formularza taska oraz dopasowanie statusów do wybranego projektu}
   \label{fig:frontend-task-form-state}
 \end{figure}
 
-Pokazany fragment kodu obrazuje sposób połączenia pól formularza z konfiguracją projektu. Stan komponentu przechowuje wartości wybierane przez użytkownika, a wyliczane listy statusów pozwalają dopasować formularz taska do kolumn kanban przypisanych do konkretnego projektu. Dzięki temu użytkownik nie wybiera statusu oderwanego od struktury projektu, lecz korzysta z opcji wynikających z jego aktualnej konfiguracji.
+Pokazany fragment kodu obrazuje sposób połączenia pól formularza z konfiguracją projektu. Stan komponentu przechowuje wartości wybierane przez użytkownika, a wyliczane listy statusów pozwalają dopasować formularz taska do kolumn Kanban przypisanych do konkretnego projektu. Dzięki temu użytkownik nie wybiera statusu oderwanego od struktury projektu, lecz korzysta z opcji wynikających z jego aktualnej konfiguracji.
 
 Wysyłanie formularza obsługuje funkcja ``\texttt{handleSubmit}''. Po zatrzymaniu domyślnego działania formularza tworzony jest obiekt ``\texttt{FormData}'', z którego pobierane są wartości pól. Przed wysłaniem żądania sprawdzane jest, czy tytuł taska nie jest pusty. Następnie komponent buduje obiekt danych zawierający między innymi pola ``\texttt{title}'', ``\texttt{description}'', ``\texttt{priority}'', ``\texttt{statusId}'', ``\texttt{projectId}'', ``\texttt{dueDate}'', ``\texttt{tags}'', ``\texttt{checklistIds}'', ``\texttt{newChecklists}'' oraz ``\texttt{noteIds}''. W zależności od trybu formularz wysyła żądanie ``\texttt{POST}'' do endpointu ``\texttt{/api/tasks}'' albo żądanie ``\texttt{PATCH}'' do endpointu ``\texttt{/api/tasks/\{taskId\}}''.
 
@@ -1173,35 +1176,35 @@ Po poprawnym utworzeniu taska użytkownik jest przenoszony do widoku listy task�
 
 \section{Implementacja formularza projektu}
 
-\FirstParagraph Formularz projektu zapisano w komponencie ``\texttt{ProjectForm}'' w pliku ``\texttt{project-form.tsx}''. Podobnie jak formularz taska działa on w trybie tworzenia i edycji, ale ma szerszy zakres odpowiedzialności. Poza podstawowymi polami projektu obsługuje konfigurację kolumn kanban oraz dodawanie początkowych tasków, więc już na etapie tworzenia projektu można przygotować jego roboczą strukturę.
+\FirstParagraph Formularz projektu zapisano w komponencie ``\texttt{ProjectForm}'' w pliku ``\texttt{project-form.tsx}''. Podobnie jak formularz taska działa on w trybie tworzenia i edycji, ale ma szerszy zakres odpowiedzialności. Poza podstawowymi polami projektu obsługuje konfigurację kolumn Kanban oraz dodawanie początkowych tasków, więc już na etapie tworzenia projektu można przygotować jego roboczą strukturę.
 
 Podstawowa część formularza obejmuje tytuł, opis, priorytet, status cyklu życia projektu, termin wykonania oraz tagi. Dane te są wysyłane do backendu jako pola ``\texttt{title}'', ``\texttt{description}'', ``\texttt{priority}'', ``\texttt{lifecycleStatus}'', ``\texttt{dueDate}'' oraz ``\texttt{tags}''. Formularz pozwala również powiązać projekt z istniejącymi checklistami i notatkami oraz utworzyć nowe checklisty podczas zapisu projektu. Dzięki temu użytkownik może przygotować projekt wraz z najbardziej potrzebnymi elementami organizacyjnymi w jednym widoku.
 
-Najważniejszą częścią formularza jest konfiguracja kolumn kanban. Domyślnie formularz posiada zestaw kolumn ``\texttt{backlog}'', ``\texttt{todo}'', ``\texttt{in\_progress}'', ``\texttt{testing}'' oraz ``\texttt{done}''. Każda kolumna ma identyfikator, nazwę, kolor, informację o tym, czy jest kolumną końcową oraz pozycję. Funkcja ``\texttt{slugifyColumnId}'' tworzy techniczny identyfikator kolumny na podstawie jej nazwy, natomiast funkcja ``\texttt{normalizeKanbanColumns}'' porządkuje tablicę kolumn przed wysłaniem jej do API. Normalizacja usuwa puste nazwy, uzupełnia brakujące kolory, nadaje pozycje oraz zabezpiecza przed powtórzeniem identyfikatorów.
+Najważniejszą częścią formularza jest konfiguracja kolumn Kanban. Domyślnie formularz posiada zestaw kolumn ``\texttt{backlog}'', ``\texttt{todo}'', ``\texttt{in\_progress}'', ``\texttt{testing}'' oraz ``\texttt{done}''. Każda kolumna ma identyfikator, nazwę, kolor, informację o tym, czy jest kolumną końcową oraz pozycję. Funkcja ``\texttt{slugifyColumnId}'' tworzy techniczny identyfikator kolumny na podstawie jej nazwy, natomiast funkcja ``\texttt{normalizeKanbanColumns}'' porządkuje tablicę kolumn przed wysłaniem jej do API. Normalizacja usuwa puste nazwy, uzupełnia brakujące kolory, nadaje pozycje oraz zabezpiecza przed powtórzeniem identyfikatorów.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.5\textheight,keepaspectratio]{../screenshots/frontend/Rozbudowa 2 a.png}
-  \caption{Fragment kodu przedstawiający tworzenie identyfikatorów oraz normalizację kolumn kanban w formularzu projektu.}
+  \includegraphics[width=\textwidth,height=0.5\textheight,keepaspectratio]{imported-media/media/image30.png}
+  \caption{Fragment kodu przedstawiający tworzenie identyfikatorów oraz normalizację kolumn Kanban w formularzu projektu}
   \label{fig:frontend-project-form-normalize-columns}
 \end{figure}
 
-Pierwszy fragment kodu pokazuje przygotowanie kolumn kanban przed zapisem projektu. Funkcja tworząca identyfikator techniczny ujednolica nazwy kolumn, natomiast normalizacja porządkuje ich listę, usuwa puste wartości i zabezpiecza formularz przed zapisaniem niespójnej konfiguracji.
+Pierwszy fragment kodu pokazuje przygotowanie kolumn Kanban przed zapisem projektu. Funkcja tworząca identyfikator techniczny ujednolica nazwy kolumn, natomiast normalizacja porządkuje ich listę, usuwa puste wartości i zabezpiecza formularz przed zapisaniem niespójnej konfiguracji.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.5\textheight,keepaspectratio]{../screenshots/frontend/Rozbudowa 2 b.png}
-  \caption{Fragment kodu przedstawiający edycję oraz zmianę kolejności kolumn kanban w formularzu projektu.}
+  \includegraphics[width=\textwidth,height=0.5\textheight,keepaspectratio]{imported-media/media/image31.png}
+  \caption{Fragment kodu przedstawiający edycję oraz zmianę kolejności kolumn Kanban w formularzu projektu}
   \label{fig:frontend-project-form-edit-columns}
 \end{figure}
 
-Drugi fragment pokazuje funkcje wykorzystywane podczas bieżącej pracy użytkownika z formularzem projektu. Kod pozwala aktualizować właściwości kolumn, usuwać je oraz zmieniać ich kolejność, dzięki czemu końcowa struktura tablicy kanban może zostać dopasowana do sposobu realizacji projektu.
+Drugi fragment pokazuje funkcje wykorzystywane podczas bieżącej pracy użytkownika z formularzem projektu. Kod pozwala aktualizować właściwości kolumn, usuwać je oraz zmieniać ich kolejność, dzięki czemu końcowa struktura tablicy Kanban może zostać dopasowana do sposobu realizacji projektu.
 
 Formularz projektu umożliwia także zarządzanie kolejnością kolumn. Funkcje ``\texttt{moveKanbanColumn}'', ``\texttt{updateKanbanColumn}'', ``\texttt{removeKanbanColumn}'' oraz mechanizm dodawania nowej kolumny pozwalają użytkownikowi zbudować strukturę tablicy dopasowaną do sposobu pracy nad projektem. Jeżeli podczas edycji zmieni się identyfikator kolumny, komponent aktualizuje również statusy nowych tasków przypisanych do tej kolumny. Dzięki temu dane przygotowane w formularzu pozostają spójne przed wysłaniem do backendu.
 
 Drugim rozbudowanym elementem jest sekcja początkowych tasków projektu. Każdy nowy task otrzymuje lokalny identyfikator generowany przez ``\texttt{crypto.randomUUID}'', tytuł, opis, priorytet, status, termin oraz tagi. Funkcje ``\texttt{addProjectTask}'', ``\texttt{updateProjectTask}'' i ``\texttt{removeProjectTask}'' pozwalają dodawać, modyfikować oraz usuwać taski jeszcze przed utworzeniem projektu. Podczas zapisu puste tytuły są odfiltrowywane, aby do API trafiły wyłącznie kompletne elementy.
 
-Zapis projektu odbywa się w funkcji ``\texttt{handleSubmit}''. Formularz najpierw sprawdza obecność tytułu oraz poprawność listy kolumn kanban. Następnie przygotowuje obiekt danych zawierający konfigurację projektu, powiązane elementy, nowe checklisty, początkowe taski oraz tablicę ``\texttt{kanbanColumns}''. W trybie tworzenia wykonywane jest żądanie ``\texttt{POST}'' do endpointu ``\texttt{/api/projects}'', natomiast w trybie edycji żądanie ``\texttt{PATCH}'' do endpointu ``\texttt{/api/projects/\{projectId\}}''. Po poprawnym utworzeniu projektu użytkownik jest przenoszony do listy projektów, a po edycji otrzymuje komunikat o zapisaniu zmian.
+Zapis projektu odbywa się w funkcji ``\texttt{handleSubmit}''. Formularz najpierw sprawdza obecność tytułu oraz poprawność listy kolumn Kanban. Następnie przygotowuje obiekt danych zawierający konfigurację projektu, powiązane elementy, nowe checklisty, początkowe taski oraz tablicę ``\texttt{kanbanColumns}''. W trybie tworzenia wykonywane jest żądanie ``\texttt{POST}'' do endpointu ``\texttt{/api/projects}'', natomiast w trybie edycji żądanie ``\texttt{PATCH}'' do endpointu ``\texttt{/api/projects/\{projectId\}}''. Po poprawnym utworzeniu projektu użytkownik jest przenoszony do listy projektów, a po edycji otrzymuje komunikat o zapisaniu zmian.
 
 \chapter{Implementacja kodu po stronie backendu}
 
@@ -1221,8 +1224,8 @@ Przed utworzeniem dokumentu dane są przekazywane do funkcji ``\texttt{sanitizeM
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/backend/1.png}
-  \caption{Fragment kodu przedstawiający obsługę metod GET i POST dla checklist.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image32.png}
+  \caption{Fragment kodu przedstawiający obsługę metod GET i POST dla checklist}
   \label{fig:backend-checklists-get-post}
 \end{figure}
 
@@ -1234,8 +1237,8 @@ Metoda ``\texttt{PATCH}'' aktualizuje checklistę przy użyciu schematu ``\textt
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/backend/2.png}
-  \caption{Fragment kodu przedstawiający aktualizację pojedynczej checklisty.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image33.png}
+  \caption{Fragment kodu przedstawiający aktualizację pojedynczej checklisty}
   \label{fig:backend-checklist-patch}
 \end{figure}
 
@@ -1245,8 +1248,8 @@ Usunięcie checklisty zostało zrealizowane jako archiwizacja. Metoda ``\texttt{
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/backend/3.png}
-  \caption{Fragment kodu przedstawiający archiwizację checklisty w metodzie DELETE.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image34.png}
+  \caption{Fragment kodu przedstawiający archiwizację checklisty w metodzie DELETE}
   \label{fig:backend-checklist-delete}
 \end{figure}
 
@@ -1260,8 +1263,8 @@ Pierwszym przykładem jest moduł ``\texttt{api-request.ts}'', w którym znajduj
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/backend/Rozbudowa 3.png}
-  \caption{Fragment kodu przedstawiający odczyt i walidację ciała żądania API.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image35.png}
+  \caption{Fragment kodu przedstawiający odczyt i walidację ciała żądania API}
   \label{fig:backend-api-request-parser}
 \end{figure}
 
@@ -1275,8 +1278,8 @@ Wspólna funkcja ``\texttt{sanitizeMutation}'' odpowiada za oczyszczanie danych 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/backend/Rozbudowa 4.png}
-  \caption{Fragment kodu przedstawiający pobieranie użytkownika z sesji oraz oczyszczanie danych przed zapisem.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image36.png}
+  \caption{Fragment kodu przedstawiający pobieranie użytkownika z sesji oraz oczyszczanie danych przed zapisem}
   \label{fig:backend-session-sanitize}
 \end{figure}
 
@@ -1296,12 +1299,12 @@ W konfiguracji zastosowano strategię ``\texttt{jwt}'' oraz callback ``\texttt{s
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/backend/4.png}
-  \caption{Fragment kodu przedstawiający konfigurację autoryzacji w Auth.js.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image37.png}
+  \caption{Fragment kodu przedstawiający konfigurację autoryzacji w Auth.js}
   \label{fig:backend-auth-options}
 \end{figure}
 
-Konfiguracja ``\texttt{authOptions}'' stanowi centralny punkt mechanizmu autoryzacji. W tym miejscu wskazano adapter MongoDB, strategię sesji, stronę logowania oraz listę aktywnych dostawców OAuth. Callback ``\texttt{session}'' dopisuje identyfikator użytkownika do obiektu sesji, dzięki czemu pozostałe endpointy mogą korzystać z jednej funkcji pobierającej właściciela danych.
+Konfiguracja ``\texttt{authOptions}'' zbiera w jednym miejscu ustawienia mechanizmu autoryzacji: adapter MongoDB, strategię sesji, stronę logowania oraz listę aktywnych dostawców OAuth. Callback ``\texttt{session}'' dopisuje identyfikator użytkownika do obiektu sesji, dzięki czemu pozostałe endpointy mogą korzystać z jednej funkcji pobierającej właściciela danych.
 
 W praktyce autoryzacja jest używana w handlerach API przez funkcję pobierającą identyfikator aktualnego użytkownika. Każda operacja na danych użytkownika rozpoczyna się od pobrania identyfikatora sesji. Następnie identyfikator ten trafia do warunków zapytań jako ``\texttt{ownerId}''. Takie rozwiązanie sprawia, że nawet poprawnie zbudowane żądanie nie pozwala odczytać ani zmienić danych należących do innej osoby.
 
@@ -1321,8 +1324,8 @@ Pierwszy test sprawdza poprawny, pełny zestaw danych taska. Weryfikowane są mi
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/testy/Testy 1 .png}
-  \caption{Fragment testu przedstawiający walidację pełnego zestawu danych taska.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image38.png}
+  \caption{Fragment testu przedstawiający walidację pełnego zestawu danych taska}
   \label{fig:test-task-validation-complete}
 \end{figure}
 
@@ -1332,7 +1335,7 @@ Drugi test kontroluje odrzucanie pól, które nie należą do obsługiwanego for
 
 Kolejny test sprawdza reakcję walidacji na niepoprawne wartości. Odrzucany jest między innymi nieznany priorytet, błędny format daty oraz puste identyfikatory powiązanych checklist i notatek. Dzięki temu błędne dane zostają zatrzymane przed wykonaniem operacji zapisu w bazie danych.
 
-Ostatni test dotyczy aktualizacji taska. Schemat ``\texttt{taskUpdateSchema}'' dopuszcza częściową aktualizację, ale wymaga przekazania przynajmniej jednego pola. Test sprawdza więc, że pusty obiekt zostaje odrzucony, natomiast aktualizacja zawierająca samo pole ``\texttt{statusId}'' jest uznawana za poprawną. Ma to znaczenie dla działania widoku kanban, w którym zmiana statusu taska może być wykonana bez modyfikowania pozostałych właściwości zadania.
+Ostatni test dotyczy aktualizacji taska. Schemat ``\texttt{taskUpdateSchema}'' dopuszcza częściową aktualizację, ale wymaga przekazania przynajmniej jednego pola. Test sprawdza więc, że pusty obiekt zostaje odrzucony, natomiast aktualizacja zawierająca samo pole ``\texttt{statusId}'' jest uznawana za poprawną. Ma to znaczenie dla działania widoku Kanban, w którym zmiana statusu taska może być wykonana bez modyfikowania pozostałych właściwości zadania.
 
 W testach wykorzystano asercje porównujące oczekiwany wynik walidacji z wynikiem rzeczywistym. Dzięki temu możliwe jest szybkie sprawdzenie, czy zmiany w schematach danych nie osłabiły reguł zabezpieczających API tasków. Ten zestaw testów ogranicza ryzyko regresji w formularzach i endpointach odpowiedzialnych za taski, ponieważ błędne dane powinny zostać odrzucone jeszcze przed próbą zapisu w bazie danych.
 
@@ -1344,8 +1347,8 @@ W testach endpointu listowego sprawdzono między innymi odrzucenie żądania nie
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/testy/Testy 2.png}
-  \caption{Fragment testu przedstawiający utworzenie taska, powiązanie go z projektem oraz zapis aktywności.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image39.png}
+  \caption{Fragment testu przedstawiający utworzenie taska, powiązanie go z projektem oraz zapis aktywności}
   \label{fig:test-task-route-create}
 \end{figure}
 
@@ -1355,8 +1358,8 @@ Testy dynamicznego endpointu taska obejmują odczyt pojedynczego dokumentu, odrz
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{../screenshots/testy/Testy 3.png}
-  \caption{Fragment testu przedstawiający aktualizację taska oraz przeniesienie powiązań między projektami.}
+  \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image40.png}
+  \caption{Fragment testu przedstawiający aktualizację taska oraz przeniesienie powiązań między projektami}
   \label{fig:test-task-route-move}
 \end{figure}
 
@@ -1367,9 +1370,9 @@ Ostatni z dodanych screenów przedstawia test dynamicznego endpointu taska. Wery
 
 \FirstParagraph Celem pracy było zaprojektowanie oraz zaimplementowanie aplikacji internetowej wspierającej indywidualną organizację zadań, checklist, notatek i projektów. Cel ten został zrealizowany: powstał system, w którym użytkownik może porządkować różne typy informacji, łączyć je z projektami, przypinać najważniejsze elementy do dashboardu i korzystać z aplikacji z poziomu przeglądarki internetowej.
 
-Wykonana aplikacja działa w architekturze klient-serwer i wykorzystuje Next.js, React, TypeScript oraz MongoDB. System umożliwia tworzenie i organizowanie tasków, checklist, notatek oraz projektów, a projekty mogą być prezentowane w formie listy albo tablicy kanban. Wdrożono także przypinanie najważniejszych elementów do dashboardu, logowanie przez zewnętrznych dostawców OAuth, walidację danych wejściowych oraz testy obejmujące wybrane mechanizmy tasków.
+Wykonana aplikacja działa w architekturze klient-serwer i wykorzystuje Next.js, React, TypeScript oraz MongoDB. System umożliwia tworzenie i organizowanie tasków, checklist, notatek oraz projektów, a projekty mogą być prezentowane w formie listy albo tablicy Kanban. Wdrożono także przypinanie najważniejszych elementów do dashboardu, logowanie przez zewnętrznych dostawców OAuth, walidację danych wejściowych oraz testy obejmujące wybrane mechanizmy tasków.
 
-Podział na frontend, endpointy API i bazę danych uporządkował odpowiedzialności poszczególnych części systemu. Frontend odpowiada za wygodę pracy i prezentację informacji, backend sprawdza sesję użytkownika oraz poprawność żądań, a MongoDB przechowuje dane w modelu dokumentowym. Takie rozwiązanie dobrze pasuje do projektów z własnymi kolumnami kanban, tagami i powiązanymi checklistami.
+Podział na frontend, endpointy API i bazę danych uporządkował odpowiedzialności poszczególnych części systemu. Frontend odpowiada za wygodę pracy i prezentację informacji, backend sprawdza sesję użytkownika oraz poprawność żądań, a MongoDB przechowuje dane w modelu dokumentowym. Takie rozwiązanie dobrze pasuje do projektów z własnymi kolumnami Kanban, tagami i powiązanymi checklistami.
 
 Samodzielny wkład autora obejmował analizę wymagań, przygotowanie koncepcji aplikacji, zaprojektowanie struktury bazy danych, wykonanie interfejsu użytkownika, implementację logiki frontendowej i backendowej, konfigurację autoryzacji, przygotowanie scenariuszy przypadków użycia oraz opracowanie testów jednostkowych dla funkcjonalności tasków. W ramach pracy przygotowano również opis architektury, diagramy, dokumentację implementacji i materiały graficzne wykorzystane w rozdziałach projektowych.
 
@@ -1388,7 +1391,7 @@ Projekt można dalej rozwijać w kilku kierunkach. Najbardziej naturalne byłoby
 
 \item {\RaggedRight Asana, Inc., \emph{Asana}, strona internetowa aplikacji do zarządzania pracą, [b.r.], dostęp: \url{https://asana.com} (17.07.2026).\par}
 
-\item {\RaggedRight Atlassian, \emph{Trello}, strona internetowa aplikacji kanban do zarządzania zadaniami, [b.r.], dostęp: \url{https://trello.com} (17.07.2026).\par}
+\item {\RaggedRight Atlassian, \emph{Trello}, strona internetowa aplikacji Kanban do zarządzania zadaniami, [b.r.], dostęp: \url{https://trello.com} (17.07.2026).\par}
 
 \item {\RaggedRight Auth.js, \emph{Auth.js}, dokumentacja biblioteki do obsługi uwierzytelniania, [b.r.], dostęp: \url{https://authjs.dev} (17.07.2026).\par}
 
