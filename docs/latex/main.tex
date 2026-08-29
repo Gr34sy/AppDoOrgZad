@@ -798,7 +798,7 @@ Na diagramie zaprezentowano sekwencję działań wykonywanych podczas przypinani
 
 \noindent \textbf{Aktor:} Głowa rodziny.
 
-\noindent \textbf{Cel:} Nie zapomnieć produktów w sklepie.
+\noindent \textbf{Cel:} Nie zapomnieć o kupieniu wszystkich produktów w sklepie.
 
 \noindent \textbf{Warunki wstępne:} Użytkownik jest zalogowany.
 
@@ -807,11 +807,9 @@ Na diagramie zaprezentowano sekwencję działań wykonywanych podczas przypinani
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \item
-  Użytkownik przechodzi do strony ``szybkie notatki''.
+  Użytkownik przechodzi do strony ``checklisty''.
 \item
   Użytkownik wybiera ikonę z plusem, znajdującą się obok istniejących elementów.
-\item
-  Użytkownik wybiera, czy chce dodać notatkę, czy checklistę.
 \item
   System otwiera formularz tworzenia checklisty.
 \item
@@ -993,7 +991,7 @@ Pierwszy ekran scenariusza pokazuje szczegóły checklisty. Najważniejsze miejs
   \label{fig:scenariusz-1-przycisk-przypnij}
 \end{figure}
 
-Po wykonaniu akcji przypięcia zmienia się wygląd przycisku widocznego przy checkliście. Ikona pinezki zostaje wypełniona kolorem, dzięki czemu interfejs natychmiast informuje, że checklista jest już przypięta. Takie rozwiązanie ogranicza potrzebę dodatkowych komunikatów tekstowych, ponieważ sam stan przycisku staje się informacją zwrotną.
+Po wykonaniu akcji przypięcia zmienia się wygląd przycisku widocznego przy checkliście. Ikona pinezki zostaje wypełniona kolorem, dzięki czemu interfejs natychmiast informuje, że checklista jest przypięta. Takie rozwiązanie ogranicza potrzebę dodatkowych komunikatów tekstowych, ponieważ sam stan przycisku staje się informacją zwrotną.
 
 \begin{figure}[H]
   \centering
@@ -1020,7 +1018,7 @@ Główna strona tasków użytkownika wykorzystuje stały układ z boczną nawiga
   \label{fig:scenariusz-2-formularz-taska}
 \end{figure}
 
-Formularz tworzenia taska uporządkowano według ważności uzupełnianych informacji. Najwyżej umieszczono pola tytułu i opisu, ponieważ są one najważniejsze dla identyfikacji zadania. Niżej znajdują się parametry organizacyjne, takie jak priorytet, status, projekt, termin realizacji, tagi, checklisty oraz powiązane notatki. Formularz zachowuje jednolity układ pól i odstępów, co zwiększa czytelność nawet przy większej liczbie ustawień.
+Formularz tworzenia taska uporządkowano w kolejności takiej, by na samej górze elementu znajdowały się najpotrzebniejsze informacje. Umieszczono tam pola tytułu i opisu, ponieważ są one najważniejsze dla identyfikacji zadania. Niżej znajdują się parametry organizacyjne, takie jak priorytet, status, projekt, termin realizacji, tagi, checklisty oraz powiązane notatki. Formularz zachowuje jednolity układ pól i odstępów, co zwiększa czytelność nawet przy większej ich liczbie.
 
 \begin{figure}[H]
   \centering
@@ -1069,7 +1067,7 @@ Alternatywny widok tasków projektu przyjmuje formę listy. W tym układzie zada
 
 \chapter{Implementacja kodu po stronie frontendu}
 
-\FirstParagraph Rozdział opisuje te fragmenty frontendu, które najmocniej wpływają na codzienną pracę z aplikacją: widok kanban w projekcie, przypięte elementy dashboardu oraz formularze tasków i projektów. Nie omawiano każdego komponentu osobno, lecz wybrano miejsca, w których najlepiej widać sposób łączenia stanu interfejsu, danych z backendu i reakcji na działania użytkownika. Przed opisem konkretnych widoków warto jednak wskazać, że warstwa frontendowa została oparta na komponentach używanych w wielu modułach aplikacji. Dotyczy to przede wszystkim formularzy, kart elementów, sekcji listujących dane i przycisków akcji. Dzięki temu użytkownik spotyka podobny układ pól i podobne zachowanie kontrolek niezależnie od tego, czy tworzy task, projekt, notatkę czy checklistę.
+\FirstParagraph Rozdział opisuje fragmenty frontendu, które najbardziej wpływają na codzienną pracę z aplikacją: widok kanban w projekcie, przypięte elementy dashboardu oraz formularze tasków i projektów. Wybrano miejsca, w których najlepiej widać sposób łączenia stanu interfejsu, danych z backendu i reakcji na działania użytkownika. Przed opisem konkretnych widoków warto jednak wskazać, że warstwa frontendowa została oparta na komponentach używanych w wielu modułach aplikacji. Dotyczy to przede wszystkim formularzy, kart elementów, sekcji listujących dane i przycisków akcji. Dzięki temu użytkownik spotyka podobny układ pól i podobne zachowanie kontrolek niezależnie od tego, czy tworzy task, projekt, notatkę czy checklistę. Pozwala to zachować spójność interfejsu aplikacji, co korzystnie wpływa na intuicyjność obsługi.
 
 Przykładem takiego rozwiązania jest komponent ``\texttt{FormShell}'', wykorzystywany jako wspólna struktura formularzy tasków i projektów. Odpowiada on za układ nagłówka, obszaru pól, komunikatów oraz przycisków zapisu, dzięki czemu poszczególne formularze mogą skupiać się na własnych danych i logice wysyłania żądania. Podobną rolę pełni komponent ``\texttt{ObjectCard}'', który pozwala prezentować notatki, checklisty, taski i projekty w ujednoliconej formie karty z ikoną, tytułem, opisem oraz metadanymi.
 
@@ -1119,13 +1117,13 @@ Karty zadań w widoku kanban zawierają najważniejsze informacje potrzebne do s
 
 Pobieranie danych do dashboardu odbywa się w pliku ``\texttt{dashboard/page.tsx}''. Strona najpierw sprawdza sesję użytkownika, a następnie łączy się z bazą danych. Za pomocą funkcji ``\texttt{Promise.all}'' równolegle pobierane są przypięcia, liczniki głównych typów danych, ostatnio aktualizowane notatki, checklisty, taski i projekty oraz wydarzenia kalendarza wynikające z terminów tasków i projektów. Takie podejście ogranicza czas oczekiwania na dane, ponieważ niezależne zapytania są wykonywane równocześnie.
 
-Dla każdego dokumentu modelu ``\texttt{Pin}'' wykonywana jest funkcja ``\texttt{findPinnedTarget}''. Funkcja ta sprawdza typ przypiętego elementu i na tej podstawie pobiera właściwy dokument z kolekcji ``\texttt{notes}'', ``\texttt{checklists}'', ``\texttt{tasks}'' albo ``\texttt{projects}''. Każde zapytanie zawiera dwa warunki do spełnienia - element musi posiadać właściwość ``\texttt{ownerId}'' oraz nie być zarchiwizowany, czyli spełniać warunek ``\texttt{archivedAt: null}''. Dlatego dashboard pokazuje tylko aktywne elementy należące do zalogowanego użytkownika. Jeżeli przypięty dokument nie istnieje lub został zarchiwizowany, nie jest przekazywany do interfejsu.
+Dla każdego dokumentu o modelu ``\texttt{Pin}'' wykonywana jest funkcja ``\texttt{findPinnedTarget}''. Funkcja ta sprawdza typ przypiętego elementu i na tej podstawie pobiera właściwy dokument z kolekcji ``\texttt{notes}'', ``\texttt{checklists}'', ``\texttt{tasks}'' albo ``\texttt{projects}''. Każde zapytanie zawiera dwa warunki do spełnienia - element musi posiadać właściwość ``\texttt{ownerId}'' oraz nie być zarchiwizowany, czyli spełniać warunek ``\texttt{archivedAt: null}''. Dlatego dashboard pokazuje tylko aktywne elementy należące do zalogowanego użytkownika. Jeżeli przypięty dokument nie istnieje lub został zarchiwizowany, nie jest przekazywany do interfejsu.
 
 Po pobraniu celu przypięcia, dane są mapowane do wspólnego formatu ``\texttt{PinnedItem}''. Obiekt ten zawiera tytuł, opis, typ, status, priorytet, tagi, daty utworzenia i aktualizacji oraz link prowadzący do szczegółów elementu. Dzięki ujednoliceniu danych komponenty frontendowe mogą renderować przypięte notatki, checklisty, zadania i projekty w jednej sekcji, bez konieczności tworzenia czterech osobnych widoków.
 
 Głównym komponentem dashboardu jest ``\texttt{PinnedBoard}''. Renderuje on kafelki metryk, mały kalendarz oraz komponent ``\texttt{PinnedItemsSearch}''. Kafelki metryk pokazują liczbę notatek, checklist, zadań i projektów. Po najechaniu na kafelek wyświetlana jest lista ostatnio aktualizowanych elementów danego typu. Kalendarz jest budowany lokalnie na podstawie zadań i projektów mających termin w bieżącym miesiącu. Funkcja ``\texttt{buildCalendarDays}'' tworzy siatkę dni, oznacza aktualny dzień oraz przypisuje wydarzenia do odpowiednich dat.
 
-Za właściwą listę przypiętych elementów odpowiada komponent ``\texttt{PinnedItems\allowbreak Search}''. Komponent ten działa po stronie klienta, ponieważ obsługuje stan wyszukiwarki, filtrów oraz sortowania. Użytkownik może wyszukiwać przypięte elementy po tytule, opisie, typie, statusie i metadanych. Może także filtrować wyniki według typu elementu: notatek, checklist, zadań lub projektów. Lista typów jest przechowywana w stanie ``\texttt{selectedTypes}'', a filtrowanie wykonywane jest w funkcji ``\texttt{useMemo}'', aby niepotrzebnie nie przeliczać wyników przy każdym renderowaniu.
+Za właściwą listę przypiętych elementów odpowiada komponent ``\texttt{PinnedItems\allowbreak Search}''. Komponent ten działa po stronie klienta, ponieważ obsługuje stan wyszukiwarki, filtrów oraz sortowania. Użytkownik może wyszukiwać przypięte elementy po tytule, opisie, typie, statusie i metadanych. Może także filtrować wyniki według typu elementu. Lista typów jest przechowywana w stanie ``\texttt{selectedTypes}'', a filtrowanie wykonywane jest w funkcji ``\texttt{useMemo}'', aby niepotrzebnie nie przeliczać wyników przy każdym renderowaniu.
 
 \begin{figure}[H]
   \centering
@@ -1177,9 +1175,9 @@ Po poprawnym utworzeniu taska użytkownik jest przenoszony do widoku listy task�
 
 \FirstParagraph Formularz projektu zapisano w komponencie ``\texttt{ProjectForm}'' w pliku ``\texttt{project-form.tsx}''. Podobnie jak formularz taska działa on w trybie tworzenia i edycji, ale ma szerszy zakres odpowiedzialności. Poza podstawowymi polami projektu obsługuje konfigurację kolumn kanban oraz dodawanie początkowych tasków, więc już na etapie tworzenia projektu można przygotować jego roboczą strukturę.
 
-Podstawowa część formularza obejmuje tytuł, opis, priorytet, status cyklu życia projektu, termin wykonania oraz tagi. Dane te są wysyłane do backendu jako pola ``\texttt{title}'', ``\texttt{description}'', ``\texttt{priority}'', ``\texttt{lifecycleStatus}'', ``\texttt{dueDate}'' oraz ``\texttt{tags}''. Formularz pozwala również powiązać projekt z istniejącymi checklistami i notatkami oraz utworzyć nowe checklisty podczas zapisu projektu. Dzięki temu użytkownik może przygotować projekt wraz z najważniejszymi elementami organizacyjnymi w jednym widoku.
+Podstawowa część formularza obejmuje tytuł, opis, priorytet, status cyklu życia projektu, termin wykonania oraz tagi. Dane te są wysyłane do backendu jako pola ``\texttt{title}'', ``\texttt{description}'', ``\texttt{priority}'', ``\texttt{lifecycleStatus}'', ``\texttt{dueDate}'' oraz ``\texttt{tags}''. Formularz pozwala również powiązać projekt z istniejącymi checklistami i notatkami oraz utworzyć nowe checklisty podczas zapisu projektu. Dzięki temu użytkownik może przygotować projekt wraz z najbardziej potrzebnymi elementami organizacyjnymi w jednym widoku.
 
-Najważniejszą częścią formularza jest konfiguracja kolumn kanban. Domyślnie formularz posiada zestaw kolumn ``\texttt{backlog}'', ``\texttt{todo}'', ``\texttt{in\_progress}'', ``\texttt{testing}'' oraz ``\texttt{done}''. Każda kolumna ma identyfikator, nazwę, kolor, informację o tym, czy jest kolumną końcową, oraz pozycję. Funkcja ``\texttt{slugifyColumnId}'' tworzy techniczny identyfikator kolumny na podstawie jej nazwy, natomiast funkcja ``\texttt{normalizeKanbanColumns}'' porządkuje tablicę kolumn przed wysłaniem jej do API. Normalizacja usuwa puste nazwy, uzupełnia brakujące kolory, nadaje pozycje oraz zabezpiecza przed powtórzeniem identyfikatorów.
+Najważniejszą częścią formularza jest konfiguracja kolumn kanban. Domyślnie formularz posiada zestaw kolumn ``\texttt{backlog}'', ``\texttt{todo}'', ``\texttt{in\_progress}'', ``\texttt{testing}'' oraz ``\texttt{done}''. Każda kolumna ma identyfikator, nazwę, kolor, informację o tym, czy jest kolumną końcową oraz pozycję. Funkcja ``\texttt{slugifyColumnId}'' tworzy techniczny identyfikator kolumny na podstawie jej nazwy, natomiast funkcja ``\texttt{normalizeKanbanColumns}'' porządkuje tablicę kolumn przed wysłaniem jej do API. Normalizacja usuwa puste nazwy, uzupełnia brakujące kolory, nadaje pozycje oraz zabezpiecza przed powtórzeniem identyfikatorów.
 
 \begin{figure}[H]
   \centering
@@ -1211,7 +1209,7 @@ Zapis projektu odbywa się w funkcji ``\texttt{handleSubmit}''. Formularz najpie
 
 \section{Implementacja handlera API checklist}
 
-\FirstParagraph Obsługa checklist została zaimplementowana w dwóch routach API: listowym oraz dynamicznym dla pojedynczej checklisty. Pierwszy route odpowiada za operacje wykonywane na całej kolekcji checklist, natomiast drugi za operacje dotyczące pojedynczej checklisty wskazanej przez identyfikator w adresie żądania. Takie rozdzielenie wynika ze sposobu działania mechanizmu routingu w Next.js, w którym struktura katalogów określa ścieżki dostępne w API.
+\FirstParagraph Obsługa checklist została zaimplementowana w dwóch routach API: listowym oraz dynamicznym dla pojedynczej checklisty. Pierwszy route odpowiada za operacje wykonywane na całej kolekcji checklist, natomiast drugi za operacje dotyczące konkretnej checklisty wskazanej przez identyfikator w adresie żądania. Takie rozdzielenie wynika ze sposobu działania mechanizmu routingu w Next.js, w którym struktura katalogów określa ścieżki dostępne w API.
 
 W pliku ``\texttt{route.ts}'' zdefiniowano metody ``\texttt{GET}'' oraz ``\texttt{POST}''. Metoda ``\texttt{GET}'' pobiera listę aktywnych checklist należących do aktualnie zalogowanego użytkownika. Przed wykonaniem zapytania wywoływana jest funkcja ``\texttt{getCurrentUserId}'', a brak identyfikatora kończy działanie odpowiedzią ``\texttt{401 Unauthorized}''.
 
