@@ -23,6 +23,8 @@
 \usepackage[bottom]{footmisc}
 \usepackage{microtype}
 \usepackage{xevlna}
+\XeTeXcharclass`\W\CSnonsyllabicpreposition
+\XeTeXcharclass`\w\CSnonsyllabicpreposition
 \usepackage{csquotes}
 \usepackage{xurl}
 \usepackage{hyperref}
@@ -351,7 +353,7 @@ Początkowo HTML, CSS i JavaScript wystarczały do budowy prostych stron, w któ
 
 Biblioteki programistyczne to zbiory gotowych funkcji, klas oraz komponentów, które rozszerzają możliwości języków programowania i ułatwiają realizację określonych zadań. Ich celem jest ponowne wykorzystanie sprawdzonych rozwiązań oraz ograniczenie konieczności samodzielnego implementowania powtarzalnych mechanizmów. Pozwalają one na skrócenie czasu tworzenia oprogramowania oraz zwiększenie czytelności i niezawodności kodu. W kontekście technologii frontendowych biblioteki wspierają między innymi budowę interfejsu użytkownika, obsługę zdarzeń oraz zarządzanie danymi po stronie klienta. 
 
-Przykładem jest tutaj React\footnote{\emph{React: The Library for Web and Native Interfaces}, dokumentacja biblioteki React, [b.r.], \url{https://react.dev} (dostęp: 28.01.2026 r.).}, czyli biblioteka języka JavaScript. Zgodnie z dokumentacją biblioteki React, dostarcza ona narzędzia pozwalające między innymi tworzyć komponenty nadające się do ponownego użycia w różnych sekcjach aplikacji. W ten sposób można przygotować na przykład przycisk lub nagłówek bez potrzeby wielokrotnego przepisywania tego samego kodu. Takie podejście oszczędza czas oraz poprawia przejrzystość kodu. Z tego powodu w projekcie zdecydowano się na wykorzystanie tej biblioteki.
+Przykładem jest tutaj React\footnote{React, \emph{React: The Library for Web and Native Interfaces}, dokumentacja biblioteki React, [b.r.], \url{https://react.dev} (dostęp: 28.01.2026 r.).}, czyli biblioteka języka JavaScript. Zgodnie z dokumentacją biblioteki React, dostarcza ona narzędzia pozwalające między innymi tworzyć komponenty nadające się do ponownego użycia w różnych sekcjach aplikacji. W ten sposób można przygotować na przykład przycisk lub nagłówek bez potrzeby wielokrotnego przepisywania tego samego kodu. Takie podejście oszczędza czas oraz poprawia przejrzystość kodu. Z tego powodu w projekcie zdecydowano się na wykorzystanie tej biblioteki.
 
 Obok bibliotek rozwinęły się narzędzia programistyczne zwane frameworkami\footnote{Framework - z jęz. ang., jest złożeniem słów ``frame'' (rama) oraz ``work'' (praca, struktura). Dosłownie oznacza ``ramę konstrukcyjną'' lub ``szkielet''.}. Różnica pomiędzy biblioteką a frameworkiem dotyczy przede wszystkim stopnia kontroli nad przepływem aplikacji. Biblioteka dostarcza zestaw narzędzi i funkcji, które są wywoływane bezpośrednio przez programistę w wybranym miejscu. Framework natomiast narzuca określoną strukturę projektu oraz sposób działania aplikacji, przejmując kontrolę nad jej przepływem i wymuszając pewne ramy, których programista musi przestrzegać.
 
@@ -395,7 +397,7 @@ W projektowanej aplikacji podejście komponentowe zastosowano między innymi w f
 
 \section{React Hooks}
 
-\FirstParagraph Mechanizm hooków\footnote{\emph{Built-in React Hooks}, dokumentacja hooków biblioteki React, [b.r.], \url{https://react.dev/reference/react/hooks} (dostęp: 16.08.2026 r.).} umożliwia przechowywanie danych pomiędzy kolejnymi wywołaniami funkcji komponentu, mimo że sama funkcja jest wykonywana od nowa przy każdym renderowaniu. Każdy hook jest wywoływany bezpośrednio w ciele funkcji komponentu, dzięki czemu React może jednoznacznie przypisać jego działanie do danego komponentu oraz zachować odpowiednie wartości pomiędzy kolejnymi wywołaniami tej funkcji. Kolejność wywołań hooków ma kluczowe znaczenie, ponieważ na jej podstawie React identyfikuje, które dane należą do danego hooka.
+\FirstParagraph Mechanizm hooków\footnote{React, \emph{Built-in React Hooks}, dokumentacja hooków biblioteki React, [b.r.], \url{https://react.dev/reference/react/hooks} (dostęp: 16.08.2026 r.).} umożliwia przechowywanie danych pomiędzy kolejnymi wywołaniami funkcji komponentu, mimo że sama funkcja jest wykonywana od nowa przy każdym renderowaniu. Każdy hook jest wywoływany bezpośrednio w ciele funkcji komponentu, dzięki czemu React może jednoznacznie przypisać jego działanie do danego komponentu oraz zachować odpowiednie wartości pomiędzy kolejnymi wywołaniami tej funkcji. Kolejność wywołań hooków ma kluczowe znaczenie, ponieważ na jej podstawie React identyfikuje, które dane należą do danego hooka.
 
 W odróżnieniu od zwykłych zmiennych lokalnych, które są tracone po zakończeniu wykonania funkcji, wartości zarządzane przez hooki są przechowywane poza samą funkcją, lecz udostępniane jej ponownie przy każdej aktualizacji interfejsu użytkownika. Dzięki temu komponent funkcyjny może być ponownie wykonywany, zachowując ciągłość danych oraz logiki aplikacji.
 
@@ -609,10 +611,10 @@ Kolejne diagramy, powstałe na etapie projektowania architektury, przygotowano z
 \begin{figure}[H]
   \centering
   \includegraphics[width=5.53039in,height=3.10322in]{imported-media/media/image11.png}
-  \caption{Diagram przepływu danych poziomu 0, przedstawiający system jako jeden proces wraz z relacjami z otoczeniem}
+  \caption{Diagram przepływu danych poziomu 0 przedstawiający system jako jeden proces wraz z relacjami z otoczeniem}
 \end{figure}
 
-Diagram przepływu danych poziomu 0 przedstawia aplikację do zarządzania zadaniami jako pojedynczy, logiczny proces, przetwarzający dane pomiędzy użytkownikiem, zewnętrznym, dostawcą autentykacji oraz bazą danych. Użytkownik inicjuje operacje takie jak logowanie oraz zarządzanie zadaniami, projektami, notatkami i checklistami, natomiast system przetwarza te żądania, komunikuje się z bazą danych oraz zwraca odpowiednie wyniki. Diagram ten obrazuje granice systemu oraz jego relacje z otoczeniem, pomijając szczegóły wewnętrznej struktury aplikacji, które przedstawiane są na kolejnym rysunku.
+Diagram przepływu danych poziomu 0 przedstawia aplikację do zarządzania zadaniami jako pojedynczy, logiczny proces przetwarzający dane pomiędzy użytkownikiem, zewnętrznym dostawcą autentykacji oraz bazą danych. Użytkownik inicjuje operacje takie jak logowanie oraz zarządzanie zadaniami, projektami, notatkami i checklistami, natomiast system przetwarza te żądania, komunikuje się z bazą danych oraz zwraca odpowiednie wyniki. Diagram ten obrazuje granice systemu oraz jego relacje z otoczeniem, pomijając szczegóły wewnętrznej struktury aplikacji, które przedstawiane są na kolejnym rysunku.
 
 Diagram przepływu danych poziomu 1 przedstawia szczegółową dekompozycję systemu na główne procesy funkcjonalne oraz pokazuje sposób wymiany informacji pomiędzy użytkownikiem, modułami aplikacji, bazą danych i zewnętrznym dostawcą autentykacji. Użytkownik inicjuje operacje takie jak logowanie, przeglądanie oraz zarządzanie zadaniami, projektami, notatkami i checklistami, a odpowiednie procesy systemowe realizują logikę biznesową i wykonują operacje zapisu lub odczytu danych w dedykowanych kolekcjach bazy danych. Dodatkowo wydzielony został proces autentykacji i zarządzania sesją, który komunikuje się z dostawcą OAuth w celu weryfikacji tożsamości użytkownika. Diagram ilustruje rozdzielenie odpowiedzialności pomiędzy warstwą logiki aplikacji i warstwą przechowywania danych.
 
@@ -788,7 +790,7 @@ Usuwanie większości elementów domenowych zostało zrealizowane jako archiwiza
 \begin{figure}[H]
   \centering
   \includegraphics[width=4.9in]{imported-media/media/image14.png}
-  \caption{Diagram UML, wizualizujący scenariusz przypięcia taska}
+  \caption{Diagram UML wizualizujący scenariusz przypięcia taska}
 \end{figure}
 
 Na diagramie zaprezentowano sekwencję działań wykonywanych podczas przypinania taska do strony głównej aplikacji. Widoczny jest podział odpowiedzialności pomiędzy użytkownika, interfejs aplikacji oraz system zapisujący zmianę. Po wybraniu elementu użytkownik otrzymuje informację o aktualnym stanie przypięcia, a następnie może zmienić ten stan za pomocą ikony pinezki.
@@ -979,7 +981,7 @@ Na diagramie zaprezentowano sekwencję działań wykonywanych podczas przypinani
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image15.png}
-  \caption{Widok, przedstawiający checklistę, z możliwością przypięcia jej do ekranu głównego}
+  \caption{Widok przedstawiający checklistę z możliwością przypięcia jej do ekranu głównego}
   \label{fig:scenariusz-1-checklista-przypiecie}
 \end{figure}
 
@@ -1006,7 +1008,7 @@ Sekcja przypiętych elementów na dashboardzie została zorganizowana w formie k
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image18.png}
-  \caption{Widok, przedstawiający stronę z taskami użytkownika}
+  \caption{Widok przedstawiający stronę z taskami użytkownika}
   \label{fig:scenariusz-2-taski}
 \end{figure}
 
@@ -1015,7 +1017,7 @@ Główna strona tasków użytkownika wykorzystuje stały układ z boczną nawiga
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image19.png}
-  \caption{Widok, przedstawiający formularz kreacji taska}
+  \caption{Widok przedstawiający formularz kreacji taska}
   \label{fig:scenariusz-2-formularz-taska}
 \end{figure}
 
@@ -1042,7 +1044,7 @@ W drugiej części formularza użytkownik może skonfigurować kolumny tablicy K
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image22.png}
-  \caption{Widok, przedstawiający opcję dodawania tasków do projektu}
+  \caption{Widok przedstawiający opcję dodawania tasków do projektu}
   \label{fig:scenariusz-5-dodawanie-taskow}
 \end{figure}
 
@@ -1051,7 +1053,7 @@ Sekcja dodawania tasków pozwala uzupełnić taski bezpośrednio podczas tworzen
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image23.png}
-  \caption{Widok, przedstawiający tablicę Kanban projektu}
+  \caption{Widok przedstawiający tablicę Kanban projektu}
   \label{fig:scenariusz-5-tablica-Kanban}
 \end{figure}
 
@@ -1060,7 +1062,7 @@ Widok tablicy Kanban prezentuje projekt jako zestaw kolumn odpowiadających stat
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth,height=0.72\textheight,keepaspectratio]{imported-media/media/image24.png}
-  \caption{Widok, przedstawiający taski projektów w formie listy}
+  \caption{Widok przedstawiający taski projektów w formie listy}
   \label{fig:scenariusz-5-lista-taskow-projektu}
 \end{figure}
 
