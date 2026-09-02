@@ -1,4 +1,4 @@
-\documentclass[12pt,a4paper]{report}
+\documentclass[12pt,a4paper,twoside]{report}
 
 \usepackage{iftex}
 \ifPDFTeX
@@ -30,8 +30,8 @@
 \usepackage{hyperref}
 
 \geometry{
-  left=3.5cm,
-  right=2.0cm,
+  inner=3.5cm,
+  outer=2.0cm,
   top=2.0cm,
   bottom=2.0cm
 }
@@ -86,12 +86,12 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyfoot[R]{\thepage}
+\fancyfoot[LE,RO]{\thepage}
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
 \fancypagestyle{plain}{
   \fancyhf{}
-  \fancyfoot[R]{\thepage}
+  \fancyfoot[LE,RO]{\thepage}
   \renewcommand{\headrulewidth}{0pt}
   \renewcommand{\footrulewidth}{0pt}
 }
