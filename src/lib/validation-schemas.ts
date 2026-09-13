@@ -163,3 +163,20 @@ export const pinUpdateSchema = z
     position: z.number().finite()
   })
   .strict();
+
+export const reorderSchema = z
+  .object({
+    entityType: z.enum(["pin", "note", "checklist", "task", "project"]),
+    items: z
+      .array(
+        z
+          .object({
+            id: objectIdStringSchema,
+            position: z.number().int().min(0)
+          })
+          .strict()
+      )
+      .min(1)
+      .max(250)
+  })
+  .strict();

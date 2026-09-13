@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose";
-import { badRequestResponse } from "@/lib/api-responses";
+import { badRequestResponse, tooManyRequestsResponse } from "@/lib/api-responses";
 import { parseJsonBody } from "@/lib/api-request";
 import { areValidNoteIds, syncEntityNoteLinks } from "@/lib/entity-note-links";
+import { cleanupEntityReferences, validOwnedChecklistIds } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
 import {
   getCurrentUserId,
@@ -11,6 +12,7 @@ import {
   unauthorizedResponse
 } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { taskUpdateSchema } from "@/lib/validation-schemas";
 import { Checklist } from "@/models/checklist";
 import { Project } from "@/models/project";
@@ -54,6 +56,16 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     return notFoundResponse();
   }
 
+  const rateLimit = checkRateLimit({
+    key: `tasks:update:${ownerId}`,
+    limit: 120,
+    windowMs: 60_000
+  });
+
+  if (!rateLimit.allowed) {
+    return tooManyRequestsResponse(rateLimit.retryAfterSeconds);
+  }
+
   const { data, error } = await parseJsonBody(request, taskUpdateSchema);
 
   if (!data) {
@@ -77,6 +89,10 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
   if (noteIds?.length && !(await areValidNoteIds(noteIds, ownerId))) {
     return badRequestResponse("One or more linked notes are invalid.");
+  }
+
+  if (!(await validOwnedChecklistIds(payload.checklistIds as string[] | undefined, ownerId))) {
+    return badRequestResponse("One or more linked checklists are invalid.");
   }
 
   const previousTask = await Task.findOne({
@@ -165,6 +181,16 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
     return notFoundResponse();
   }
 
+  const rateLimit = checkRateLimit({
+    key: `tasks:delete:${ownerId}`,
+    limit: 60,
+    windowMs: 60_000
+  });
+
+  if (!rateLimit.allowed) {
+    return tooManyRequestsResponse(rateLimit.retryAfterSeconds);
+  }
+
   await connectDatabase();
   const task = await Task.findOneAndUpdate(
     { _id: params.taskId, ownerId, archivedAt: null },
@@ -176,12 +202,11 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
     return notFoundResponse();
   }
 
-  if (task.projectId) {
-    await Project.updateOne(
-      { _id: task.projectId, ownerId },
-      { $pull: { taskIds: task._id } }
-    );
-  }
+  await cleanupEntityReferences({
+    ownerId,
+    targetType: "task",
+    targetId: task.id
+  });
 
   await recordActivityEvent({ ownerId, entityType: "task", entityId: task.id, action: "deleted" });
 

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose";
-import { badRequestResponse } from "@/lib/api-responses";
+import { badRequestResponse, tooManyRequestsResponse } from "@/lib/api-responses";
 import { parseJsonBody } from "@/lib/api-request";
 import { areValidNoteIds, syncEntityNoteLinks } from "@/lib/entity-note-links";
+import { cleanupEntityReferences, validOwnedChecklistIds } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
 import {
   getCurrentUserId,
@@ -11,6 +12,7 @@ import {
   unauthorizedResponse
 } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { projectUpdateSchema } from "@/lib/validation-schemas";
 import { Checklist } from "@/models/checklist";
 import { Project } from "@/models/project";
@@ -54,6 +56,16 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     return notFoundResponse();
   }
 
+  const rateLimit = checkRateLimit({
+    key: `projects:update:${ownerId}`,
+    limit: 80,
+    windowMs: 60_000
+  });
+
+  if (!rateLimit.allowed) {
+    return tooManyRequestsResponse(rateLimit.retryAfterSeconds);
+  }
+
   const { data, error } = await parseJsonBody(request, projectUpdateSchema);
 
   if (!data) {
@@ -63,9 +75,14 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
   await connectDatabase();
   const { newTasks, newChecklists, noteIds, ...projectData } = data;
   const payload = sanitizeMutation(projectData);
+  delete payload.taskIds;
 
   if (noteIds?.length && !(await areValidNoteIds(noteIds, ownerId))) {
     return badRequestResponse("One or more linked notes are invalid.");
+  }
+
+  if (!(await validOwnedChecklistIds(payload.checklistIds as string[] | undefined, ownerId))) {
+    return badRequestResponse("One or more linked checklists are invalid.");
   }
 
   const hasProjectUpdates = Object.keys(payload).length > 0;
@@ -147,16 +164,51 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
     return notFoundResponse();
   }
 
+  const rateLimit = checkRateLimit({
+    key: `projects:delete:${ownerId}`,
+    limit: 40,
+    windowMs: 60_000
+  });
+
+  if (!rateLimit.allowed) {
+    return tooManyRequestsResponse(rateLimit.retryAfterSeconds);
+  }
+
   await connectDatabase();
+  const existingProject = await Project.findOne({
+    _id: params.projectId,
+    ownerId,
+    archivedAt: null
+  });
+
+  if (!existingProject) {
+    return notFoundResponse();
+  }
+
   const project = await Project.findOneAndUpdate(
     { _id: params.projectId, ownerId, archivedAt: null },
-    { $set: { archivedAt: new Date(), lifecycleStatus: "archived" } },
+    {
+      $set: {
+        archivedAt: new Date(),
+        lifecycleStatus: "archived",
+        previousLifecycleStatus:
+          existingProject.lifecycleStatus === "archived"
+            ? "active"
+            : existingProject.lifecycleStatus
+      }
+    },
     { new: true }
   );
 
   if (!project) {
     return notFoundResponse();
   }
+
+  await cleanupEntityReferences({
+    ownerId,
+    targetType: "project",
+    targetId: project.id
+  });
 
   await recordActivityEvent({
     ownerId,

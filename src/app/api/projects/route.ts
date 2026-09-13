@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { badRequestResponse } from "@/lib/api-responses";
+import { badRequestResponse, tooManyRequestsResponse } from "@/lib/api-responses";
 import { parseJsonBody } from "@/lib/api-request";
 import { areValidNoteIds, syncEntityNoteLinks } from "@/lib/entity-note-links";
+import { validOwnedChecklistIds } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
 import { getCurrentUserId, sanitizeMutation, unauthorizedResponse } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { projectCreateSchema } from "@/lib/validation-schemas";
 import { Checklist } from "@/models/checklist";
 import { Project } from "@/models/project";
@@ -34,6 +36,16 @@ export async function POST(request: NextRequest) {
     return unauthorizedResponse();
   }
 
+  const rateLimit = checkRateLimit({
+    key: `projects:create:${ownerId}`,
+    limit: 40,
+    windowMs: 60_000
+  });
+
+  if (!rateLimit.allowed) {
+    return tooManyRequestsResponse(rateLimit.retryAfterSeconds);
+  }
+
   const { data, error } = await parseJsonBody(request, projectCreateSchema);
 
   if (!data) {
@@ -43,12 +55,24 @@ export async function POST(request: NextRequest) {
   await connectDatabase();
   const { newTasks, newChecklists, noteIds, ...projectData } = data;
   const payload = sanitizeMutation(projectData);
+  delete payload.taskIds;
 
   if (noteIds?.length && !(await areValidNoteIds(noteIds, ownerId))) {
     return badRequestResponse("One or more linked notes are invalid.");
   }
 
-  const project = await Project.create({ ...payload, ownerId });
+  if (!(await validOwnedChecklistIds(payload.checklistIds as string[] | undefined, ownerId))) {
+    return badRequestResponse("One or more linked checklists are invalid.");
+  }
+
+  const lastProject = await Project.findOne({ ownerId, archivedAt: null })
+    .sort({ position: -1 })
+    .select({ position: 1 });
+  const project = await Project.create({
+    ...payload,
+    ownerId,
+    position: payload.position ?? (lastProject?.position ?? -1) + 1
+  });
   const createdChecklists = await Promise.all(
     (newChecklists ?? []).map((checklist, index) =>
       Checklist.create({

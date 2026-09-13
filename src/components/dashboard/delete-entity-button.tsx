@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2 } from "lucide-react";
+import { Archive as ArchiveIcon } from "lucide-react";
+import { ConfirmationDialog } from "@/components/dashboard/confirmation-dialog";
 
 type DeleteEntityButtonProps = {
   endpoint: string;
@@ -21,18 +21,13 @@ export function DeleteEntityButton({
   iconOnly = false
 }: DeleteEntityButtonProps) {
   const router = useRouter();
-  const [isMounted, setIsMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  async function handleDelete() {
+  async function handleArchive() {
     setError(null);
-    setIsDeleting(true);
+    setIsArchiving(true);
 
     const response = await fetch(endpoint, {
       method: "DELETE"
@@ -40,7 +35,7 @@ export function DeleteEntityButton({
 
     if (!response.ok) {
       setError(errorLabel);
-      setIsDeleting(false);
+      setIsArchiving(false);
       return;
     }
 
@@ -49,57 +44,40 @@ export function DeleteEntityButton({
     router.refresh();
   }
 
-  const confirmationDialog = isConfirming ? (
-    <div className="fixed inset-0 z-[100] grid place-items-center bg-zinc-950/50 px-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-md border border-zinc-200 bg-white p-5 text-center shadow-2xl shadow-zinc-950/20 dark:border-zinc-800 dark:bg-zinc-950">
-        <p className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
-          Are you sure to delete?
-        </p>
-        {error ? <p className="mt-3 text-sm text-red-600 dark:text-red-300">{error}</p> : null}
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="inline-flex h-10 items-center justify-center rounded-md bg-red-600 px-4 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isDeleting ? "Deleting..." : "Yes"}
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsConfirming(false)}
-            disabled={isDeleting}
-            className="inline-flex h-10 items-center justify-center rounded-md border border-zinc-300 px-4 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
-          >
-            No
-          </button>
-        </div>
-      </div>
-    </div>
-  ) : null;
-
   return (
     <div className="grid gap-2">
       <button
         type="button"
         onClick={() => setIsConfirming(true)}
-        disabled={isDeleting}
+        disabled={isArchiving}
         aria-label={label}
         title={label}
-        className={`inline-flex h-10 items-center justify-center gap-2 rounded-md border border-red-200 text-sm font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-500/30 dark:text-red-300 dark:hover:border-red-500/60 dark:hover:bg-red-500/10 ${
+        className={`inline-flex h-10 items-center justify-center gap-2 rounded-md text-sm font-medium text-amber-700 transition hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:text-amber-300 dark:hover:bg-amber-500/10 ${
           iconOnly ? "w-10 px-0" : "px-3"
         }`}
       >
-        <Trash2 aria-hidden="true" className="h-4 w-4" />
+        <ArchiveIcon aria-hidden="true" className="h-4 w-4 text-yellow-500 dark:text-yellow-300" />
         {iconOnly ? (
-          <span className="sr-only">{isDeleting ? "Deleting..." : label}</span>
-        ) : isDeleting ? (
-          "Deleting..."
+          <span className="sr-only">{isArchiving ? "Archiving..." : label}</span>
+        ) : isArchiving ? (
+          "Archiving..."
         ) : (
           label
         )}
       </button>
-      {isMounted && confirmationDialog ? createPortal(confirmationDialog, document.body) : null}
+      <ConfirmationDialog
+        isOpen={isConfirming}
+        title="Archive this item?"
+        description="The item will be moved to the archive. You can restore it later from the Archive page."
+        confirmLabel={isArchiving ? "Archiving..." : "Archive"}
+        cancelLabel="Cancel"
+        error={error}
+        icon={<ArchiveIcon aria-hidden="true" className="h-5 w-5 text-yellow-500 dark:text-yellow-300" />}
+        isPending={isArchiving}
+        onCancel={() => setIsConfirming(false)}
+        onConfirm={() => void handleArchive()}
+        variant="archive"
+      />
       {error && !isConfirming ? <p className="text-sm text-red-600 dark:text-red-300">{error}</p> : null}
     </div>
   );

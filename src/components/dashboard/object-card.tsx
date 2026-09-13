@@ -1,6 +1,6 @@
-import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { CardDeleteButton } from "@/components/dashboard/card-delete-button";
+import { ReturnToLink } from "@/components/dashboard/return-to-link";
 import { TagList } from "@/components/dashboard/tag-list";
 
 type ObjectCardProps = {
@@ -48,7 +48,7 @@ export function ObjectCard({
   return (
     <article className="group relative min-w-0 max-w-sm overflow-hidden rounded-md transition hover:-translate-y-0.5">
       <CardDeleteButton endpoint={deleteEndpoint} />
-      <Link
+      <ReturnToLink
         href={href}
         className="grid min-h-44 min-w-0 rounded-md border border-zinc-200 bg-white p-4 pr-12 shadow-sm transition hover:border-[var(--app-accent)] hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950"
       >
@@ -91,13 +91,13 @@ export function ObjectCard({
           )
         ) : (
           <>
-            <TagList tags={tags} className="mt-4" showEmpty />
+            <TagList tags={tags} className="mt-4" limit={3} showEmpty size="compact" />
             <p className="mt-4 min-w-0 break-words text-sm leading-6 text-zinc-600 dark:text-zinc-300">
               {getDescriptionPreview(description)}
             </p>
           </>
         )}
-      </Link>
+      </ReturnToLink>
     </article>
   );
 }

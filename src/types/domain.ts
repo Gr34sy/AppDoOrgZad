@@ -17,7 +17,15 @@ export type ColorSettings = {
 
 export type EntityType = "note" | "checklist" | "task" | "project";
 
-export type ActivityAction = "created" | "updated" | "deleted" | "moved" | "pinned" | "unpinned";
+export type ActivityAction =
+  | "created"
+  | "updated"
+  | "deleted"
+  | "moved"
+  | "pinned"
+  | "unpinned"
+  | "restored"
+  | "permanentlyDeleted";
 
 export type ChecklistItem = {
   title: string;

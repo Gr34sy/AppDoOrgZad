@@ -49,7 +49,14 @@ describe("/api/user-preferences", () => {
     expect(payload).toEqual({
       preference: {
         colorMode: "system",
-        colors: {},
+        colors: {
+          accent: "#2563eb",
+          upcoming: "#16a085",
+          todo: "#0284c7",
+          inProgress: "#c026d3",
+          completed: "#27272a",
+          calendar: "#2563eb"
+        },
         savedThemes: []
       },
       unavailable: true
@@ -92,6 +99,14 @@ describe("/api/user-preferences", () => {
       { new: true, upsert: true }
     );
     expect(payload.preference.colorMode).toBe("dark");
+    expect(payload.preference.colors).toEqual({
+      accent: "#000000",
+      upcoming: "#22d3ee",
+      todo: "#38bdf8",
+      inProgress: "#e879f9",
+      completed: "#71717a",
+      calendar: "#60a5fa"
+    });
     expect(payload.preference.savedThemes[0].id).toBe("theme-1");
   });
 

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { cleanupEntityReferences, validOwnedChecklistIds } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
 import { Project } from "@/models/project";
 import { Task } from "@/models/task";
@@ -20,6 +21,11 @@ vi.mock("@/lib/mongoose", () => ({
 
 vi.mock("@/lib/activity-events", () => ({
   recordActivityEvent: vi.fn()
+}));
+
+vi.mock("@/lib/entity-relations", () => ({
+  cleanupEntityReferences: vi.fn(),
+  validOwnedChecklistIds: vi.fn()
 }));
 
 vi.mock("@/models/project", () => ({
@@ -52,6 +58,7 @@ function createJsonRequest(body: unknown) {
 describe("/api/projects/[projectId]", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(validOwnedChecklistIds).mockResolvedValue(true);
   });
 
   it("reads a project owned by the current user", async () => {
@@ -118,6 +125,11 @@ describe("/api/projects/[projectId]", () => {
       { $set: { archivedAt: expect.any(Date), lifecycleStatus: "archived" } },
       { new: true }
     );
+    expect(cleanupEntityReferences).toHaveBeenCalledWith({
+      ownerId: "user-1",
+      targetType: "project",
+      targetId: projectId
+    });
     expect(recordActivityEvent).toHaveBeenCalledWith({
       ownerId: "user-1",
       entityType: "project",

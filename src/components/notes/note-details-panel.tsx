@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { ArrowLeft, Link2, Plus, StickyNote, Tag, X } from "lucide-react";
 import { DeleteEntityButton } from "@/components/dashboard/delete-entity-button";
 import { InlineEditableField } from "@/components/dashboard/inline-editable-field";
 import { PinEntityButton } from "@/components/dashboard/pin-entity-button";
+import { ReturnToLink } from "@/components/dashboard/return-to-link";
 import { SaveChangesButton } from "@/components/dashboard/save-changes-button";
+import { TagList } from "@/components/dashboard/tag-list";
 
 type LinkedItem = {
   targetType: "note" | "checklist" | "task" | "project";
@@ -36,28 +37,7 @@ function normalizeTags(tags: string[]) {
 }
 
 function NoteTagPreview({ tags }: { tags: string[] }) {
-  if (!tags.length) {
-    return (
-      <span className="inline-flex items-center gap-2 text-[0.9375rem] opacity-75">
-        <Tag aria-hidden="true" className="h-[1.09375rem] w-[1.09375rem] opacity-80" />
-        No tags
-      </span>
-    );
-  }
-
-  return (
-    <div className="flex flex-wrap items-center gap-2.5">
-      <Tag aria-hidden="true" className="h-[1.09375rem] w-[1.09375rem] shrink-0 opacity-80" />
-      {tags.map((tag) => (
-        <span
-          key={tag}
-          className="inline-flex items-center rounded-full border border-current px-[0.78125rem] py-[0.3125rem] text-[0.9375rem] font-medium"
-        >
-          {tag}
-        </span>
-      ))}
-    </div>
-  );
+  return <TagList tags={tags} showEmpty tone="current" />;
 }
 
 export function NoteDetailsPanel({
@@ -199,8 +179,8 @@ export function NoteDetailsPanel({
             <DeleteEntityButton
               endpoint={`/api/notes/${noteId}`}
               redirectTo="/dashboard/notes"
-              label="Delete"
-              errorLabel="Could not delete the note."
+              label="Archive"
+              errorLabel="Could not archive the note."
               iconOnly
             />
           </div>
@@ -304,10 +284,10 @@ export function NoteDetailsPanel({
                 return (
                   <span key={`${linkedItem.targetType}:${linkedItem.targetId}`} className="inline-flex max-w-full items-center rounded-md border border-zinc-200 bg-white text-sm dark:border-zinc-700 dark:bg-zinc-900">
                     {option ? (
-                      <Link href={option.href} className="min-w-0 truncate px-3 py-2 hover:text-[var(--app-accent)]">
+                      <ReturnToLink href={option.href} className="min-w-0 truncate px-3 py-2 hover:text-[var(--app-accent)]">
                         <span className="mr-2 text-xs uppercase text-zinc-500">{linkedItem.targetType}</span>
                         {option.title}
-                      </Link>
+                      </ReturnToLink>
                     ) : (
                       <span className="px-3 py-2 text-zinc-500">Unavailable item</span>
                     )}

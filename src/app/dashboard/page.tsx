@@ -15,6 +15,7 @@ type PinDocument = {
   _id: unknown;
   targetType: PinTargetType;
   targetId: unknown;
+  position?: number;
 };
 
 type PinnedTarget = {
@@ -34,6 +35,8 @@ type PinnedTarget = {
   createdAt?: Date | string;
   updatedAt?: Date | string;
 };
+
+type RelationTarget = "project" | "task";
 
 type DashboardMetricDocument = {
   _id: unknown;
@@ -162,13 +165,31 @@ export default async function DashboardPage() {
           target.description ??
           target.content ??
           (target.items ? `items: ${target.items.length}` : target.priority ?? "Pinned");
-        const isLinkedToProjectOrTask =
-          (pin.targetType === "task" && Boolean(target.projectId)) ||
-          (pin.targetType === "checklist" && Boolean(target.parentId) && (target.parentType === "task" || target.parentType === "project")) ||
-          (pin.targetType === "note" && Boolean(target.linkedItems?.some((item) => item.targetType === "task" || item.targetType === "project")));
+        const relationTargets: RelationTarget[] = [];
+
+        if (pin.targetType === "task" && Boolean(target.projectId)) {
+          relationTargets.push("project");
+        }
+
+        if (
+          pin.targetType === "checklist" &&
+          Boolean(target.parentId) &&
+          (target.parentType === "task" || target.parentType === "project")
+        ) {
+          relationTargets.push(target.parentType);
+        }
+
+        if (pin.targetType === "note") {
+          target.linkedItems?.forEach((item) => {
+            if (item.targetType === "task" || item.targetType === "project") {
+              relationTargets.push(item.targetType);
+            }
+          });
+        }
 
         return {
           id: String(pin._id),
+          position: pin.position ?? 0,
           title: target.title,
           description: target.description ?? target.content ?? "",
           type: config.label,
@@ -178,7 +199,7 @@ export default async function DashboardPage() {
           tags: target.tags ?? [],
           items: pin.targetType === "checklist" ? target.items ?? [] : undefined,
           canFilterRelation: pin.targetType !== "project",
-          isLinkedToProjectOrTask,
+          relationTargets,
           createdAt: target.createdAt ? new Date(target.createdAt).toISOString() : "",
           updatedAt: target.updatedAt ? new Date(target.updatedAt).toISOString() : "",
           href: `${config.hrefBase}/${targetId}`

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {
   CalendarCheck,
+  Archive,
   FolderKanban,
   LayoutDashboard,
   ListChecks,
@@ -24,6 +25,7 @@ const navigationItems: NavigationItem[] = [
   { href: "/dashboard/checklists", label: "Checklists", icon: ListChecks },
   { href: "/dashboard/tasks", label: "Tasks", icon: CalendarCheck },
   { href: "/dashboard/projects", label: "Projects", icon: FolderKanban },
+  { href: "/dashboard/archive", label: "Archive", icon: Archive },
   { href: "/dashboard/settings", label: "Settings", icon: Settings }
 ];
 

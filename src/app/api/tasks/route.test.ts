@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { validOwnedChecklistIds } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
 import { Project } from "@/models/project";
 import { Task } from "@/models/task";
@@ -21,6 +22,10 @@ vi.mock("@/lib/activity-events", () => ({
   recordActivityEvent: vi.fn()
 }));
 
+vi.mock("@/lib/entity-relations", () => ({
+  validOwnedChecklistIds: vi.fn()
+}));
+
 vi.mock("@/models/project", () => ({
   Project: {
     exists: vi.fn(),
@@ -31,6 +36,7 @@ vi.mock("@/models/project", () => ({
 vi.mock("@/models/task", () => ({
   Task: {
     find: vi.fn(),
+    findOne: vi.fn(),
     create: vi.fn()
   }
 }));
@@ -48,6 +54,7 @@ function createJsonRequest(body: unknown) {
 describe("/api/tasks", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(validOwnedChecklistIds).mockResolvedValue(true);
   });
 
   it("rejects unauthenticated list requests", async () => {
@@ -90,6 +97,9 @@ describe("/api/tasks", () => {
   it("creates a task, links it to a project and records activity", async () => {
     vi.mocked(getCurrentUserId).mockResolvedValue("user-1");
     vi.mocked(Project.exists).mockResolvedValue({ _id: "project-1" } as never);
+    const selectLastTask = vi.fn().mockResolvedValue({ position: 5 });
+    const sortLastTask = vi.fn().mockReturnValue({ select: selectLastTask });
+    vi.mocked(Task.findOne).mockReturnValue({ sort: sortLastTask } as never);
     vi.mocked(Task.create).mockResolvedValue({
       id: "task-1",
       _id: "task-1",
@@ -117,7 +127,8 @@ describe("/api/tasks", () => {
       statusId: "todo",
       projectId: "project-1",
       tags: ["docs"],
-      ownerId: "user-1"
+      ownerId: "user-1",
+      position: 6
     });
     expect(Project.updateOne).toHaveBeenCalledWith(
       { _id: "project-1", ownerId: "user-1", archivedAt: null },
@@ -148,6 +159,21 @@ describe("/api/tasks", () => {
       ownerId: "user-1",
       archivedAt: null
     });
+    expect(Task.create).not.toHaveBeenCalled();
+  });
+
+  it("rejects tasks linked to unavailable checklists", async () => {
+    vi.mocked(getCurrentUserId).mockResolvedValue("user-1");
+    vi.mocked(validOwnedChecklistIds).mockResolvedValue(false);
+
+    const response = await POST(
+      createJsonRequest({
+        title: "Write docs",
+        checklistIds: ["665f1f77bcf86cd799439012"]
+      }) as never
+    );
+
+    expect(response.status).toBe(400);
     expect(Task.create).not.toHaveBeenCalled();
   });
 });

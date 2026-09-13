@@ -1,9 +1,10 @@
-import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { CheckCircle2, ClipboardList, Plus } from "lucide-react";
+import { ClipboardList, Plus } from "lucide-react";
 import { ListControls } from "@/components/dashboard/list-controls";
 import { ObjectCard } from "@/components/dashboard/object-card";
+import { ReorderableList } from "@/components/dashboard/reorderable-list";
+import { ReturnToLink } from "@/components/dashboard/return-to-link";
 import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
@@ -28,6 +29,7 @@ type ListedTask = {
   statusId?: string;
   dueDate?: Date | null;
   tags?: string[];
+  position?: number;
 };
 
 function getTaskSort(sort: string, direction: string): Record<string, 1 | -1> {
@@ -54,8 +56,9 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
   const search = getSearchParam(searchParams?.q).trim();
   const priority = getSearchParam(searchParams?.priority).trim();
   const linked = getSearchParam(searchParams?.linked).trim();
-  const sort = getSearchParam(searchParams?.sort) || "updated";
-  const direction = getSearchParam(searchParams?.direction) === "asc" ? "asc" : "desc";
+  const sort = getSearchParam(searchParams?.sort) || "position";
+  const requestedDirection = getSearchParam(searchParams?.direction) === "desc" ? "desc" : "asc";
+  const direction = sort === "position" ? "asc" : requestedDirection;
   const query: Record<string, unknown> = {
     ownerId,
     archivedAt: null
@@ -75,16 +78,17 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
     query.priority = priority;
   }
 
-  if (linked === "linked") {
+  if (linked === "linked" || linked === "project") {
     query.projectId = { $exists: true, $ne: null };
   }
 
-  if (linked === "unlinked") {
-    query.projectId = null;
+  if (linked === "task") {
+    query._id = null;
   }
 
   await connectDatabase();
   const tasks = await Task.find(query).sort(getTaskSort(sort, direction)).lean<ListedTask[]>();
+  const isReorderEnabled = sort === "position" && !search && !priority && !linked;
 
   return (
     <AppShell>
@@ -96,13 +100,10 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
               Track work items, priorities, due dates and progress.
             </p>
           </div>
-          <Link
-            href="/dashboard/tasks/new"
-            className="app-primary-action"
-          >
-            <Plus aria-hidden="true" className="h-4 w-4" />
-            New task
-          </Link>
+          <ClipboardList
+            aria-hidden="true"
+            className="hidden h-10 w-10 text-[var(--app-accent)] sm:block"
+          />
         </div>
 
         <ListControls
@@ -113,15 +114,27 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
           sortValue={sort}
           sortDirection={direction}
           clearHref="/dashboard/tasks"
+          action={
+            <ReturnToLink href="/dashboard/tasks/new" className="app-primary-action">
+              <Plus aria-hidden="true" className="h-4 w-4" />
+              New task
+            </ReturnToLink>
+          }
         />
 
         {tasks.length ? (
-          <div className="app-card-grid">
-            {tasks.map((task) => {
+          <ReorderableList
+            entityType="task"
+            className="app-card-grid"
+            disabled={!isReorderEnabled}
+            items={tasks.map((task, index) => {
               const taskId = String(task._id);
 
-              return (
-                <ObjectCard
+              return {
+                id: taskId,
+                position: task.position ?? index,
+                content: (
+                  <ObjectCard
                   key={taskId}
                   href={`/dashboard/tasks/${taskId}`}
                   title={task.title}
@@ -132,13 +145,14 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
                   status={task.statusId ?? "todo"}
                   priority={task.priority ?? "medium"}
                 />
-              );
+                )
+              };
             })}
-          </div>
+          />
         ) : (
-          <div className="grid min-h-72 place-items-center rounded-md border border-dashed border-zinc-300 bg-white px-6 py-12 text-center dark:border-zinc-700 dark:bg-zinc-950">
+          <div className="grid min-h-72 place-items-center rounded-md bg-white px-6 py-12 text-center dark:bg-zinc-950">
             <div className="max-w-sm">
-              <CheckCircle2
+              <ClipboardList
                 aria-hidden="true"
                 className="mx-auto h-10 w-10 text-[var(--app-accent)]"
               />

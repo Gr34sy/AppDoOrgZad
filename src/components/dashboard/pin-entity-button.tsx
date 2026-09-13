@@ -37,7 +37,7 @@ export function PinEntityButton({
         });
 
     if (!response.ok) {
-      setError(pinId ? "Nie udało się odpiąć elementu." : "Nie udało się przypiąć elementu.");
+      setError(pinId ? "Could not unpin the item." : "Could not pin the item.");
       setIsSubmitting(false);
       return;
     }

@@ -3,7 +3,7 @@
 import {
   defaultDarkColors,
   defaultLightColors
-} from "@/components/theme/theme-provider";
+} from "@/lib/color-settings";
 import { useTheme } from "@/components/theme/theme-provider";
 import type { ColorMode, ColorSettings } from "@/types/domain";
 import { useRouter } from "next/navigation";
@@ -36,8 +36,8 @@ const accentColorThemes = [
   { id: "preset-purple", name: "Purple", color: "#8b5cf6" },
   { id: "preset-pink", name: "Pink", color: "#ec4899" },
   { id: "preset-light-green", name: "Light Green", color: "#84cc16" },
-  { id: "preset-cream", name: "Cream", color: "#f5deb3" },
-  { id: "preset-aquamarine", name: "Aquamarine", color: "#7fffd4" }
+  { id: "preset-cream", name: "Cream", color: "#d8b46a" },
+  { id: "preset-aquamarine", name: "Aquamarine", color: "#2f9f8f" }
 ];
 
 function getDefaultColors(mode: ColorMode) {
@@ -81,8 +81,10 @@ export function ColorThemeSettings() {
 
     if (presetTheme) {
       setSelectedThemeId(themeId);
+      const defaultColors = getDefaultColors(colorMode);
+
       setColors({
-        ...colors,
+        ...defaultColors,
         accent: presetTheme.color,
         calendar: presetTheme.color
       });
@@ -148,7 +150,7 @@ export function ColorThemeSettings() {
         const databaseColors = {
           ...getDefaultColors(databaseMode),
           ...(payload.preference?.colors ?? {})
-        } as ColorSettings;
+        };
 
         setColorMode(databaseMode);
         setColors(databaseColors);
@@ -159,54 +161,87 @@ export function ColorThemeSettings() {
     }
   }
 
+  const selectedPresetThemeId = accentColorThemes.some((theme) => theme.id === selectedThemeId)
+    ? selectedThemeId
+    : "";
+  const selectedUserThemeId = savedThemes.some((theme) => theme.id === selectedThemeId)
+    ? selectedThemeId
+    : "";
+
   return (
     <div className="grid gap-5">
-      <div className="grid gap-5 lg:grid-cols-[minmax(22rem,1fr)_auto] lg:items-end">
-        <label className="grid text-sm font-medium text-zinc-700 dark:text-zinc-200">
-          <span className="sr-only">Select color theme</span>
-          <select
-            value={selectedThemeId}
-            onChange={(event) => applyThemeSelection(event.target.value)}
-            className="h-11 rounded-md border border-zinc-300 bg-white px-3 text-zinc-900 shadow-sm outline-none transition focus:border-[var(--app-accent)] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+      <div className="grid gap-3">
+        <div className="grid gap-3 lg:grid-cols-[minmax(22rem,1fr)_auto] lg:items-end">
+          <label className="grid text-sm font-medium text-zinc-700 dark:text-zinc-200">
+            <span className="sr-only">Select default color theme</span>
+            <select
+              value={selectedPresetThemeId}
+              onChange={(event) => applyThemeSelection(event.target.value)}
+              className="h-11 rounded-md border border-zinc-300 bg-white px-3 text-zinc-900 shadow-sm outline-none transition focus:border-[var(--app-accent)] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            >
+              <option value="">Default Themes</option>
+              {accentColorThemes.map((presetTheme) => (
+                <option key={presetTheme.id} value={presetTheme.id}>
+                  {presetTheme.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div
+            className="grid h-11 grid-cols-3 overflow-hidden rounded-md border border-zinc-200 bg-zinc-50 text-sm font-medium dark:border-zinc-800 dark:bg-zinc-950"
+            aria-label="Color mode"
           >
-            <option value="">Select Theme</option>
-            {accentColorThemes.map((presetTheme) => (
-              <option key={presetTheme.id} value={presetTheme.id}>
-                {presetTheme.name}
-              </option>
-            ))}
-            {savedThemes.map((savedTheme) => (
-              <option key={savedTheme.id} value={savedTheme.id}>
-                {savedTheme.name}
-              </option>
-            ))}
-          </select>
-        </label>
+            {modeOptions.map((mode, index) => {
+              const isActive = colorMode === mode.value;
+              const edgeClassName =
+                index === 0
+                  ? "rounded-l-md"
+                  : index === modeOptions.length - 1
+                    ? "rounded-r-md"
+                    : "";
 
-        <div
-          className="grid h-11 grid-cols-3 rounded-md border border-zinc-200 bg-zinc-50 p-1 text-sm font-medium dark:border-zinc-800 dark:bg-zinc-950"
-          aria-label="Color mode"
-        >
-          {modeOptions.map((mode) => {
-            const isActive = colorMode === mode.value;
-
-            return (
-              <button
-                key={mode.value}
-                type="button"
-                aria-pressed={isActive}
-                onClick={() => applyMode(mode.value)}
-                className={`rounded px-3 py-2 transition ${
-                  isActive
-                    ? "bg-[var(--app-accent)] text-white shadow-sm"
-                    : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
-                }`}
-              >
-                {mode.label}
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={mode.value}
+                  type="button"
+                  aria-pressed={isActive}
+                  onClick={() => applyMode(mode.value)}
+                  className={`px-3 py-2 transition ${edgeClassName} ${
+                    isActive
+                      ? "bg-[var(--app-accent)] text-white shadow-sm"
+                      : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
+                  }`}
+                >
+                  {mode.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
+
+        {savedThemes.length ? (
+          <div className="grid gap-2">
+            <h3 className="text-sm font-semibold uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
+              User Themes
+            </h3>
+            <label className="grid text-sm font-medium text-zinc-700 dark:text-zinc-200">
+              <span className="sr-only">Select user color theme</span>
+              <select
+                value={selectedUserThemeId}
+                onChange={(event) => applyThemeSelection(event.target.value)}
+                className="h-11 rounded-md border border-zinc-300 bg-white px-3 text-zinc-900 shadow-sm outline-none transition focus:border-[var(--app-accent)] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              >
+                <option value="">Select User Theme</option>
+                {savedThemes.map((savedTheme) => (
+                  <option key={savedTheme.id} value={savedTheme.id}>
+                    {savedTheme.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        ) : null}
       </div>
 
       <div className="grid gap-3">

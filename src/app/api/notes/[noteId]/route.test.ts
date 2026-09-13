@@ -3,9 +3,9 @@ import { NextResponse } from "next/server";
 import { resetRateLimitCache } from "@/lib/rate-limit";
 import { getCurrentUserId } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { cleanupEntityReferences } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
 import { Note } from "@/models/note";
-import { Pin } from "@/models/pin";
 import { DELETE, GET, PATCH } from "./route";
 
 vi.mock("@/lib/session", () => ({
@@ -22,17 +22,14 @@ vi.mock("@/lib/activity-events", () => ({
   recordActivityEvent: vi.fn()
 }));
 
+vi.mock("@/lib/entity-relations", () => ({
+  cleanupEntityReferences: vi.fn()
+}));
+
 vi.mock("@/models/note", () => ({
   Note: {
     findOne: vi.fn(),
-    findOneAndUpdate: vi.fn(),
-    findOneAndDelete: vi.fn()
-  }
-}));
-
-vi.mock("@/models/pin", () => ({
-  Pin: {
-    deleteMany: vi.fn()
+    findOneAndUpdate: vi.fn()
   }
 }));
 
@@ -117,19 +114,19 @@ describe("/api/notes/[noteId]", () => {
     });
   });
 
-  it("deletes an owned note and removes related pins", async () => {
+  it("soft deletes an owned note and removes related references", async () => {
     vi.mocked(getCurrentUserId).mockResolvedValue("user-1");
-    vi.mocked(Note.findOneAndDelete).mockResolvedValue({ id: noteId, title: "Deleted" });
+    vi.mocked(Note.findOneAndUpdate).mockResolvedValue({ id: noteId, title: "Deleted" });
 
     const response = await DELETE({} as never, context);
 
     expect(response.status).toBe(200);
-    expect(Note.findOneAndDelete).toHaveBeenCalledWith({
-      _id: noteId,
-      ownerId: "user-1",
-      archivedAt: null
-    });
-    expect(Pin.deleteMany).toHaveBeenCalledWith({
+    expect(Note.findOneAndUpdate).toHaveBeenCalledWith(
+      { _id: noteId, ownerId: "user-1", archivedAt: null },
+      { $set: { archivedAt: expect.any(Date) } },
+      { new: true }
+    );
+    expect(cleanupEntityReferences).toHaveBeenCalledWith({
       ownerId: "user-1",
       targetType: "note",
       targetId: noteId

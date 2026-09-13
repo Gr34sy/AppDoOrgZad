@@ -1,9 +1,10 @@
-import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { FileText, Plus, StickyNote } from "lucide-react";
+import { Plus, StickyNote } from "lucide-react";
 import { ListControls } from "@/components/dashboard/list-controls";
 import { ObjectCard } from "@/components/dashboard/object-card";
+import { ReorderableList } from "@/components/dashboard/reorderable-list";
+import { ReturnToLink } from "@/components/dashboard/return-to-link";
 import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
@@ -24,7 +25,18 @@ type ListedNote = {
   title: string;
   content?: string;
   tags?: string[];
+  position?: number;
 };
+
+function getNoteSort(sort: string, direction: string): Record<string, 1 | -1> {
+  const order = direction === "asc" ? 1 : -1;
+
+  if (sort === "description") {
+    return { content: order };
+  }
+
+  return getListSort(sort, direction);
+}
 
 export default async function NotesPage({ searchParams }: NotesPageProps) {
   const session = await getServerSession(authOptions);
@@ -36,8 +48,9 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
   const ownerId = session.user.id;
   const search = getSearchParam(searchParams?.q).trim();
   const linked = getSearchParam(searchParams?.linked).trim();
-  const sort = getSearchParam(searchParams?.sort) || "updated";
-  const direction = getSearchParam(searchParams?.direction) === "asc" ? "asc" : "desc";
+  const sort = getSearchParam(searchParams?.sort) || "position";
+  const requestedDirection = getSearchParam(searchParams?.direction) === "desc" ? "desc" : "asc";
+  const direction = sort === "position" ? "asc" : requestedDirection;
   const query: Record<string, unknown> = {
     ownerId,
     archivedAt: null
@@ -48,29 +61,18 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
     query.$or = [{ title: searchRegex }, { content: searchRegex }, { tags: searchRegex }];
   }
 
-  if (linked === "linked") {
+  if (linked === "linked" || linked === "project" || linked === "task") {
     query.linkedItems = {
       $elemMatch: {
-        targetType: { $in: ["task", "project"] }
+        targetType: linked === "linked" ? { $in: ["task", "project"] } : linked
       }
     };
   }
 
-  if (linked === "unlinked") {
-    query.$nor = [
-      {
-        linkedItems: {
-          $elemMatch: {
-            targetType: { $in: ["task", "project"] }
-          }
-        }
-      }
-    ];
-  }
-
   await connectDatabase();
 
-  const notes = await Note.find(query).sort(getListSort(sort, direction)).lean<ListedNote[]>();
+  const notes = await Note.find(query).sort(getNoteSort(sort, direction)).lean<ListedNote[]>();
+  const isReorderEnabled = sort === "position" && !search && !linked;
 
   return (
     <AppShell>
@@ -82,13 +84,10 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
               Capture ideas, organize information and keep important details in one place.
             </p>
           </div>
-          <Link
-            href="/dashboard/notes/new"
-            className="app-primary-action"
-          >
-            <Plus aria-hidden="true" className="h-4 w-4" />
-            New note
-          </Link>
+          <StickyNote
+            aria-hidden="true"
+            className="hidden h-10 w-10 text-[var(--app-accent)] sm:block"
+          />
         </div>
 
         <ListControls
@@ -98,15 +97,27 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
           sortValue={sort}
           sortDirection={direction}
           clearHref="/dashboard/notes"
+          action={
+            <ReturnToLink href="/dashboard/notes/new" className="app-primary-action">
+              <Plus aria-hidden="true" className="h-4 w-4" />
+              New note
+            </ReturnToLink>
+          }
         />
 
         {notes.length ? (
-          <div className="app-card-grid">
-            {notes.map((note) => {
+          <ReorderableList
+            entityType="note"
+            className="app-card-grid"
+            disabled={!isReorderEnabled}
+            items={notes.map((note, index) => {
               const noteId = String(note._id);
 
-              return (
-                <ObjectCard
+              return {
+                id: noteId,
+                position: note.position ?? index,
+                content: (
+                  <ObjectCard
                   key={noteId}
                   href={`/dashboard/notes/${noteId}`}
                   title={note.title}
@@ -115,13 +126,14 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
                   description={note.content}
                   tags={note.tags ?? []}
                 />
-              );
+                )
+              };
             })}
-          </div>
+          />
         ) : (
-          <div className="grid min-h-72 place-items-center rounded-md border border-dashed border-zinc-300 bg-white px-6 py-12 text-center dark:border-zinc-700 dark:bg-zinc-950">
+          <div className="grid min-h-72 place-items-center rounded-md bg-white px-6 py-12 text-center dark:bg-zinc-950">
             <div className="max-w-sm">
-              <FileText
+              <StickyNote
                 aria-hidden="true"
                 className="mx-auto h-10 w-10 text-[var(--app-accent)]"
               />

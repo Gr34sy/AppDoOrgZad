@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Save, Trash2, X } from "lucide-react";
 import { FormShell } from "@/components/dashboard/form-shell";
+import { getCreatedEntityId } from "@/lib/created-entity-response";
 
 type ChecklistItemInput = {
   title: string;
@@ -15,6 +16,7 @@ type ChecklistFormProps = {
   checklistId?: string;
   initialTitle?: string;
   initialItems?: ChecklistItemInput[];
+  returnTo?: string;
   onCancel?: () => void;
   onSaved?: () => void;
 };
@@ -24,6 +26,7 @@ export function ChecklistForm({
   checklistId,
   initialTitle = "",
   initialItems = [],
+  returnTo = "/dashboard/checklists",
   onCancel,
   onSaved
 }: ChecklistFormProps) {
@@ -64,7 +67,7 @@ export function ChecklistForm({
       .filter((item) => item.title);
 
     if (!title) {
-      setError("Tytuł checklisty jest wymagany.");
+      setError("Checklist title is required.");
       setIsSubmitting(false);
       return;
     }
@@ -83,19 +86,23 @@ export function ChecklistForm({
 
     if (!response.ok) {
       setError(
-        mode === "create" ? "Nie udało się dodać checklisty." : "Nie udało się zapisać checklisty."
+        mode === "create" ? "Could not create the checklist." : "Could not save the checklist."
       );
       setIsSubmitting(false);
       return;
     }
 
     if (mode === "create") {
-      router.push("/dashboard/checklists");
+      const createdChecklistId = await getCreatedEntityId(response, "checklist");
+
+      router.push(
+        createdChecklistId ? `/dashboard/checklists/${createdChecklistId}` : returnTo
+      );
       router.refresh();
       return;
     }
 
-    setMessage("Checklista została zapisana.");
+    setMessage("Checklist saved.");
     setIsSubmitting(false);
     onSaved?.();
     router.refresh();

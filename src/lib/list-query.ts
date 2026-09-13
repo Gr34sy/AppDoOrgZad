@@ -1,11 +1,13 @@
 export type SearchParams = Record<string, string | string[] | undefined>;
 
 export const defaultSortOptions = [
+  { label: "User's Order", value: "position" },
   { label: "updated", value: "updated" },
   { label: "created", value: "created" },
-  { label: "title", value: "title" },
-  { label: "position", value: "position" }
+  { label: "title", value: "title" }
 ];
+
+export const descriptionSortOption = { label: "description", value: "description" };
 
 export function getSearchParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] ?? "" : value ?? "";
@@ -21,6 +23,8 @@ export function getListSort(sort: string, direction: string): Record<string, 1 |
   switch (sort) {
     case "title":
       return { title: order };
+    case "description":
+      return { description: order };
     case "created":
       return { createdAt: order };
     case "position":

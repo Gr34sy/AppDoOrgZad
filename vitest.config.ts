@@ -2,8 +2,14 @@ import { defineConfig } from "vitest/config";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig({
+  esbuild: {
+    jsx: "automatic",
+    jsxImportSource: "react"
+  },
   test: {
-    environment: "node"
+    environment: "node",
+    globals: true,
+    setupFiles: ["./vitest.setup.ts"]
   },
   resolve: {
     alias: {

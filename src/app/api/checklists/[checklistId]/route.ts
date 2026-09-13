@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose";
-import { badRequestResponse } from "@/lib/api-responses";
+import { badRequestResponse, tooManyRequestsResponse } from "@/lib/api-responses";
 import { parseJsonBody } from "@/lib/api-request";
+import { cleanupEntityReferences, validChecklistParent } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
 import {
   getCurrentUserId,
@@ -10,6 +11,7 @@ import {
   unauthorizedResponse
 } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { checklistUpdateSchema } from "@/lib/validation-schemas";
 import { Checklist } from "@/models/checklist";
 
@@ -51,6 +53,16 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     return notFoundResponse();
   }
 
+  const rateLimit = checkRateLimit({
+    key: `checklists:update:${ownerId}`,
+    limit: 120,
+    windowMs: 60_000
+  });
+
+  if (!rateLimit.allowed) {
+    return tooManyRequestsResponse(rateLimit.retryAfterSeconds);
+  }
+
   const { data, error } = await parseJsonBody(request, checklistUpdateSchema);
 
   if (!data) {
@@ -59,6 +71,17 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
   await connectDatabase();
   const payload = sanitizeMutation(data);
+
+  if (
+    !(await validChecklistParent({
+      ownerId,
+      parentType: payload.parentType as "task" | "project" | null | undefined,
+      parentId: payload.parentId as string | null | undefined
+    }))
+  ) {
+    return badRequestResponse("Selected parent item does not exist.");
+  }
+
   const checklist = await Checklist.findOneAndUpdate(
     { _id: params.checklistId, ownerId, archivedAt: null },
     { $set: payload },
@@ -90,6 +113,16 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
     return notFoundResponse();
   }
 
+  const rateLimit = checkRateLimit({
+    key: `checklists:delete:${ownerId}`,
+    limit: 60,
+    windowMs: 60_000
+  });
+
+  if (!rateLimit.allowed) {
+    return tooManyRequestsResponse(rateLimit.retryAfterSeconds);
+  }
+
   await connectDatabase();
   const checklist = await Checklist.findOneAndUpdate(
     { _id: params.checklistId, ownerId, archivedAt: null },
@@ -100,6 +133,12 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
   if (!checklist) {
     return notFoundResponse();
   }
+
+  await cleanupEntityReferences({
+    ownerId,
+    targetType: "checklist",
+    targetId: checklist.id
+  });
 
   await recordActivityEvent({
     ownerId,

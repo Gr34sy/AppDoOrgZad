@@ -1,10 +1,11 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { DragEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowDown, ArrowUp, Plus, Save, Trash2, X } from "lucide-react";
+import { GripVertical, Plus, Save, Trash2, X } from "lucide-react";
 import { FormShell } from "@/components/dashboard/form-shell";
 import { TagEditor } from "@/components/dashboard/tag-editor";
+import { getCreatedEntityId } from "@/lib/created-entity-response";
 
 type EntityOption = {
   id: string;
@@ -16,6 +17,10 @@ export type KanbanColumnInput = {
   title: string;
   color: string;
   isDone: boolean;
+};
+
+type EditableKanbanColumnInput = KanbanColumnInput & {
+  formId: string;
 };
 
 type ProjectTaskInput = {
@@ -40,6 +45,7 @@ type ProjectFormProps = {
   initialChecklistIds?: string[];
   initialNoteIds?: string[];
   initialKanbanColumns?: KanbanColumnInput[];
+  returnTo?: string;
   onCancel?: () => void;
   onSaved?: () => void;
 };
@@ -93,6 +99,13 @@ function normalizeKanbanColumns(columns: KanbanColumnInput[]) {
     .filter((column) => column.title);
 }
 
+function createEditableKanbanColumns(columns: KanbanColumnInput[]) {
+  return columns.map((column, index) => ({
+    ...column,
+    formId: `${column.id || "column"}-${index}`
+  }));
+}
+
 export function ProjectForm({
   mode,
   projectId,
@@ -107,6 +120,7 @@ export function ProjectForm({
   initialChecklistIds = [],
   initialNoteIds = [],
   initialKanbanColumns = defaultKanbanColumns,
+  returnTo = "/dashboard/projects",
   onCancel,
   onSaved
 }: ProjectFormProps) {
@@ -118,10 +132,14 @@ export function ProjectForm({
   const [checklistIds, setChecklistIds] = useState(initialChecklistIds);
   const [noteIds, setNoteIds] = useState(initialNoteIds);
   const [newChecklistTitles, setNewChecklistTitles] = useState<string[]>([]);
-  const [kanbanColumns, setKanbanColumns] = useState<KanbanColumnInput[]>(
-    initialKanbanColumns.length ? initialKanbanColumns : defaultKanbanColumns
+  const [kanbanColumns, setKanbanColumns] = useState<EditableKanbanColumnInput[]>(
+    () => createEditableKanbanColumns(
+      initialKanbanColumns.length ? initialKanbanColumns : defaultKanbanColumns
+    )
   );
   const [newTasks, setNewTasks] = useState<ProjectTaskInput[]>([]);
+  const [draggedColumnFormId, setDraggedColumnFormId] = useState("");
+  const [activeDropColumnFormId, setActiveDropColumnFormId] = useState("");
 
   function addNewChecklist() {
     setNewChecklistTitles((currentTitles) => [...currentTitles, ""]);
@@ -139,7 +157,7 @@ export function ProjectForm({
     );
   }
 
-  function updateKanbanColumn(index: number, column: KanbanColumnInput) {
+  function updateKanbanColumn(index: number, column: EditableKanbanColumnInput) {
     const previousColumnId = kanbanColumns[index]?.id;
 
     setKanbanColumns((currentColumns) =>
@@ -157,20 +175,50 @@ export function ProjectForm({
     }
   }
 
-  function moveKanbanColumn(index: number, direction: -1 | 1) {
+  function moveKanbanColumn(draggedFormId: string, targetFormId: string) {
     setKanbanColumns((currentColumns) => {
-      const nextIndex = index + direction;
+      const draggedIndex = currentColumns.findIndex((column) => column.formId === draggedFormId);
+      const targetIndex = currentColumns.findIndex((column) => column.formId === targetFormId);
 
-      if (nextIndex < 0 || nextIndex >= currentColumns.length) {
+      if (draggedIndex < 0 || targetIndex < 0 || draggedIndex === targetIndex) {
         return currentColumns;
       }
 
       const nextColumns = [...currentColumns];
-      const [column] = nextColumns.splice(index, 1);
-      nextColumns.splice(nextIndex, 0, column);
+      const [column] = nextColumns.splice(draggedIndex, 1);
+      nextColumns.splice(targetIndex, 0, column);
 
       return nextColumns;
     });
+  }
+
+  function handleColumnDragStart(event: DragEvent<HTMLButtonElement>, formId: string) {
+    setDraggedColumnFormId(formId);
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", formId);
+  }
+
+  function handleColumnDragOver(event: DragEvent<HTMLDivElement>, formId: string) {
+    if (!draggedColumnFormId || draggedColumnFormId === formId) {
+      return;
+    }
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    setActiveDropColumnFormId(formId);
+  }
+
+  function handleColumnDrop(event: DragEvent<HTMLDivElement>, formId: string) {
+    event.preventDefault();
+
+    const draggedFormId = event.dataTransfer.getData("text/plain") || draggedColumnFormId;
+
+    if (draggedFormId) {
+      moveKanbanColumn(draggedFormId, formId);
+    }
+
+    setDraggedColumnFormId("");
+    setActiveDropColumnFormId("");
   }
 
   function removeKanbanColumn(index: number) {
@@ -269,7 +317,9 @@ export function ProjectForm({
     }
 
     if (mode === "create") {
-      router.push("/dashboard/projects");
+      const createdProjectId = await getCreatedEntityId(response, "project");
+
+      router.push(createdProjectId ? `/dashboard/projects/${createdProjectId}` : returnTo);
       router.refresh();
       return;
     }
@@ -394,7 +444,7 @@ export function ProjectForm({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">No checklists available.</p>
+          <p className="app-form-hint px-3 py-2">No checklists available.</p>
         )}
         {newChecklistTitles.length ? (
           <div className="grid gap-2">
@@ -452,7 +502,7 @@ export function ProjectForm({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">No notes available.</p>
+          <p className="app-form-hint px-3 py-2">No notes available.</p>
         )}
       </fieldset>
 
@@ -557,7 +607,7 @@ export function ProjectForm({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="app-form-hint px-3 py-2">
             Add tasks here to create them together with this project.
           </p>
         )}
@@ -574,6 +624,7 @@ export function ProjectForm({
               setKanbanColumns((currentColumns) => [
                 ...currentColumns,
                 {
+                  formId: crypto.randomUUID(),
                   id: `column_${currentColumns.length + 1}`,
                   title: "New column",
                   color: "#71717a",
@@ -591,9 +642,30 @@ export function ProjectForm({
         <div className="grid gap-2">
           {kanbanColumns.map((column, index) => (
             <div
-              key={`${column.id}-${index}`}
-              className="grid gap-3 rounded-md bg-zinc-50/80 p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_7rem_auto_auto_auto] sm:items-end dark:bg-zinc-900/70"
+              key={column.formId}
+              onDragOver={(event) => handleColumnDragOver(event, column.formId)}
+              onDragLeave={() => setActiveDropColumnFormId("")}
+              onDrop={(event) => handleColumnDrop(event, column.formId)}
+              className={`grid gap-3 rounded-md bg-zinc-50/80 p-3 shadow-sm transition sm:grid-cols-[auto_minmax(0,1fr)_7rem_auto_auto] sm:items-end dark:bg-zinc-900/70 ${
+                activeDropColumnFormId === column.formId
+                  ? "ring-2 ring-[var(--app-accent)]/30"
+                  : ""
+              } ${draggedColumnFormId === column.formId ? "opacity-60" : ""}`}
             >
+              <button
+                type="button"
+                draggable
+                onDragStart={(event) => handleColumnDragStart(event, column.formId)}
+                onDragEnd={() => {
+                  setDraggedColumnFormId("");
+                  setActiveDropColumnFormId("");
+                }}
+                className="grid h-11 w-full cursor-grab place-items-center rounded-md bg-white text-zinc-400 shadow-sm transition active:cursor-grabbing sm:w-11 dark:bg-zinc-950 dark:text-zinc-500"
+                aria-label={`Reorder ${column.title || "Kanban column"}`}
+                title="Drag to reorder"
+              >
+                <GripVertical aria-hidden="true" className="h-4 w-4" />
+              </button>
               <div className="app-form-field">
                 <label htmlFor={`kanban-title-${index}`} className={labelClass}>
                   Column title
@@ -637,28 +709,6 @@ export function ProjectForm({
                 />
                 Done
               </label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => moveKanbanColumn(index, -1)}
-                  disabled={index === 0}
-                  className="grid h-12 place-items-center rounded-md border border-zinc-300 text-zinc-500 transition hover:border-[var(--app-accent)] hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
-                  aria-label={`Move ${column.title} left`}
-                  title="Move left"
-                >
-                  <ArrowUp aria-hidden="true" className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => moveKanbanColumn(index, 1)}
-                  disabled={index === kanbanColumns.length - 1}
-                  className="grid h-12 place-items-center rounded-md border border-zinc-300 text-zinc-500 transition hover:border-[var(--app-accent)] hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
-                  aria-label={`Move ${column.title} right`}
-                  title="Move right"
-                >
-                  <ArrowDown aria-hidden="true" className="h-4 w-4" />
-                </button>
-              </div>
               <button
                 type="button"
                 onClick={() => removeKanbanColumn(index)}

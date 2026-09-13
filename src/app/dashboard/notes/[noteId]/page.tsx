@@ -7,6 +7,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { NoteDetailsPanel } from "@/components/notes/note-details-panel";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
+import { getSafeReturnTo } from "@/lib/return-to";
 import { Note } from "@/models/note";
 import { Pin } from "@/models/pin";
 import { Checklist } from "@/models/checklist";
@@ -16,6 +17,9 @@ import { Task } from "@/models/task";
 type NotePageProps = {
   params: {
     noteId: string;
+  };
+  searchParams?: {
+    returnTo?: string | string[];
   };
 };
 
@@ -28,7 +32,7 @@ type NoteDetails = {
   updatedAt?: Date;
 };
 
-export default async function NotePage({ params }: NotePageProps) {
+export default async function NotePage({ params, searchParams }: NotePageProps) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -62,6 +66,8 @@ export default async function NotePage({ params }: NotePageProps) {
     notFound();
   }
 
+  const returnTo = getSafeReturnTo(searchParams?.returnTo, "/dashboard/notes");
+
   const linkOptions = [
     ...notes.map((item) => ({ targetType: "note" as const, targetId: String(item._id), title: item.title, href: `/dashboard/notes/${String(item._id)}` })),
     ...checklists.map((item) => ({ targetType: "checklist" as const, targetId: String(item._id), title: item.title, href: `/dashboard/checklists/${String(item._id)}` })),
@@ -73,11 +79,11 @@ export default async function NotePage({ params }: NotePageProps) {
     <AppShell>
       <section className="app-page">
       <Link
-        href="/dashboard/notes"
+        href={returnTo}
         className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
       >
         <ArrowLeft aria-hidden="true" className="h-4 w-4" />
-        Back to notes
+        Back
       </Link>
 
       <NoteDetailsPanel

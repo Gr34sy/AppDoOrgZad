@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { validChecklistParent } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
 import { Checklist } from "@/models/checklist";
 import { GET, POST } from "./route";
@@ -18,6 +19,10 @@ vi.mock("@/lib/mongoose", () => ({
 
 vi.mock("@/lib/activity-events", () => ({
   recordActivityEvent: vi.fn()
+}));
+
+vi.mock("@/lib/entity-relations", () => ({
+  validChecklistParent: vi.fn()
 }));
 
 vi.mock("@/models/checklist", () => ({
@@ -40,6 +45,7 @@ function createJsonRequest(body: unknown) {
 describe("/api/checklists", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(validChecklistParent).mockResolvedValue(true);
   });
 
   it("rejects unauthenticated list requests", async () => {
@@ -99,5 +105,21 @@ describe("/api/checklists", () => {
       action: "created"
     });
     expect(payload.checklist).toEqual({ id: "checklist-1", title: "Launch" });
+  });
+
+  it("rejects checklist parents that are missing or owned by another user", async () => {
+    vi.mocked(getCurrentUserId).mockResolvedValue("user-1");
+    vi.mocked(validChecklistParent).mockResolvedValue(false);
+
+    const response = await POST(
+      createJsonRequest({
+        title: "Launch",
+        parentType: "task",
+        parentId: "665f1f77bcf86cd799439013"
+      }) as never
+    );
+
+    expect(response.status).toBe(400);
+    expect(Checklist.create).not.toHaveBeenCalled();
   });
 });

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Plus, Save, Trash2, X } from "lucide-react";
 import { FormShell } from "@/components/dashboard/form-shell";
 import { TagEditor } from "@/components/dashboard/tag-editor";
+import { getCreatedEntityId } from "@/lib/created-entity-response";
 
 type EntityOption = {
   id: string;
@@ -30,6 +31,7 @@ type TaskFormProps = {
   initialTags?: string[];
   initialChecklistIds?: string[];
   initialNoteIds?: string[];
+  returnTo?: string;
   onCancel?: () => void;
   onSaved?: () => void;
 };
@@ -51,6 +53,7 @@ export function TaskForm({
   initialTags = [],
   initialChecklistIds = [],
   initialNoteIds = [],
+  returnTo = "/dashboard/tasks",
   onCancel,
   onSaved
 }: TaskFormProps) {
@@ -114,7 +117,7 @@ export function TaskForm({
     const dueDate = String(formData.get("dueDate") ?? "").trim();
 
     if (!title) {
-      setError("Tytuł taska jest wymagany.");
+      setError("Task title is required.");
       setIsSubmitting(false);
       return;
     }
@@ -142,18 +145,20 @@ export function TaskForm({
     });
 
     if (!response.ok) {
-      setError(mode === "create" ? "Nie udało się dodać taska." : "Nie udało się zapisać taska.");
+      setError(mode === "create" ? "Could not create the task." : "Could not save the task.");
       setIsSubmitting(false);
       return;
     }
 
     if (mode === "create") {
-      router.push("/dashboard/tasks");
+      const createdTaskId = await getCreatedEntityId(response, "task");
+
+      router.push(createdTaskId ? `/dashboard/tasks/${createdTaskId}` : returnTo);
       router.refresh();
       return;
     }
 
-    setMessage("Task został zapisany.");
+    setMessage("Task saved.");
     setIsSubmitting(false);
     onSaved?.();
     router.refresh();
@@ -296,7 +301,7 @@ export function TaskForm({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">No checklists available.</p>
+          <p className="app-form-hint px-3 py-2">No checklists available.</p>
         )}
         {newChecklistTitles.length ? (
           <div className="grid gap-2">
@@ -354,7 +359,7 @@ export function TaskForm({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">No notes available.</p>
+          <p className="app-form-hint px-3 py-2">No notes available.</p>
         )}
       </fieldset>
 

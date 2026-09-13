@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Check, ChevronDown, ListChecks } from "lucide-react";
+import { ReturnToLink } from "@/components/dashboard/return-to-link";
 
 export type LinkedChecklistOption = {
   id: string;
@@ -57,12 +57,12 @@ export function LinkedChecklistList({
               className="rounded-md border border-zinc-200 bg-zinc-50/70 p-3 dark:border-zinc-800 dark:bg-zinc-900/70"
             >
               <div className="flex min-w-0 items-center gap-2">
-                <Link
+                <ReturnToLink
                   href={`/dashboard/checklists/${checklist.id}`}
                   className="min-w-0 flex-1 truncate text-sm font-semibold text-zinc-950 transition hover:text-[var(--app-accent)] dark:text-zinc-50"
                 >
                   {checklist.title}
-                </Link>
+                </ReturnToLink>
                 <button
                   type="button"
                   onClick={() => toggleChecklist(checklist.id)}

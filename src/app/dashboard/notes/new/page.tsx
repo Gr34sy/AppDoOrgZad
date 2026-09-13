@@ -5,39 +5,56 @@ import { ArrowLeft, StickyNote } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { NoteCreateForm } from "@/components/notes/note-create-form";
 import { authOptions } from "@/lib/auth";
+import { getSafeReturnTo } from "@/lib/return-to";
 
-export default async function NewNotePage() {
+type NewNotePageProps = {
+  searchParams?: {
+    returnTo?: string | string[];
+  };
+};
+
+export default async function NewNotePage({ searchParams }: NewNotePageProps) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect("/login");
   }
 
+  const returnTo = getSafeReturnTo(searchParams?.returnTo, "/dashboard/notes");
+
   return (
     <AppShell>
       <section className="app-page">
         <Link
-          href="/dashboard/notes"
+          href={returnTo}
           className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
         >
           <ArrowLeft aria-hidden="true" className="h-4 w-4" />
           Back to notes
         </Link>
 
+        <div className="app-page-header">
+          <div className="app-page-heading">
+            <p className="text-sm font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
+              New note
+            </p>
+            <h1 className="mt-1 break-words text-2xl font-semibold tracking-normal text-zinc-950 sm:text-3xl dark:text-zinc-50">
+              Capture an idea
+            </h1>
+          </div>
+          <StickyNote
+            aria-hidden="true"
+            className="hidden h-10 w-10 text-[var(--app-accent)] sm:block"
+            strokeWidth={2.25}
+          />
+        </div>
+
         <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
           <div className="grid gap-4">
-            <div>
-              <p className="text-sm font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
-                New note
-              </p>
-              <h1 className="mt-1 break-words text-2xl font-semibold tracking-normal text-zinc-950 sm:text-3xl dark:text-zinc-50">
-                Capture an idea
-              </h1>
-            </div>
-            <NoteCreateForm />
+            <NoteCreateForm returnTo={returnTo} />
           </div>
 
-          <aside className="rounded-md border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+          <aside className="app-form-hint p-5">
             <StickyNote
               aria-hidden="true"
               className="h-8 w-8 text-[var(--app-accent)]"
@@ -46,7 +63,7 @@ export default async function NewNotePage() {
             <h2 className="mt-4 text-base font-semibold text-zinc-950 dark:text-zinc-50">
               Notes stay lightweight
             </h2>
-            <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+            <p className="mt-2">
               Add a title, write the important details, then use tags to make it easy to
               find later.
             </p>

@@ -7,6 +7,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { TaskDetailsPanel } from "@/components/tasks/task-details-panel";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
+import { getSafeReturnTo } from "@/lib/return-to";
 import { Checklist } from "@/models/checklist";
 import { Pin } from "@/models/pin";
 import { Project } from "@/models/project";
@@ -15,6 +16,9 @@ import { Task } from "@/models/task";
 type TaskPageProps = {
   params: {
     taskId: string;
+  };
+  searchParams?: {
+    returnTo?: string | string[];
   };
 };
 
@@ -54,7 +58,7 @@ function getDateInputValue(date?: Date | null) {
   return date.toISOString().slice(0, 10);
 }
 
-export default async function TaskPage({ params }: TaskPageProps) {
+export default async function TaskPage({ params, searchParams }: TaskPageProps) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -90,15 +94,17 @@ export default async function TaskPage({ params }: TaskPageProps) {
     notFound();
   }
 
+  const returnTo = getSafeReturnTo(searchParams?.returnTo, "/dashboard/tasks");
+
   return (
     <AppShell>
       <section className="app-page">
         <Link
-          href="/dashboard/tasks"
+          href={returnTo}
           className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
         >
           <ArrowLeft aria-hidden="true" className="h-4 w-4" />
-          Back to tasks
+          Back
         </Link>
 
         <TaskDetailsPanel

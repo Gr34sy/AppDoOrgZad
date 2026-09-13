@@ -1,9 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type ReactNode
+} from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ArrowDownUp, Filter, Search, SlidersHorizontal } from "lucide-react";
-import { defaultSortOptions } from "@/lib/list-query";
+import { ArrowDownUp, Filter, RotateCcw } from "lucide-react";
+import { defaultSortOptions, descriptionSortOption } from "@/lib/list-query";
+import { SearchInput } from "@/components/dashboard/search-input";
 import { SortDirectionButton } from "@/components/dashboard/sort-direction-button";
 
 type ListEntityType = "notes" | "tasks" | "checklists" | "projects";
@@ -22,6 +30,7 @@ type ListControlsProps = {
   filterValue?: string;
   filterOptions?: SelectOption[];
   linkedValue?: string;
+  action?: ReactNode;
 };
 
 const priorityOptions = [
@@ -33,13 +42,20 @@ const priorityOptions = [
 
 const taskProjectSortOptions = [
   ...defaultSortOptions,
+  descriptionSortOption,
   { label: "due date", value: "due" },
   { label: "priority", value: "priority" }
 ];
 
+const noteSortOptions = [
+  ...defaultSortOptions,
+  descriptionSortOption
+];
+
 const linkedOptions = [
-  { label: "linked to project/task", value: "linked" },
-  { label: "not linked", value: "unlinked" }
+  { label: "Linked", value: "linked" },
+  { label: "Linked to Project", value: "project" },
+  { label: "Linked to Task", value: "task" }
 ];
 
 const controlConfig: Record<
@@ -51,11 +67,15 @@ const controlConfig: Record<
     filterOptions?: SelectOption[];
     linkedFilter?: boolean;
     sortOptions: SelectOption[];
+    defaultSort: string;
+    defaultDirection: "asc" | "desc";
   }
 > = {
   notes: {
     linkedFilter: true,
-    sortOptions: defaultSortOptions
+    sortOptions: noteSortOptions,
+    defaultSort: "position",
+    defaultDirection: "asc"
   },
   tasks: {
     filterName: "priority",
@@ -63,18 +83,24 @@ const controlConfig: Record<
     filterPlaceholder: "all priorities",
     filterOptions: priorityOptions,
     linkedFilter: true,
-    sortOptions: taskProjectSortOptions
+    sortOptions: taskProjectSortOptions,
+    defaultSort: "position",
+    defaultDirection: "asc"
   },
   checklists: {
     linkedFilter: true,
-    sortOptions: defaultSortOptions
+    sortOptions: defaultSortOptions,
+    defaultSort: "position",
+    defaultDirection: "asc"
   },
   projects: {
     filterName: "priority",
     filterLabel: "Priority",
     filterPlaceholder: "all priorities",
     filterOptions: priorityOptions,
-    sortOptions: taskProjectSortOptions
+    sortOptions: taskProjectSortOptions,
+    defaultSort: "position",
+    defaultDirection: "asc"
   }
 };
 
@@ -86,7 +112,8 @@ export function ListControls({
   clearHref,
   filterValue = "",
   filterOptions,
-  linkedValue = ""
+  linkedValue = "",
+  action
 }: ListControlsProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -101,6 +128,7 @@ export function ListControls({
   const [selectedSort, setSelectedSort] = useState(sortValue);
   const [direction, setDirection] = useState<"asc" | "desc">(sortDirection);
   const hasSearchSettled = useRef(false);
+  const isUserOrderSort = selectedSort === "position";
 
   const navigateWithControls = useCallback(({
     nextQuery,
@@ -132,11 +160,11 @@ export function ListControls({
       params.set("linked", nextLinkedFilter);
     }
 
-    if (nextSort && nextSort !== "updated") {
+    if (nextSort && nextSort !== config.defaultSort) {
       params.set("sort", nextSort);
     }
 
-    if (nextDirection === "asc") {
+    if (nextSort !== "position" && nextDirection !== config.defaultDirection) {
       params.set("direction", nextDirection);
     }
 
@@ -155,7 +183,15 @@ export function ListControls({
     }
 
     router.push(nextHref);
-  }, [config.filterName, config.linkedFilter, pathname, router, searchParams]);
+  }, [
+    config.defaultDirection,
+    config.defaultSort,
+    config.filterName,
+    config.linkedFilter,
+    pathname,
+    router,
+    searchParams
+  ]);
 
   useEffect(() => {
     setQuery(searchValue);
@@ -188,26 +224,17 @@ export function ListControls({
         nextQuery: query,
         nextFilter: selectedFilter,
         nextLinkedFilter: selectedLinkedFilter,
-        nextSort: sortValue,
+        nextSort: selectedSort,
         nextDirection: direction,
         replace: true
       });
     }, 250);
 
     return () => window.clearTimeout(timeoutId);
-  }, [direction, navigateWithControls, query, selectedFilter, selectedLinkedFilter, sortValue]);
+  }, [direction, navigateWithControls, query, selectedFilter, selectedLinkedFilter, selectedSort]);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    navigateWithControls({
-      nextQuery: query,
-      nextFilter: selectedFilter,
-      nextLinkedFilter: selectedLinkedFilter,
-      nextSort: selectedSort,
-      nextDirection: direction,
-      replace: false
-    });
   }
 
   function handleFilterChange(event: ChangeEvent<HTMLSelectElement>) {
@@ -218,7 +245,7 @@ export function ListControls({
       nextQuery: query,
       nextFilter,
       nextLinkedFilter: selectedLinkedFilter,
-      nextSort: sortValue,
+      nextSort: selectedSort,
       nextDirection: direction,
       replace: true
     });
@@ -232,8 +259,24 @@ export function ListControls({
       nextQuery: query,
       nextFilter: selectedFilter,
       nextLinkedFilter,
-      nextSort: sortValue,
+      nextSort: selectedSort,
       nextDirection: direction,
+      replace: true
+    });
+  }
+
+  function handleSortChange(event: ChangeEvent<HTMLSelectElement>) {
+    const nextSort = event.target.value;
+    const nextDirection = nextSort === "position" ? "asc" : direction;
+
+    setSelectedSort(nextSort);
+    setDirection(nextDirection);
+    navigateWithControls({
+      nextQuery: query,
+      nextFilter: selectedFilter,
+      nextLinkedFilter: selectedLinkedFilter,
+      nextSort,
+      nextDirection,
       replace: true
     });
   }
@@ -246,60 +289,41 @@ export function ListControls({
       nextQuery: query,
       nextFilter: selectedFilter,
       nextLinkedFilter: selectedLinkedFilter,
-      nextSort: sortValue,
+      nextSort: selectedSort,
       nextDirection,
       replace: true
     });
   }
 
-  function clearControls() {
+  function resetControls() {
     setQuery("");
     setSelectedFilter("");
     setSelectedLinkedFilter("");
-    setSelectedSort("updated");
-    setDirection("desc");
-    router.push(clearHref);
+    setSelectedSort(config.defaultSort);
+    setDirection(config.defaultDirection);
+    router.replace(clearHref);
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative grid gap-3 overflow-hidden rounded-md border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+      className="app-controls-panel"
     >
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,var(--app-accent),#38bdf8,#a78bfa)]"
-      />
-      <div
-        className={`grid min-w-0 items-end gap-3 ${
-          hasFilter && hasLinkedFilter
-            ? "lg:grid-cols-[minmax(16rem,24rem)_minmax(10rem,0.75fr)_minmax(10rem,0.75fr)_minmax(10rem,0.75fr)_auto_auto_auto]"
-            : hasFilter || hasLinkedFilter
-              ? "lg:grid-cols-[minmax(16rem,24rem)_minmax(10rem,0.75fr)_minmax(10rem,0.75fr)_auto_auto_auto]"
-              : "lg:grid-cols-[minmax(16rem,24rem)_minmax(10rem,0.75fr)_auto_auto_auto]"
-        } lg:justify-start`}
-      >
-        <div className="w-full min-w-0">
-          <label htmlFor={`${entityType}-search`} className="sr-only">
-            Search
-          </label>
-          <div className="relative">
-            <Search
-              aria-hidden="true"
-              className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
-              strokeWidth={2.25}
-            />
-            <input
-              id={`${entityType}-search`}
-              name="q"
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search"
-              className="h-11 w-full rounded-full border border-zinc-300 bg-white pl-11 pr-4 text-sm text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-700 focus:ring-2 focus:ring-zinc-950/10 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500 dark:focus:border-zinc-300 dark:focus:ring-white/10"
-            />
-          </div>
-        </div>
+      <div aria-hidden="true" className="app-controls-accent" />
+      <div className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        <SearchInput
+          id={`${entityType}-search`}
+          name="q"
+          label="Search"
+          defaultValue={searchValue}
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+        />
+
+        {action ? <div className="min-w-0 sm:shrink-0">{action}</div> : null}
+      </div>
+
+      <div className="grid min-w-0 items-end gap-3 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(10rem,auto))] lg:justify-start">
 
         {hasFilter ? (
           <label className="grid min-w-0 gap-1">
@@ -311,7 +335,7 @@ export function ListControls({
               name={config.filterName}
               value={selectedFilter}
               onChange={handleFilterChange}
-              className="h-11 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition focus:border-[var(--app-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:bg-zinc-950"
+              className="app-select h-11 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition focus:border-[var(--app-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:bg-zinc-950"
             >
               <option value="">{config.filterPlaceholder ?? "all"}</option>
               {resolvedFilterOptions.map((option) => (
@@ -333,7 +357,7 @@ export function ListControls({
               name="linked"
               value={selectedLinkedFilter}
               onChange={handleLinkedFilterChange}
-              className="h-11 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition focus:border-[var(--app-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:bg-zinc-950"
+              className="app-select h-11 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition focus:border-[var(--app-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:bg-zinc-950"
             >
               <option value="">all relations</option>
               {linkedOptions.map((option) => (
@@ -353,8 +377,8 @@ export function ListControls({
           <select
             name="sort"
             value={selectedSort}
-            onChange={(event) => setSelectedSort(event.target.value)}
-            className="h-11 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition focus:border-[var(--app-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:bg-zinc-950"
+            onChange={handleSortChange}
+            className="app-select h-11 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition focus:border-[var(--app-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:bg-zinc-950"
           >
             {config.sortOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -365,24 +389,20 @@ export function ListControls({
         </label>
 
         <input type="hidden" name="direction" value={direction} />
-        <SortDirectionButton
-          direction={direction}
-          onToggle={toggleDirection}
-        />
+        {isUserOrderSort ? null : (
+          <SortDirectionButton
+            direction={direction}
+            onToggle={toggleDirection}
+          />
+        )}
 
         <button
-          type="submit"
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-zinc-950 px-4 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
-        >
-          <SlidersHorizontal aria-hidden="true" className="h-4 w-4" />
-          Apply
-        </button>
-        <button
           type="button"
-          onClick={clearControls}
-          className="inline-flex h-11 items-center justify-center rounded-md border border-zinc-300 px-4 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
+          onClick={resetControls}
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-zinc-300 px-4 text-sm font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
         >
-          Clear
+          <RotateCcw aria-hidden="true" className="h-4 w-4" />
+          Reset
         </button>
       </div>
     </form>

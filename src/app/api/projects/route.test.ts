@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { validOwnedChecklistIds } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
 import { Project } from "@/models/project";
 import { Task } from "@/models/task";
@@ -21,9 +22,14 @@ vi.mock("@/lib/activity-events", () => ({
   recordActivityEvent: vi.fn()
 }));
 
+vi.mock("@/lib/entity-relations", () => ({
+  validOwnedChecklistIds: vi.fn()
+}));
+
 vi.mock("@/models/project", () => ({
   Project: {
     find: vi.fn(),
+    findOne: vi.fn(),
     create: vi.fn(),
     updateOne: vi.fn()
   }
@@ -48,6 +54,7 @@ function createJsonRequest(body: unknown) {
 describe("/api/projects", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(validOwnedChecklistIds).mockResolvedValue(true);
   });
 
   it("rejects unauthenticated list requests", async () => {
@@ -88,6 +95,9 @@ describe("/api/projects", () => {
 
   it("creates a project for the current owner and records activity", async () => {
     vi.mocked(getCurrentUserId).mockResolvedValue("user-1");
+    const selectLastProject = vi.fn().mockResolvedValue({ position: 2 });
+    const sortLastProject = vi.fn().mockReturnValue({ select: selectLastProject });
+    vi.mocked(Project.findOne).mockReturnValue({ sort: sortLastProject } as never);
     vi.mocked(Project.create).mockResolvedValue({ id: "project-1", title: "Website" } as never);
 
     const response = await POST(
@@ -108,7 +118,8 @@ describe("/api/projects", () => {
       priority: "medium",
       lifecycleStatus: "active",
       tags: ["web"],
-      ownerId: "user-1"
+      ownerId: "user-1",
+      position: 3
     });
     expect(recordActivityEvent).toHaveBeenCalledWith({
       ownerId: "user-1",
@@ -121,6 +132,9 @@ describe("/api/projects", () => {
 
   it("creates project tasks as regular tasks linked to the project", async () => {
     vi.mocked(getCurrentUserId).mockResolvedValue("user-1");
+    const selectLastProject = vi.fn().mockResolvedValue(null);
+    const sortLastProject = vi.fn().mockReturnValue({ select: selectLastProject });
+    vi.mocked(Project.findOne).mockReturnValue({ sort: sortLastProject } as never);
     vi.mocked(Project.create).mockResolvedValue({
       id: "project-1",
       _id: "project-1",

@@ -29,17 +29,21 @@ export async function GET(request: NextRequest) {
       };
 
       const poll = async () => {
-        const events = await ActivityEvent.find({
-          ownerId,
-          occurredAt: { $gt: lastSeenAt }
-        })
-          .sort({ occurredAt: 1 })
-          .limit(50)
-          .lean();
+        try {
+          const events = await ActivityEvent.find({
+            ownerId,
+            occurredAt: { $gt: lastSeenAt }
+          })
+            .sort({ occurredAt: 1 })
+            .limit(50)
+            .lean();
 
-        for (const event of events) {
-          send(event);
-          lastSeenAt = event.occurredAt;
+          for (const event of events) {
+            send(event);
+            lastSeenAt = event.occurredAt;
+          }
+        } catch {
+          send({ type: "realtime_error", at: new Date().toISOString() });
         }
       };
 
@@ -47,9 +51,13 @@ export async function GET(request: NextRequest) {
       const interval = setInterval(() => {
         void poll();
       }, 2000);
+      const heartbeatInterval = setInterval(() => {
+        send({ type: "heartbeat", at: new Date().toISOString() });
+      }, 25000);
 
       request.signal.addEventListener("abort", () => {
         clearInterval(interval);
+        clearInterval(heartbeatInterval);
         controller.close();
       });
     }

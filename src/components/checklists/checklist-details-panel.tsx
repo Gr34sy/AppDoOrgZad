@@ -1,8 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { type DragEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Edit2, ListChecks, Plus, Trash2 } from "lucide-react";
+import {
+  Check,
+  Edit2,
+  GripVertical,
+  ListChecks,
+  Plus,
+  Trash2
+} from "lucide-react";
 import { DeleteEntityButton } from "@/components/dashboard/delete-entity-button";
 import { InlineEditableField } from "@/components/dashboard/inline-editable-field";
 import { PinEntityButton } from "@/components/dashboard/pin-entity-button";
@@ -62,6 +69,8 @@ export function ChecklistDetailsPanel({
   const [savedItems, setSavedItems] = useState(items);
   const [draftItems, setDraftItems] = useState<DraftChecklistItem[]>(() => createDraftItems(items));
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
+  const [draggedItemId, setDraggedItemId] = useState("");
+  const [activeDropItemId, setActiveDropItemId] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const itemSnapshot = getEditableItemSnapshot(savedItems);
@@ -220,6 +229,49 @@ export function ChecklistDetailsPanel({
     setError("");
   }
 
+  function moveDraftItem(draggedId: string, targetId: string) {
+    setDraftItems((currentItems) => {
+      const draggedIndex = currentItems.findIndex((item) => item.localId === draggedId);
+      const targetIndex = currentItems.findIndex((item) => item.localId === targetId);
+
+      if (draggedIndex < 0 || targetIndex < 0 || draggedIndex === targetIndex) {
+        return currentItems;
+      }
+
+      const nextItems = [...currentItems];
+      const [draggedItem] = nextItems.splice(draggedIndex, 1);
+      nextItems.splice(targetIndex, 0, draggedItem);
+
+      return nextItems.map((item, index) => ({ ...item, position: index }));
+    });
+    setEditingItemIndex(null);
+  }
+
+  function handleItemDragStart(event: DragEvent<HTMLLIElement>, itemId: string) {
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", itemId);
+    setDraggedItemId(itemId);
+  }
+
+  function handleItemDragOver(event: DragEvent<HTMLLIElement>, itemId: string) {
+    if (!draggedItemId || draggedItemId === itemId) {
+      return;
+    }
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    setActiveDropItemId(itemId);
+  }
+
+  function handleItemDrop(event: DragEvent<HTMLLIElement>, targetId: string) {
+    event.preventDefault();
+    const itemId = event.dataTransfer.getData("text/plain") || draggedItemId;
+
+    setDraggedItemId("");
+    setActiveDropItemId("");
+    moveDraftItem(itemId, targetId);
+  }
+
   function cancelItemEdit(index: number) {
     const sourceIndex = draftItems[index]?.sourceIndex;
     const originalTitle = sourceIndex === null || sourceIndex === undefined
@@ -294,8 +346,8 @@ export function ChecklistDetailsPanel({
             <DeleteEntityButton
               endpoint={`/api/checklists/${checklistId}`}
               redirectTo="/dashboard/checklists"
-              label="Delete"
-              errorLabel="Could not delete the checklist."
+              label="Archive"
+              errorLabel="Could not archive the checklist."
               iconOnly
             />
           </div>
@@ -308,9 +360,28 @@ export function ChecklistDetailsPanel({
             {draftItems.map((item, index) => (
               <li
                 key={item.localId}
-                className="group relative rounded-md text-sm text-zinc-700 transition [--app-checkbox-check-color:#fff] hover:bg-zinc-50 hover:[--app-checkbox-check-color:#fafafa] dark:text-zinc-200 dark:[--app-checkbox-check-color:#09090b] dark:hover:bg-zinc-900 dark:hover:[--app-checkbox-check-color:#18181b]"
+                draggable
+                onDragStart={(event) => handleItemDragStart(event, item.localId)}
+                onDragOver={(event) => handleItemDragOver(event, item.localId)}
+                onDragLeave={() => setActiveDropItemId("")}
+                onDrop={(event) => handleItemDrop(event, item.localId)}
+                onDragEnd={() => {
+                  setDraggedItemId("");
+                  setActiveDropItemId("");
+                }}
+                className={`group relative rounded-md text-sm text-zinc-700 transition [--app-checkbox-check-color:#fff] hover:bg-zinc-50 hover:[--app-checkbox-check-color:#fafafa] dark:text-zinc-200 dark:[--app-checkbox-check-color:#09090b] dark:hover:bg-zinc-900 dark:hover:[--app-checkbox-check-color:#18181b] ${
+                  draggedItemId === item.localId ? "opacity-60" : ""
+                } ${
+                  activeDropItemId === item.localId
+                    ? "ring-2 ring-[var(--app-accent)]/30"
+                    : ""
+                }`}
               >
-                <div className="flex items-center gap-3 py-3 pl-3 pr-24">
+                <div className="flex items-center gap-3 py-3 pl-3 pr-14">
+                  <GripVertical
+                    aria-hidden="true"
+                    className="h-4 w-4 shrink-0 cursor-grab text-zinc-400 active:cursor-grabbing"
+                  />
                   <button
                     type="button"
                     onClick={() => toggleItem(index)}

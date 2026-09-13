@@ -65,6 +65,11 @@ const projectSchema = new Schema(
       default: "active",
       index: true
     },
+    previousLifecycleStatus: {
+      type: String,
+      enum: ["active", "paused", "completed", null],
+      default: null
+    },
     dueDate: {
       type: Date,
       default: null,

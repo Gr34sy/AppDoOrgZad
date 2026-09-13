@@ -8,6 +8,7 @@ import { DeleteEntityButton } from "@/components/dashboard/delete-entity-button"
 import { InlineEditableField } from "@/components/dashboard/inline-editable-field";
 import { PinEntityButton } from "@/components/dashboard/pin-entity-button";
 import { SaveChangesButton } from "@/components/dashboard/save-changes-button";
+import { TagList } from "@/components/dashboard/tag-list";
 
 type EntityOption = {
   id: string;
@@ -52,31 +53,7 @@ function formatMetaValue(value: string) {
 }
 
 function ProjectTagPreview({ tags }: { tags: string[] }) {
-  if (!tags.length) {
-    return (
-      <span className="inline-flex items-center gap-2 text-[0.9375rem] text-zinc-500 dark:text-zinc-400">
-        <Tag aria-hidden="true" className="h-[1.09375rem] w-[1.09375rem] text-[var(--app-accent)]" />
-        No tags
-      </span>
-    );
-  }
-
-  return (
-    <div className="flex flex-wrap items-center gap-2.5">
-      <Tag
-        aria-hidden="true"
-        className="h-[1.09375rem] w-[1.09375rem] shrink-0 text-[var(--app-accent)]"
-      />
-      {tags.map((tag) => (
-        <span
-          key={tag}
-          className="inline-flex items-center rounded-full border border-[var(--app-accent)] px-[0.78125rem] py-[0.3125rem] text-[0.9375rem] font-medium text-[var(--app-accent)]"
-        >
-          {tag}
-        </span>
-      ))}
-    </div>
-  );
+  return <TagList tags={tags} showEmpty />;
 }
 
 export function ProjectDetailsPanel({
@@ -219,8 +196,8 @@ export function ProjectDetailsPanel({
             <DeleteEntityButton
               endpoint={`/api/projects/${projectId}`}
               redirectTo="/dashboard/projects"
-              label="Delete"
-              errorLabel="Could not delete the project."
+              label="Archive"
+              errorLabel="Could not archive the project."
               iconOnly
             />
           </div>

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { cleanupEntityReferences, validOwnedChecklistIds } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
 import { Project } from "@/models/project";
 import { Task } from "@/models/task";
@@ -20,6 +21,11 @@ vi.mock("@/lib/mongoose", () => ({
 
 vi.mock("@/lib/activity-events", () => ({
   recordActivityEvent: vi.fn()
+}));
+
+vi.mock("@/lib/entity-relations", () => ({
+  cleanupEntityReferences: vi.fn(),
+  validOwnedChecklistIds: vi.fn()
 }));
 
 vi.mock("@/models/project", () => ({
@@ -52,6 +58,7 @@ function createJsonRequest(body: unknown) {
 describe("/api/tasks/[taskId]", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(validOwnedChecklistIds).mockResolvedValue(true);
   });
 
   it("reads a task owned by the current user", async () => {
@@ -130,7 +137,6 @@ describe("/api/tasks/[taskId]", () => {
       title: "Deleted",
       projectId: "project-1"
     });
-    vi.mocked(Project.updateOne).mockResolvedValue({} as never);
 
     const response = await DELETE({} as never, context);
 
@@ -140,10 +146,11 @@ describe("/api/tasks/[taskId]", () => {
       { $set: { archivedAt: expect.any(Date) } },
       { new: true }
     );
-    expect(Project.updateOne).toHaveBeenCalledWith(
-      { _id: "project-1", ownerId: "user-1" },
-      { $pull: { taskIds: taskId } }
-    );
+    expect(cleanupEntityReferences).toHaveBeenCalledWith({
+      ownerId: "user-1",
+      targetType: "task",
+      targetId: taskId
+    });
     expect(recordActivityEvent).toHaveBeenCalledWith({
       ownerId: "user-1",
       entityType: "task",

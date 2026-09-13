@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
+import { cleanupEntityReferences, validChecklistParent } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
 import { Checklist } from "@/models/checklist";
 import { DELETE, GET, PATCH } from "./route";
@@ -19,6 +20,11 @@ vi.mock("@/lib/mongoose", () => ({
 
 vi.mock("@/lib/activity-events", () => ({
   recordActivityEvent: vi.fn()
+}));
+
+vi.mock("@/lib/entity-relations", () => ({
+  cleanupEntityReferences: vi.fn(),
+  validChecklistParent: vi.fn()
 }));
 
 vi.mock("@/models/checklist", () => ({
@@ -44,6 +50,7 @@ function createJsonRequest(body: unknown) {
 describe("/api/checklists/[checklistId]", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(validChecklistParent).mockResolvedValue(true);
   });
 
   it("reads a checklist owned by the current user", async () => {
@@ -109,6 +116,11 @@ describe("/api/checklists/[checklistId]", () => {
       { $set: { archivedAt: expect.any(Date) } },
       { new: true }
     );
+    expect(cleanupEntityReferences).toHaveBeenCalledWith({
+      ownerId: "user-1",
+      targetType: "checklist",
+      targetId: checklistId
+    });
     expect(recordActivityEvent).toHaveBeenCalledWith({
       ownerId: "user-1",
       entityType: "checklist",

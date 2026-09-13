@@ -1,25 +1,14 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  defaultDarkColors,
+  defaultLightColors,
+  normalizeColorSettings
+} from "@/lib/color-settings";
 import type { ColorMode, ColorSettings } from "@/types/domain";
 
-export const defaultLightColors: ColorSettings = {
-  accent: "#2563eb",
-  upcoming: "#16a085",
-  todo: "#0284c7",
-  inProgress: "#c026d3",
-  completed: "#27272a",
-  calendar: "#2563eb"
-};
-
-export const defaultDarkColors: ColorSettings = {
-  accent: "#60a5fa",
-  upcoming: "#22d3ee",
-  todo: "#38bdf8",
-  inProgress: "#e879f9",
-  completed: "#71717a",
-  calendar: "#60a5fa"
-};
+export { defaultDarkColors, defaultLightColors };
 
 type ThemeContextValue = {
   colorMode: ColorMode;
@@ -54,6 +43,10 @@ function applyColors(colors: ColorSettings) {
 
   root.style.setProperty("--app-accent", colors.accent);
   root.style.setProperty("--dashboard-accent", colors.upcoming);
+  root.style.setProperty("--dashboard-notes-color", colors.upcoming);
+  root.style.setProperty("--dashboard-checklists-color", colors.todo);
+  root.style.setProperty("--dashboard-tasks-color", colors.inProgress);
+  root.style.setProperty("--dashboard-projects-color", colors.completed);
   root.style.setProperty("--dashboard-upcoming-color", colors.upcoming);
   root.style.setProperty("--dashboard-todo-color", colors.todo);
   root.style.setProperty("--dashboard-progress-color", colors.inProgress);
@@ -120,10 +113,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         }
 
         const databaseMode = (payload.preference.colorMode ?? initialMode) as ColorMode;
-        const databaseColors = {
-          ...getDefaultColorsForMode(databaseMode),
-          ...(payload.preference.colors ?? {})
-        } as ColorSettings;
+        const databaseColors = normalizeColorSettings(databaseMode, payload.preference.colors);
 
         window.localStorage.setItem(colorModeStorageKey, databaseMode);
         window.localStorage.setItem(colorStorageKey, JSON.stringify(databaseColors));

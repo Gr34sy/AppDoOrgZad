@@ -8,6 +8,7 @@ import { ProjectDetailsPanel } from "@/components/projects/project-details-panel
 import { ProjectTaskView } from "@/components/projects/project-task-view";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
+import { getSafeReturnTo } from "@/lib/return-to";
 import { Checklist } from "@/models/checklist";
 import { Pin } from "@/models/pin";
 import { Project } from "@/models/project";
@@ -16,6 +17,9 @@ import { Task } from "@/models/task";
 type ProjectPageProps = {
   params: {
     projectId: string;
+  };
+  searchParams?: {
+    returnTo?: string | string[];
   };
 };
 
@@ -71,7 +75,7 @@ function getDateInputValue(date?: Date | null) {
   return date.toISOString().slice(0, 10);
 }
 
-export default async function ProjectPage({ params }: ProjectPageProps) {
+export default async function ProjectPage({ params, searchParams }: ProjectPageProps) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -114,6 +118,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const kanbanColumns = [...(project.kanbanColumns ?? [])].sort((firstColumn, secondColumn) => {
     return firstColumn.position - secondColumn.position;
   });
+  const returnTo = getSafeReturnTo(searchParams?.returnTo, "/dashboard/projects");
 
   return (
     <AppShell>
@@ -122,11 +127,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           projectId={params.projectId}
           initialView={project.taskView ?? "kanban"}
           projectInformation={<><Link
-            href="/dashboard/projects"
+            href={returnTo}
             className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
           >
             <ArrowLeft aria-hidden="true" className="h-4 w-4" />
-            Back to projects
+            Back
           </Link><ProjectDetailsPanel
           projectId={params.projectId}
           checklistOptions={checklists.map((checklist) => ({

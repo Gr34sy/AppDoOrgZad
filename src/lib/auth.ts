@@ -24,8 +24,7 @@ const oauthProviderConfigs: OAuthProviderConfig[] = [
     createProvider: (clientId, clientSecret) =>
       GoogleProvider({
         clientId,
-        clientSecret,
-        allowDangerousEmailAccountLinking: true
+        clientSecret
       })
   },
   {
@@ -36,8 +35,7 @@ const oauthProviderConfigs: OAuthProviderConfig[] = [
     createProvider: (clientId, clientSecret) =>
       GitHubProvider({
         clientId,
-        clientSecret,
-        allowDangerousEmailAccountLinking: true
+        clientSecret
       })
   }
 ];
@@ -55,8 +53,12 @@ export const enabledOAuthProviders = enabledOAuthProviderConfigs.map(({ id, name
   name
 }));
 
+const authAdapter = MongoDBAdapter(clientPromise);
+// OAuth accounts are kept separate by provider, even when Google and GitHub share an email.
+authAdapter.getUserByEmail = async () => null;
+
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(clientPromise),
+  adapter: authAdapter,
   session: {
     strategy: "jwt"
   },

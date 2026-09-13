@@ -22,7 +22,16 @@ const activityEventSchema = new Schema(
     },
     action: {
       type: String,
-      enum: ["created", "updated", "deleted", "moved", "pinned", "unpinned"] satisfies ActivityAction[],
+      enum: [
+        "created",
+        "updated",
+        "deleted",
+        "moved",
+        "pinned",
+        "unpinned",
+        "restored",
+        "permanentlyDeleted"
+      ] satisfies ActivityAction[],
       required: true,
       index: true
     },

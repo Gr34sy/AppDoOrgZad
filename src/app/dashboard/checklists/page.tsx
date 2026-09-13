@@ -1,9 +1,10 @@
-import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { CheckSquare, ListChecks, Plus } from "lucide-react";
 import { ListControls } from "@/components/dashboard/list-controls";
 import { ObjectCard } from "@/components/dashboard/object-card";
+import { ReorderableList } from "@/components/dashboard/reorderable-list";
+import { ReturnToLink } from "@/components/dashboard/return-to-link";
 import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
@@ -23,6 +24,7 @@ type ListedChecklist = {
   _id: unknown;
   title: string;
   items?: Array<{ title: string; isCompleted?: boolean }>;
+  position?: number;
 };
 
 export default async function ChecklistsPage({ searchParams }: ChecklistsPageProps) {
@@ -35,8 +37,9 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
   const ownerId = session.user.id;
   const search = getSearchParam(searchParams?.q).trim();
   const linked = getSearchParam(searchParams?.linked).trim();
-  const sort = getSearchParam(searchParams?.sort) || "updated";
-  const direction = getSearchParam(searchParams?.direction) === "asc" ? "asc" : "desc";
+  const sort = getSearchParam(searchParams?.sort) || "position";
+  const requestedDirection = getSearchParam(searchParams?.direction) === "desc" ? "desc" : "asc";
+  const direction = sort === "position" ? "asc" : requestedDirection;
   const query: Record<string, unknown> = {
     ownerId,
     archivedAt: null
@@ -47,18 +50,15 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
     query.title = searchRegex;
   }
 
-  if (linked === "linked") {
-    query.parentType = { $in: ["task", "project"] };
+  if (linked === "linked" || linked === "project" || linked === "task") {
+    query.parentType = linked === "linked" ? { $in: ["task", "project"] } : linked;
     query.parentId = { $exists: true, $ne: null };
-  }
-
-  if (linked === "unlinked") {
-    query.parentId = null;
   }
 
   await connectDatabase();
 
   const checklists = await Checklist.find(query).sort(getListSort(sort, direction)).lean<ListedChecklist[]>();
+  const isReorderEnabled = sort === "position" && !search && !linked;
 
   return (
     <AppShell>
@@ -70,13 +70,10 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
               Build reusable lists and track completion item by item.
             </p>
           </div>
-          <Link
-            href="/dashboard/checklists/new"
-            className="app-primary-action"
-          >
-            <Plus aria-hidden="true" className="h-4 w-4" />
-            New checklist
-          </Link>
+          <ListChecks
+            aria-hidden="true"
+            className="hidden h-10 w-10 text-[var(--app-accent)] sm:block"
+          />
         </div>
 
         <ListControls
@@ -86,15 +83,27 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
           sortValue={sort}
           sortDirection={direction}
           clearHref="/dashboard/checklists"
+          action={
+            <ReturnToLink href="/dashboard/checklists/new" className="app-primary-action">
+              <Plus aria-hidden="true" className="h-4 w-4" />
+              New checklist
+            </ReturnToLink>
+          }
         />
 
         {checklists.length ? (
-          <div className="app-card-grid">
-            {checklists.map((checklist) => {
+          <ReorderableList
+            entityType="checklist"
+            className="app-card-grid"
+            disabled={!isReorderEnabled}
+            items={checklists.map((checklist, index) => {
               const checklistId = String(checklist._id);
 
-              return (
-                <ObjectCard
+              return {
+                id: checklistId,
+                position: checklist.position ?? index,
+                content: (
+                  <ObjectCard
                   key={checklistId}
                   href={`/dashboard/checklists/${checklistId}`}
                   title={checklist.title}
@@ -102,11 +111,12 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
                   deleteEndpoint={`/api/checklists/${checklistId}`}
                   previewItems={checklist.items ?? []}
                 />
-              );
+                )
+              };
             })}
-          </div>
+          />
         ) : (
-          <div className="grid min-h-72 place-items-center rounded-md border border-dashed border-zinc-300 bg-white px-6 py-12 text-center dark:border-zinc-700 dark:bg-zinc-950">
+          <div className="grid min-h-72 place-items-center rounded-md bg-white px-6 py-12 text-center dark:bg-zinc-950">
             <div className="max-w-sm">
               <CheckSquare
                 aria-hidden="true"

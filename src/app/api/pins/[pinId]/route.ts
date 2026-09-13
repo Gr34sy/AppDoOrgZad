@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose";
-import { badRequestResponse } from "@/lib/api-responses";
+import { badRequestResponse, tooManyRequestsResponse } from "@/lib/api-responses";
 import { parseJsonBody } from "@/lib/api-request";
 import { connectDatabase } from "@/lib/mongoose";
 import { recordActivityEvent } from "@/lib/activity-events";
 import { getCurrentUserId, notFoundResponse, unauthorizedResponse } from "@/lib/session";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { pinUpdateSchema } from "@/lib/validation-schemas";
 import { Pin } from "@/models/pin";
 
@@ -46,6 +47,16 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     return notFoundResponse();
   }
 
+  const rateLimit = checkRateLimit({
+    key: `pins:update:${ownerId}`,
+    limit: 120,
+    windowMs: 60_000
+  });
+
+  if (!rateLimit.allowed) {
+    return tooManyRequestsResponse(rateLimit.retryAfterSeconds);
+  }
+
   const { data, error } = await parseJsonBody(request, pinUpdateSchema);
 
   if (!data) {
@@ -82,6 +93,16 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
 
   if (!isValidObjectId(params.pinId)) {
     return notFoundResponse();
+  }
+
+  const rateLimit = checkRateLimit({
+    key: `pins:delete:${ownerId}`,
+    limit: 120,
+    windowMs: 60_000
+  });
+
+  if (!rateLimit.allowed) {
+    return tooManyRequestsResponse(rateLimit.retryAfterSeconds);
   }
 
   await connectDatabase();

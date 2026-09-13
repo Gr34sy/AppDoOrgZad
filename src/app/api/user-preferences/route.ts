@@ -7,6 +7,7 @@ import {
 import { parseJsonBody } from "@/lib/api-request";
 import { connectDatabase } from "@/lib/mongoose";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { normalizeColorSettings } from "@/lib/color-settings";
 import { getCurrentUserId, unauthorizedResponse } from "@/lib/session";
 import { savedThemeCreateSchema, userPreferenceUpdateSchema } from "@/lib/validation-schemas";
 import { UserPreference } from "@/models/user-preference";
@@ -41,7 +42,7 @@ function serializePreference(preference: PreferencePayload | null) {
 
   return {
     colorMode,
-    colors: safePreference.colors,
+    colors: normalizeColorSettings(colorMode, safePreference.colors),
     savedThemes: (safePreference.savedThemes ?? []).map(
       (savedTheme: {
         _id: unknown;
@@ -51,7 +52,7 @@ function serializePreference(preference: PreferencePayload | null) {
       }) => ({
         id: String(savedTheme._id),
         name: savedTheme.name,
-        colors: savedTheme.colors,
+        colors: normalizeColorSettings(colorMode, savedTheme.colors),
         createdAt: savedTheme.createdAt
       })
     )

@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { PinnedItemsSearch } from "@/components/dashboard/pinned-items-search";
+import { QuickCreateActions } from "@/components/dashboard/quick-create-actions";
 
 type PinnedItem = {
   id: string;
+  position: number;
   title: string;
   description: string;
   type: string;
@@ -12,7 +14,7 @@ type PinnedItem = {
   tags: string[];
   items?: Array<{ title: string; isCompleted?: boolean }>;
   canFilterRelation: boolean;
-  isLinkedToProjectOrTask: boolean;
+  relationTargets: Array<"project" | "task">;
   createdAt: string;
   updatedAt: string;
   href: string;
@@ -56,10 +58,10 @@ const priorityStyles: Record<string, string> = {
 };
 
 const dashboardMetricStyles: Record<DashboardMetric["colorKey"], string> = {
-  notes: "bg-[var(--dashboard-upcoming-color)]",
-  checklists: "bg-[var(--dashboard-todo-color)]",
-  tasks: "bg-[var(--dashboard-progress-color)]",
-  projects: "bg-[var(--dashboard-completed-color)]"
+  notes: "bg-[var(--dashboard-notes-color)]",
+  checklists: "bg-[var(--dashboard-checklists-color)]",
+  tasks: "bg-[var(--dashboard-tasks-color)]",
+  projects: "bg-[var(--dashboard-projects-color)]"
 };
 
 function buildCalendarDays(events: CalendarEvent[]) {
@@ -144,6 +146,8 @@ export function PinnedBoard({ pinnedItems, dashboardMetrics, calendarEvents }: P
 
   return (
     <div className="grid gap-6">
+      <QuickCreateActions />
+
       <section className="grid gap-3">
         <div className="grid min-w-0 items-stretch gap-4 md:grid-cols-[minmax(0,412px)_minmax(18rem,340px)] md:justify-start">
           <div className="grid h-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:grid-rows-2">

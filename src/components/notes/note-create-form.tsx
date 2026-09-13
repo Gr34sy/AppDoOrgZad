@@ -5,8 +5,13 @@ import { useRouter } from "next/navigation";
 import { Save } from "lucide-react";
 import { FormShell } from "@/components/dashboard/form-shell";
 import { TagEditor } from "@/components/dashboard/tag-editor";
+import { getCreatedEntityId } from "@/lib/created-entity-response";
 
-export function NoteCreateForm() {
+type NoteCreateFormProps = {
+  returnTo?: string;
+};
+
+export function NoteCreateForm({ returnTo = "/dashboard/notes" }: NoteCreateFormProps) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,7 +53,9 @@ export function NoteCreateForm() {
       return;
     }
 
-    router.push("/dashboard/notes");
+    const noteId = await getCreatedEntityId(response, "note");
+
+    router.push(noteId ? `/dashboard/notes/${noteId}` : returnTo);
     router.refresh();
   }
 

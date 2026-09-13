@@ -1,9 +1,10 @@
-import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { FolderKanban, Plus } from "lucide-react";
 import { ListControls } from "@/components/dashboard/list-controls";
 import { ObjectCard } from "@/components/dashboard/object-card";
+import { ReorderableList } from "@/components/dashboard/reorderable-list";
+import { ReturnToLink } from "@/components/dashboard/return-to-link";
 import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
@@ -27,6 +28,7 @@ type ListedProject = {
   lifecycleStatus?: string;
   dueDate?: Date | null;
   tags?: string[];
+  position?: number;
 };
 
 function getProjectSort(sort: string, direction: string): Record<string, 1 | -1> {
@@ -52,8 +54,9 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   const ownerId = session.user.id;
   const search = getSearchParam(searchParams?.q).trim();
   const priority = getSearchParam(searchParams?.priority).trim();
-  const sort = getSearchParam(searchParams?.sort) || "updated";
-  const direction = getSearchParam(searchParams?.direction) === "asc" ? "asc" : "desc";
+  const sort = getSearchParam(searchParams?.sort) || "position";
+  const requestedDirection = getSearchParam(searchParams?.direction) === "desc" ? "desc" : "asc";
+  const direction = sort === "position" ? "asc" : requestedDirection;
   const query: Record<string, unknown> = {
     ownerId,
     archivedAt: null
@@ -70,6 +73,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
 
   await connectDatabase();
   const projects = await Project.find(query).sort(getProjectSort(sort, direction)).lean<ListedProject[]>();
+  const isReorderEnabled = sort === "position" && !search && !priority;
 
   return (
     <AppShell>
@@ -81,13 +85,10 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
               Organize larger work streams with status, priority and linked tasks.
             </p>
           </div>
-          <Link
-            href="/dashboard/projects/new"
-            className="app-primary-action"
-          >
-            <Plus aria-hidden="true" className="h-4 w-4" />
-            New project
-          </Link>
+          <FolderKanban
+            aria-hidden="true"
+            className="hidden h-10 w-10 text-[var(--app-accent)] sm:block"
+          />
         </div>
 
         <ListControls
@@ -97,15 +98,27 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
           sortValue={sort}
           sortDirection={direction}
           clearHref="/dashboard/projects"
+          action={
+            <ReturnToLink href="/dashboard/projects/new" className="app-primary-action">
+              <Plus aria-hidden="true" className="h-4 w-4" />
+              New project
+            </ReturnToLink>
+          }
         />
 
         {projects.length ? (
-          <div className="app-card-grid">
-            {projects.map((project) => {
+          <ReorderableList
+            entityType="project"
+            className="app-card-grid"
+            disabled={!isReorderEnabled}
+            items={projects.map((project, index) => {
               const projectId = String(project._id);
 
-              return (
-                <ObjectCard
+              return {
+                id: projectId,
+                position: project.position ?? index,
+                content: (
+                  <ObjectCard
                   key={projectId}
                   href={`/dashboard/projects/${projectId}`}
                   title={project.title}
@@ -116,11 +129,12 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                   status={project.lifecycleStatus ?? "active"}
                   priority={project.priority ?? "medium"}
                 />
-              );
+                )
+              };
             })}
-          </div>
+          />
         ) : (
-          <div className="grid min-h-72 place-items-center rounded-md border border-dashed border-zinc-300 bg-white px-6 py-12 text-center dark:border-zinc-700 dark:bg-zinc-950">
+          <div className="grid min-h-72 place-items-center rounded-md bg-white px-6 py-12 text-center dark:bg-zinc-950">
             <div className="max-w-sm">
               <FolderKanban
                 aria-hidden="true"

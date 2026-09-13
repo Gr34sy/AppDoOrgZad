@@ -23,7 +23,7 @@ export function RealtimeRefresh() {
         return;
       }
 
-      if (payload.type === "connected") {
+      if (payload.type === "connected" || payload.type === "heartbeat" || payload.type === "realtime_error") {
         return;
       }
 

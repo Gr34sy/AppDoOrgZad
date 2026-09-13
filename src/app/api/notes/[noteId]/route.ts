@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose";
 import { badRequestResponse, tooManyRequestsResponse } from "@/lib/api-responses";
 import { parseJsonBody } from "@/lib/api-request";
+import { cleanupEntityReferences } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
 import {
   getCurrentUserId,
@@ -14,7 +15,6 @@ import { areValidNoteLinks } from "@/lib/note-links";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { noteUpdateSchema } from "@/lib/validation-schemas";
 import { Note } from "@/models/note";
-import { Pin } from "@/models/pin";
 
 type RouteContext = {
   params: {
@@ -113,13 +113,21 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
   }
 
   await connectDatabase();
-  const note = await Note.findOneAndDelete({ _id: params.noteId, ownerId, archivedAt: null });
+  const note = await Note.findOneAndUpdate(
+    { _id: params.noteId, ownerId, archivedAt: null },
+    { $set: { archivedAt: new Date() } },
+    { new: true }
+  );
 
   if (!note) {
     return notFoundResponse();
   }
 
-  await Pin.deleteMany({ ownerId, targetType: "note", targetId: params.noteId });
+  await cleanupEntityReferences({
+    ownerId,
+    targetType: "note",
+    targetId: note.id
+  });
   await recordActivityEvent({ ownerId, entityType: "note", entityId: note.id, action: "deleted" });
 
   return NextResponse.json({ note });

@@ -1,10 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  ArrowLeft,
-  ArrowRight,
   CalendarClock,
   Check,
   GripVertical,
@@ -13,6 +10,7 @@ import {
 } from 'lucide-react';
 import { DragEvent, useEffect, useMemo, useState } from 'react';
 import { TagList } from '@/components/dashboard/tag-list';
+import { ReturnToLink } from '@/components/dashboard/return-to-link';
 
 type KanbanColumn = {
   id: string;
@@ -64,6 +62,7 @@ export function ProjectKanbanBoard({
   const [movingTaskId, setMovingTaskId] = useState('');
   const [draggedTaskId, setDraggedTaskId] = useState('');
   const [activeDropColumnId, setActiveDropColumnId] = useState('');
+  const [activeDropTaskId, setActiveDropTaskId] = useState('');
   const [boardTasks, setBoardTasks] = useState(tasks);
   const [boardColumns, setBoardColumns] = useState(columns);
   const [editingColumnId, setEditingColumnId] = useState('');
@@ -98,53 +97,119 @@ export function ProjectKanbanBoard({
 
     return [...baseColumns, ...extraColumns];
   }, [boardColumns, boardTasks]);
-  const columnIds = useMemo(
-    () => orderedColumns.map((column) => column.id),
-    [orderedColumns],
-  );
   const taskCount = boardTasks.length;
 
-  async function moveTask(task: KanbanTask, nextStatusId: string) {
-    if (task.statusId === nextStatusId) {
+  function getOrderedColumnTasks(taskList: KanbanTask[], statusId: string) {
+    return taskList
+      .filter((task) => task.statusId === statusId)
+      .sort(
+        (firstTask, secondTask) =>
+          firstTask.position - secondTask.position,
+      );
+  }
+
+  function buildMovedTaskOrder(
+    task: KanbanTask,
+    nextStatusId: string,
+    targetTaskId = '',
+  ) {
+    const sourceStatusId = task.statusId;
+    const sourceTasks = getOrderedColumnTasks(boardTasks, sourceStatusId).filter(
+      (currentTask) => currentTask.id !== task.id,
+    );
+    const targetTasks = getOrderedColumnTasks(boardTasks, nextStatusId).filter(
+      (currentTask) => currentTask.id !== task.id,
+    );
+    const targetIndex = targetTaskId
+      ? targetTasks.findIndex((currentTask) => currentTask.id === targetTaskId)
+      : -1;
+    const nextTargetTasks = [...targetTasks];
+    const movedTask = {
+      ...task,
+      statusId: nextStatusId,
+    };
+
+    if (targetIndex >= 0) {
+      nextTargetTasks.splice(targetIndex, 0, movedTask);
+    } else {
+      nextTargetTasks.push(movedTask);
+    }
+
+    const reorderedTasks = new Map<string, KanbanTask>();
+    sourceTasks.forEach((currentTask, position) => {
+      reorderedTasks.set(currentTask.id, { ...currentTask, position });
+    });
+    nextTargetTasks.forEach((currentTask, position) => {
+      reorderedTasks.set(currentTask.id, {
+        ...currentTask,
+        statusId: nextStatusId,
+        position,
+      });
+    });
+
+    const nextTasks = boardTasks.map((currentTask) =>
+      reorderedTasks.get(currentTask.id) ?? currentTask,
+    );
+    const affectedTasks = nextTasks.filter((currentTask) =>
+      sourceStatusId === nextStatusId
+        ? currentTask.statusId === nextStatusId
+        : currentTask.statusId === sourceStatusId ||
+          currentTask.statusId === nextStatusId,
+    );
+
+    return {
+      nextTasks,
+      affectedTasks,
+      movedTask: reorderedTasks.get(task.id) ?? movedTask,
+      statusChanged: sourceStatusId !== nextStatusId,
+    };
+  }
+
+  async function moveTask(task: KanbanTask, nextStatusId: string, targetTaskId = '') {
+    setError(null);
+    setMovingTaskId(task.id);
+    const { nextTasks, affectedTasks, movedTask, statusChanged } =
+      buildMovedTaskOrder(task, nextStatusId, targetTaskId);
+
+    setBoardTasks(nextTasks);
+
+    const statusResponse = statusChanged
+      ? await fetch(`/api/tasks/${task.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            statusId: nextStatusId,
+            projectId,
+            position: movedTask.position,
+          }),
+        })
+      : null;
+
+    if (statusResponse && !statusResponse.ok) {
+      setError('Could not move the task.');
+      setBoardTasks(tasks);
+      setMovingTaskId('');
       return;
     }
 
-    setError(null);
-    setMovingTaskId(task.id);
-    const nextPosition =
-      Math.max(
-        -1,
-        ...boardTasks
-          .filter(
-            (currentTask) =>
-              currentTask.id !== task.id &&
-              currentTask.statusId === nextStatusId,
-          )
-          .map((currentTask) => currentTask.position ?? 0),
-      ) + 1;
-
-    setBoardTasks((currentTasks) =>
-      currentTasks.map((currentTask) =>
-        currentTask.id === task.id
-          ? { ...currentTask, statusId: nextStatusId, position: nextPosition }
-          : currentTask,
-      ),
-    );
-
-    const response = await fetch(`/api/tasks/${task.id}`, {
+    const reorderResponse = await fetch('/api/reorder', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        statusId: nextStatusId,
-        projectId,
-        position: nextPosition,
+        entityType: 'task',
+        items: affectedTasks.map((currentTask) => ({
+          id: currentTask.id,
+          position: currentTask.position,
+        })),
       }),
     });
 
-    if (!response.ok) {
-      setError('Could not move the task.');
+    if (!reorderResponse.ok) {
+      setError('Could not reorder the tasks.');
       setBoardTasks(tasks);
       setMovingTaskId('');
       return;
@@ -225,6 +290,17 @@ export function ProjectKanbanBoard({
     setActiveDropColumnId(columnId);
   }
 
+  function handleTaskDragOver(event: DragEvent<HTMLElement>, taskId: string) {
+    if (!draggedTaskId || draggedTaskId === taskId) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = 'move';
+    setActiveDropTaskId(taskId);
+  }
+
   async function handleDrop(event: DragEvent<HTMLElement>, columnId: string) {
     event.preventDefault();
     const taskId = event.dataTransfer.getData('text/plain') || draggedTaskId;
@@ -232,12 +308,34 @@ export function ProjectKanbanBoard({
 
     setDraggedTaskId('');
     setActiveDropColumnId('');
+    setActiveDropTaskId('');
 
     if (!task) {
       return;
     }
 
     await moveTask(task, columnId);
+  }
+
+  async function handleTaskDrop(
+    event: DragEvent<HTMLElement>,
+    targetTask: KanbanTask,
+  ) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const taskId = event.dataTransfer.getData('text/plain') || draggedTaskId;
+    const task = boardTasks.find((currentTask) => currentTask.id === taskId);
+
+    setDraggedTaskId('');
+    setActiveDropColumnId('');
+    setActiveDropTaskId('');
+
+    if (!task || task.id === targetTask.id) {
+      return;
+    }
+
+    await moveTask(task, targetTask.statusId, targetTask.id);
   }
 
   return (
@@ -252,13 +350,13 @@ export function ProjectKanbanBoard({
             {orderedColumns.length} columns
           </p>
         </div>
-        <Link
+        <ReturnToLink
           href={`/dashboard/tasks/new?projectId=${projectId}`}
           className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-[var(--app-accent)] px-3 text-sm font-medium text-white transition hover:opacity-90 sm:w-auto"
         >
           <Plus aria-hidden="true" className="h-4 w-4" />
           New task
-        </Link>
+        </ReturnToLink>
       </div>
 
       {error ? (
@@ -275,8 +373,6 @@ export function ProjectKanbanBoard({
               (firstTask, secondTask) =>
                 firstTask.position - secondTask.position,
             );
-          const previousColumnId = columnIds[columnIndex - 1];
-          const nextColumnId = columnIds[columnIndex + 1];
           const progress = getColumnProgress(columnTasks, taskCount);
 
           return (
@@ -412,12 +508,22 @@ export function ProjectKanbanBoard({
                       key={task.id}
                       draggable
                       onDragStart={(event) => handleDragStart(event, task.id)}
+                      onDragOver={(event) => handleTaskDragOver(event, task.id)}
+                      onDragLeave={() => setActiveDropTaskId('')}
+                      onDrop={(event) => handleTaskDrop(event, task)}
                       onDragEnd={() => {
                         setDraggedTaskId('');
                         setActiveDropColumnId('');
+                        setActiveDropTaskId('');
                       }}
-                      className={`group grid cursor-grab gap-3 rounded-md border border-zinc-200 bg-white p-3 shadow-sm transition hover:border-[var(--app-accent)] active:cursor-grabbing dark:border-zinc-800 dark:bg-zinc-950 ${
-                        draggedTaskId === task.id ? 'opacity-60' : ''
+                      className={`group grid cursor-grab gap-3 rounded-md border bg-white p-3 shadow-sm transition hover:border-[var(--app-accent)] active:cursor-grabbing dark:bg-zinc-950 ${
+                        activeDropTaskId === task.id
+                          ? 'border-[var(--app-accent)] ring-2 ring-[var(--app-accent)]/15'
+                          : 'border-zinc-200 dark:border-zinc-800'
+                      } ${
+                        draggedTaskId === task.id || movingTaskId === task.id
+                          ? 'opacity-60'
+                          : ''
                       }`}
                     >
                       <div className="flex items-start gap-2">
@@ -426,12 +532,12 @@ export function ProjectKanbanBoard({
                           className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400"
                         />
                         <div className="min-w-0 flex-1">
-                          <Link
+                          <ReturnToLink
                             href={`/dashboard/tasks/${task.id}`}
                             className="line-clamp-2 text-sm font-semibold text-zinc-950 transition hover:text-[var(--app-accent)] dark:text-zinc-50"
                           >
                             {task.title}
-                          </Link>
+                          </ReturnToLink>
                           {task.description ? (
                             <p className="mt-2 line-clamp-3 text-xs leading-5 text-zinc-600 dark:text-zinc-300">
                               {task.description}
@@ -460,40 +566,7 @@ export function ProjectKanbanBoard({
                         ) : null}
                       </div>
 
-                      <TagList tags={task.tags} limit={3} />
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          disabled={
-                            !previousColumnId || movingTaskId === task.id
-                          }
-                          onClick={() =>
-                            previousColumnId && moveTask(task, previousColumnId)
-                          }
-                          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-zinc-300 px-2 text-xs font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-45 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
-                        >
-                          <ArrowLeft
-                            aria-hidden="true"
-                            className="h-3.5 w-3.5"
-                          />
-                          Back
-                        </button>
-                        <button
-                          type="button"
-                          disabled={!nextColumnId || movingTaskId === task.id}
-                          onClick={() =>
-                            nextColumnId && moveTask(task, nextColumnId)
-                          }
-                          className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-zinc-300 px-2 text-xs font-medium text-zinc-700 transition hover:border-[var(--app-accent)] hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-45 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-[var(--app-accent)] dark:hover:text-white"
-                        >
-                          Next
-                          <ArrowRight
-                            aria-hidden="true"
-                            className="h-3.5 w-3.5"
-                          />
-                        </button>
-                      </div>
+                      <TagList tags={task.tags} limit={3} size="compact" />
                     </article>
                   ))}
                 </div>

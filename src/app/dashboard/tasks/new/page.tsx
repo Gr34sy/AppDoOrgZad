@@ -1,11 +1,12 @@
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ClipboardList } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { TaskForm } from "@/components/tasks/task-form";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
+import { getSafeReturnTo } from "@/lib/return-to";
 import { Checklist } from "@/models/checklist";
 import { Note } from "@/models/note";
 import { Project } from "@/models/project";
@@ -22,6 +23,7 @@ type EntityOptionDocument = {
 type NewTaskPageProps = {
   searchParams?: {
     projectId?: string | string[];
+    returnTo?: string | string[];
   };
 };
 
@@ -50,47 +52,57 @@ export default async function NewTaskPage({ searchParams }: NewTaskPageProps) {
       .lean<EntityOptionDocument[]>()
   ]);
   const initialProjectId = getSearchParam(searchParams?.projectId);
+  const returnTo = getSafeReturnTo(searchParams?.returnTo, "/dashboard/tasks");
 
   return (
     <AppShell>
-      <section className="app-page max-w-4xl">
+      <section className="app-page">
         <div className="grid gap-3">
           <Link
-            href="/dashboard/tasks"
+            href={returnTo}
             className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
           >
             <ArrowLeft aria-hidden="true" className="h-4 w-4" />
             Back to tasks
           </Link>
-          <div>
-            <h1 className="app-page-title">
-              New task
-            </h1>
-            <p className="app-page-description">
-              Create a task with priority, status and optional project links.
-            </p>
+          <div className="app-page-header">
+            <div className="app-page-heading">
+              <h1 className="app-page-title">
+                New task
+              </h1>
+              <p className="app-page-description">
+                Create a task with priority, status and optional project links.
+              </p>
+            </div>
+            <ClipboardList
+              aria-hidden="true"
+              className="hidden h-10 w-10 text-[var(--app-accent)] sm:block"
+            />
           </div>
         </div>
-        <TaskForm
-          mode="create"
-          projectOptions={projects.map((project) => ({
-            id: String(project._id),
-            title: project.title,
-            kanbanColumns: (project.kanbanColumns ?? []).map((column) => ({
-              id: column.id,
-              title: column.title
-            }))
-          }))}
-          checklistOptions={checklists.map((checklist) => ({
-            id: String(checklist._id),
-            title: checklist.title
-          }))}
-          noteOptions={notes.map((note) => ({
-            id: String(note._id),
-            title: note.title
-          }))}
-          initialProjectId={initialProjectId}
-        />
+        <div className="w-full max-w-4xl">
+          <TaskForm
+            mode="create"
+            projectOptions={projects.map((project) => ({
+              id: String(project._id),
+              title: project.title,
+              kanbanColumns: (project.kanbanColumns ?? []).map((column) => ({
+                id: column.id,
+                title: column.title
+              }))
+            }))}
+            checklistOptions={checklists.map((checklist) => ({
+              id: String(checklist._id),
+              title: checklist.title
+            }))}
+            noteOptions={notes.map((note) => ({
+              id: String(note._id),
+              title: note.title
+            }))}
+            initialProjectId={initialProjectId}
+            returnTo={returnTo}
+          />
+        </div>
       </section>
     </AppShell>
   );
