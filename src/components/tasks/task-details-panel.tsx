@@ -56,11 +56,7 @@ function normalizeTags(tags: string[]) {
 function formatMetaValue(value: string) {
   const normalizedValue = value.replace(/_/g, " ").trim();
 
-  return normalizedValue ? normalizedValue[0].toUpperCase() + normalizedValue.slice(1) : value;
-}
-
-function normalizeIds(ids: string[]) {
-  return [...ids].filter(Boolean).sort();
+  return normalizedValue ? normalizedValue[0].toUpperCase() + normalizedValue.slice(1) : "-";
 }
 
 function getTaskDatePayload(date: string) {
@@ -100,6 +96,9 @@ export function TaskDetailsPanel({
   const [draftProjectId, setDraftProjectId] = useState(projectId);
   const [draftDueDate, setDraftDueDate] = useState(dueDate);
   const [draftChecklistIds, setDraftChecklistIds] = useState(checklistIds);
+  const [editingMetaField, setEditingMetaField] = useState<
+    "status" | "priority" | "project" | "due" | null
+  >(null);
   const [isTagEditorOpen, setIsTagEditorOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
@@ -115,8 +114,12 @@ export function TaskDetailsPanel({
   const isProjectTask = Boolean(draftProjectId);
   const statusTitle =
     projectStatusOptions.find((status) => status.id === draftStatusId)?.title ?? draftStatusId;
+  const dueDateDisplay = draftDueDate
+    ? draftDueDate === dueDate
+      ? dueDateLabel ?? draftDueDate
+      : draftDueDate
+    : "-";
   const normalizedDraftTags = normalizeTags(draftTags);
-  const normalizedDraftChecklistIds = normalizeIds(draftChecklistIds);
   const isDirty =
     draftTitle.trim() !== title.trim() ||
     draftDescription !== description ||
@@ -124,8 +127,7 @@ export function TaskDetailsPanel({
     draftStatusId !== statusId ||
     draftProjectId !== projectId ||
     draftDueDate !== dueDate ||
-    normalizedDraftTags.join("\n") !== tags.join("\n") ||
-    normalizedDraftChecklistIds.join("\n") !== normalizeIds(checklistIds).join("\n");
+    normalizedDraftTags.join("\n") !== tags.join("\n");
 
   useEffect(() => {
     setDraftTitle(title);
@@ -156,7 +158,7 @@ export function TaskDetailsPanel({
     setDraftStatusId(statusId);
     setDraftProjectId(projectId);
     setDraftDueDate(dueDate);
-    setDraftChecklistIds(checklistIds);
+    setEditingMetaField(null);
     setError("");
   }
 
@@ -174,18 +176,6 @@ export function TaskDetailsPanel({
       const nextTags = currentTags.filter((_, tagIndex) => tagIndex !== index);
 
       return nextTags.length ? nextTags : [""];
-    });
-  }
-
-  function toggleChecklist(checklistId: string, isChecked: boolean) {
-    setDraftChecklistIds((currentChecklistIds) => {
-      if (isChecked) {
-        return currentChecklistIds.includes(checklistId)
-          ? currentChecklistIds
-          : [...currentChecklistIds, checklistId];
-      }
-
-      return currentChecklistIds.filter((id) => id !== checklistId);
     });
   }
 
@@ -224,8 +214,10 @@ export function TaskDetailsPanel({
     router.refresh();
   }
 
-  const fieldClass = "app-form-control";
-  const labelClass = "app-form-label";
+  const inlineMetaControlClass =
+    "h-8 min-w-28 rounded-md bg-zinc-100/80 px-2 text-[0.9375rem] text-zinc-950 outline-none dark:bg-zinc-900 dark:text-zinc-50";
+  const inlineMetaButtonClass =
+    "rounded-md p-1 text-left transition hover:bg-zinc-100/80 focus-visible:bg-zinc-100/80 focus-visible:outline-none dark:hover:bg-zinc-900 dark:focus-visible:bg-zinc-900";
 
   return (
     <article className="grid gap-5">
@@ -238,7 +230,7 @@ export function TaskDetailsPanel({
         />
       </div>
       <div className="rounded-md border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-zinc-200 pb-4 dark:border-zinc-800">
           <div className="flex min-w-0 flex-1 items-start gap-3">
             <CheckCircle2
               aria-hidden="true"
@@ -249,7 +241,7 @@ export function TaskDetailsPanel({
               onChange={setDraftTitle}
               required
               className="min-w-0 break-words p-1 text-2xl font-semibold tracking-normal text-zinc-950 sm:text-3xl dark:text-zinc-50"
-              inputClassName="w-full rounded-md border border-[var(--app-accent)] bg-white px-2 py-1 text-2xl font-semibold text-zinc-950 outline-none ring-2 ring-[var(--app-accent)]/15 sm:text-3xl dark:bg-zinc-900 dark:text-zinc-50"
+              inputClassName="w-full bg-transparent p-1 text-2xl font-semibold tracking-normal text-zinc-950 outline-none sm:text-3xl dark:text-zinc-50"
             />
           </div>
           <div className="app-action-row">
@@ -279,67 +271,172 @@ export function TaskDetailsPanel({
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-zinc-600 dark:text-zinc-300">
-          <span className="inline-flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
+        <div className="my-6 grid gap-2 text-[0.9375rem] text-zinc-600 dark:text-zinc-300">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <span className="inline-flex items-center gap-1.5">
             <Gauge aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
-            <span>
-              <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Status:</strong>{" "}
-              {formatMetaValue(statusTitle)}
-            </span>
-            <span aria-hidden="true" className="text-zinc-400 dark:text-zinc-500">
-              |
-            </span>
-            <span>
-              <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Priority:</strong>{" "}
-              {formatMetaValue(draftPriority)}
-            </span>
+            {editingMetaField === "status" ? (
+              isProjectTask ? (
+                <select
+                  autoFocus
+                  aria-label="Status"
+                  value={draftStatusId}
+                  onChange={(event) => {
+                    setDraftStatusId(event.target.value);
+                    setEditingMetaField(null);
+                  }}
+                  onBlur={() => setEditingMetaField(null)}
+                  className={inlineMetaControlClass}
+                >
+                  {projectStatusOptions.map((status) => (
+                    <option key={status.id} value={status.id}>
+                      {status.title}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  autoFocus
+                  aria-label="Status"
+                  value={draftStatusId}
+                  onChange={(event) => setDraftStatusId(event.target.value)}
+                  onBlur={() => setEditingMetaField(null)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === "Escape") {
+                      setEditingMetaField(null);
+                    }
+                  }}
+                  className={inlineMetaControlClass}
+                />
+              )
+            ) : (
+              <button
+                type="button"
+                onClick={() => setEditingMetaField("status")}
+                className={inlineMetaButtonClass}
+              >
+                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Status</strong>{" "}
+                {formatMetaValue(statusTitle)}
+              </button>
+            )}
           </span>
-          {projectTitle ? (
-            <span className="inline-flex items-center gap-1.5">
-              <FolderKanban aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
-              {projectTitle}
-            </span>
-          ) : null}
-          {dueDateLabel || draftDueDate ? (
-            <span className="inline-flex items-center gap-1.5">
-              <CalendarClock aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
-              Due {draftDueDate === dueDate ? dueDateLabel : draftDueDate}
-            </span>
-          ) : null}
-          {draftChecklistIds.length ? (
-            <span className="inline-flex items-center gap-1.5">
-              <ListChecks aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
-              Checklists: {draftChecklistIds.length}
-            </span>
-          ) : null}
-          <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span className="inline-flex items-center gap-1.5">
+            {editingMetaField === "priority" ? (
+              <select
+                autoFocus
+                aria-label="Priority"
+                value={draftPriority}
+                onChange={(event) => {
+                  setDraftPriority(event.target.value);
+                  setEditingMetaField(null);
+                }}
+                onBlur={() => setEditingMetaField(null)}
+                className={inlineMetaControlClass}
+              >
+                {priorityOptions.map((priorityOption) => (
+                  <option key={priorityOption} value={priorityOption}>
+                    {priorityOption}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setEditingMetaField("priority")}
+                className={inlineMetaButtonClass}
+              >
+                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Priority</strong>{" "}
+                {formatMetaValue(draftPriority)}
+              </button>
+            )}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <FolderKanban aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
+            {editingMetaField === "project" ? (
+              <select
+                autoFocus
+                aria-label="Project"
+                value={draftProjectId}
+                onChange={(event) => {
+                  setDraftProjectId(event.target.value);
+                  setEditingMetaField(null);
+                }}
+                onBlur={() => setEditingMetaField(null)}
+                className={inlineMetaControlClass}
+              >
+                <option value="">No project</option>
+                {projectOptions.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.title}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setEditingMetaField("project")}
+                className={inlineMetaButtonClass}
+              >
+                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Project</strong>{" "}
+                {projectTitle ?? "-"}
+              </button>
+            )}
+          </span>
+            {draftChecklistIds.length ? (
+              <span className="inline-flex items-center gap-1.5">
+                <ListChecks aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
+                Checklists: {draftChecklistIds.length}
+              </span>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
             <CalendarClock aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
+            {editingMetaField === "due" ? (
+              <input
+                autoFocus
+                type="date"
+                aria-label="Due"
+                value={draftDueDate}
+                onChange={(event) => setDraftDueDate(event.target.value)}
+                onBlur={() => setEditingMetaField(null)}
+                className={inlineMetaControlClass}
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => setEditingMetaField("due")}
+                className={inlineMetaButtonClass}
+              >
+                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Due</strong>{" "}
+                {dueDateDisplay}
+              </button>
+            )}
             {createdAtLabel ? (
-              <span>
-                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Created:</strong>{" "}
+              <span className="inline-flex items-center gap-1.5">
+                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Created</strong>{" "}
                 {createdAtLabel}
               </span>
             ) : null}
             {updatedAtLabel ? (
-              <span>
-                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Updated:</strong>{" "}
+              <span className="inline-flex items-center gap-1.5">
+                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Updated</strong>{" "}
                 {updatedAtLabel}
               </span>
             ) : null}
-          </span>
-          {completedAtLabel ? (
-            <span>Completed {completedAtLabel}</span>
-          ) : null}
+            {completedAtLabel ? (
+              <span>Completed {completedAtLabel}</span>
+            ) : null}
+          </div>
         </div>
 
-        <div className="mt-6">
+        <div>
           {isTagEditorOpen ? (
-            <div className="rounded-md bg-zinc-50/80 p-3 shadow-sm dark:bg-zinc-900/70">
+            <div>
               <div className="flex flex-wrap gap-2">
                 {draftTags.map((tag, index) => (
                   <label
                     key={index}
-                    className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border border-[var(--app-accent)]/35 bg-white px-[0.78125rem] text-[0.9375rem] shadow-sm transition focus-within:border-[var(--app-accent)] focus-within:ring-2 focus-within:ring-[var(--app-accent)]/15 dark:bg-zinc-950"
+                    className="inline-flex min-h-8 max-w-full items-center gap-1.5 rounded-full border border-[var(--app-accent)]/35 bg-white px-[0.78125rem] text-[0.9375rem] shadow-sm transition focus-within:border-[var(--app-accent)] dark:bg-zinc-950"
                   >
                     <Tag aria-hidden="true" className="h-[1.09375rem] w-[1.09375rem] shrink-0 text-[var(--app-accent)]" />
                     <span className="sr-only">Tag {index + 1}</span>
@@ -354,7 +451,7 @@ export function TaskDetailsPanel({
                     <button
                       type="button"
                       onClick={() => removeTag(index)}
-                      className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-zinc-400 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-300"
+                      className="grid h-5 w-5 shrink-0 place-items-center rounded-full text-zinc-400 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-300"
                       aria-label={`Remove tag ${index + 1}`}
                       title="Remove tag"
                     >
@@ -365,7 +462,7 @@ export function TaskDetailsPanel({
                 <button
                   type="button"
                   onClick={() => setDraftTags((currentTags) => [...currentTags, ""])}
-                  className="inline-flex h-11 items-center gap-2 rounded-full border border-dashed border-[var(--app-accent)]/50 px-[0.78125rem] text-[0.9375rem] font-medium text-[var(--app-accent)] transition hover:border-[var(--app-accent)] hover:bg-[var(--app-accent)]/5"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-dashed border-[var(--app-accent)]/50 px-[0.78125rem] text-[0.9375rem] font-medium text-[var(--app-accent)] transition hover:border-[var(--app-accent)] hover:bg-[var(--app-accent)]/5"
                 >
                   <Plus aria-hidden="true" className="h-[1.09375rem] w-[1.09375rem]" />
                   Add tag
@@ -373,7 +470,7 @@ export function TaskDetailsPanel({
                 <button
                   type="button"
                   onClick={() => setIsTagEditorOpen(false)}
-                  className="grid h-10 w-10 place-items-center rounded-full text-[var(--app-accent)] transition hover:bg-[var(--app-accent)]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/20"
+                  className="grid h-8 w-8 place-items-center rounded-full text-[var(--app-accent)] transition hover:bg-[var(--app-accent)]/5 focus-visible:outline-none"
                   aria-label="Back to tag preview"
                   title="Back to tag preview"
                 >
@@ -385,7 +482,7 @@ export function TaskDetailsPanel({
             <button
               type="button"
               onClick={() => setIsTagEditorOpen(true)}
-              className="group -m-2 flex w-fit max-w-full rounded-md p-2 text-left transition hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/20 dark:hover:bg-zinc-900"
+              className="group -m-2 flex w-fit max-w-full rounded-md p-2 text-left focus-visible:outline-none"
             >
               <TaskTagPreview tags={normalizedDraftTags} />
             </button>
@@ -398,110 +495,17 @@ export function TaskDetailsPanel({
           multiline
           emptyLabel="No description yet."
           className="mt-6 whitespace-pre-wrap p-1 text-sm leading-7 text-zinc-700 dark:text-zinc-300"
-          inputClassName="mt-6 min-h-32 w-full rounded-md border border-[var(--app-accent)] bg-white px-3 py-3 text-sm leading-7 text-zinc-950 outline-none ring-2 ring-[var(--app-accent)]/15 dark:bg-zinc-900 dark:text-zinc-50"
+          inputClassName="mt-6 w-full rounded-md bg-zinc-100/80 p-1 text-sm leading-7 text-zinc-950 outline-none dark:bg-zinc-900 dark:text-zinc-50"
         />
 
         <LinkedChecklistList
+          parentType="task"
+          parentId={taskId}
           checklistIds={draftChecklistIds}
           checklistOptions={checklistOptions}
+          onChecklistIdsChange={setDraftChecklistIds}
           className="mt-6"
         />
-
-        <div className="app-form-section mt-6">
-          <div className="app-form-grid">
-          <label className="app-form-field">
-            <span className={labelClass}>Priority</span>
-            <select
-              value={draftPriority}
-              onChange={(event) => setDraftPriority(event.target.value)}
-              className={fieldClass}
-            >
-              {priorityOptions.map((priorityOption) => (
-                <option key={priorityOption} value={priorityOption}>
-                  {priorityOption}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="app-form-field">
-            <span className={labelClass}>Status</span>
-            {isProjectTask ? (
-              <select
-                value={draftStatusId}
-                onChange={(event) => setDraftStatusId(event.target.value)}
-                className={fieldClass}
-              >
-                {projectStatusOptions.map((status) => (
-                  <option key={status.id} value={status.id}>
-                    {status.title}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <input
-                type="text"
-                value={draftStatusId}
-                onChange={(event) => setDraftStatusId(event.target.value)}
-                placeholder="todo"
-                className={fieldClass}
-              />
-            )}
-          </label>
-
-          <label className="app-form-field">
-            <span className={labelClass}>Project</span>
-            <select
-              value={draftProjectId}
-              onChange={(event) => setDraftProjectId(event.target.value)}
-              className={fieldClass}
-            >
-              <option value="">No project</option>
-              {projectOptions.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.title}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="app-form-field">
-            <span className={labelClass}>Due date</span>
-            <input
-              type="date"
-              value={draftDueDate}
-              onChange={(event) => setDraftDueDate(event.target.value)}
-              className={fieldClass}
-            />
-          </label>
-          </div>
-        </div>
-
-        <fieldset className="mt-6 grid gap-3">
-          <legend className="app-form-legend">
-            Checklists
-          </legend>
-          {checklistOptions.length ? (
-            <div className="grid gap-2 sm:grid-cols-2">
-              {checklistOptions.map((checklist) => (
-                <label
-                  key={checklist.id}
-                  className="app-form-checkbox-card"
-                >
-                  <input
-                    type="checkbox"
-                    checked={draftChecklistIds.includes(checklist.id)}
-                    onChange={(event) => toggleChecklist(checklist.id, event.target.checked)}
-                    className="app-form-checkbox"
-                  />
-                  <span className="min-w-0 break-words">{checklist.title}</span>
-                </label>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">No checklists available.</p>
-          )}
-        </fieldset>
 
         {error ? <p className="mt-4 text-sm text-red-600 dark:text-red-300">{error}</p> : null}
       </div>

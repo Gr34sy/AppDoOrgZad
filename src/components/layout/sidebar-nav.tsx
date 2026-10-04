@@ -41,7 +41,7 @@ export function SidebarNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="mt-6 grid gap-2">
+    <nav className="mt-5 grid gap-1">
       {navigationItems.map((item) => {
         const isActive = isActivePath(pathname, item.href);
 

@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { Settings } from "lucide-react";
-import { AppShell } from "@/components/layout/app-shell";
 import { ColorThemeSettings } from "@/components/theme/color-theme-settings";
 import { authOptions } from "@/lib/auth";
 
@@ -13,7 +12,6 @@ export default async function SettingsPage() {
   }
 
   return (
-    <AppShell>
       <section className="app-page">
         <div className="app-page-header">
           <div className="app-page-heading">
@@ -35,6 +33,5 @@ export default async function SettingsPage() {
           </div>
         </div>
       </section>
-    </AppShell>
   );
 }

@@ -63,7 +63,7 @@ export function ObjectCard({
         </div>
 
         {hasMeta ? (
-          <p className="mt-2 text-xs font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
+          <p className="mt-2 text-sm font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
             {[status, priority].filter(Boolean).map((value) => formatMeta(String(value))).join(" / ")}
           </p>
         ) : null}

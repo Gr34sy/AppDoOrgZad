@@ -5,7 +5,6 @@ import { ListControls } from "@/components/dashboard/list-controls";
 import { ObjectCard } from "@/components/dashboard/object-card";
 import { ReorderableList } from "@/components/dashboard/reorderable-list";
 import { ReturnToLink } from "@/components/dashboard/return-to-link";
-import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
 import { connectDatabase } from "@/lib/mongoose";
@@ -55,13 +54,16 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
     query.parentId = { $exists: true, $ne: null };
   }
 
+  if (linked === "unlinked") {
+    query.parentId = null;
+  }
+
   await connectDatabase();
 
   const checklists = await Checklist.find(query).sort(getListSort(sort, direction)).lean<ListedChecklist[]>();
   const isReorderEnabled = sort === "position" && !search && !linked;
 
   return (
-    <AppShell>
       <section className="app-page">
         <div className="app-page-header">
           <div className="app-page-heading">
@@ -86,7 +88,7 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
           action={
             <ReturnToLink href="/dashboard/checklists/new" className="app-primary-action">
               <Plus aria-hidden="true" className="h-4 w-4" />
-              New checklist
+              New
             </ReturnToLink>
           }
         />
@@ -132,6 +134,5 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
           </div>
         )}
       </section>
-    </AppShell>
   );
 }

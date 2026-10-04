@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 import { isValidObjectId } from "mongoose";
 import { ArrowLeft } from "lucide-react";
-import { AppShell } from "@/components/layout/app-shell";
 import { ProjectDetailsPanel } from "@/components/projects/project-details-panel";
 import { ProjectTaskView } from "@/components/projects/project-task-view";
 import { authOptions } from "@/lib/auth";
@@ -50,6 +49,8 @@ type ProjectDetails = {
 type EntityOptionDocument = {
   _id: unknown;
   title: string;
+  parentType?: "task" | "project" | null;
+  parentId?: unknown;
   items?: Array<{
     title: string;
     isCompleted?: boolean;
@@ -121,7 +122,6 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
   const returnTo = getSafeReturnTo(searchParams?.returnTo, "/dashboard/projects");
 
   return (
-    <AppShell>
       <section className="app-page">
         <ProjectTaskView
           projectId={params.projectId}
@@ -140,7 +140,9 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
             items: (checklist.items ?? []).map((item) => ({
               title: item.title,
               isCompleted: Boolean(item.isCompleted)
-            }))
+            })),
+            parentType: checklist.parentType ?? null,
+            parentId: checklist.parentId ? String(checklist.parentId) : null
           }))}
           title={project.title}
           description={project.description ?? ""}
@@ -180,6 +182,5 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
           }))}
         />
       </section>
-    </AppShell>
   );
 }

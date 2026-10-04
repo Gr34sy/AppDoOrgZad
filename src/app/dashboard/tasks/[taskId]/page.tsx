@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 import { isValidObjectId } from "mongoose";
 import { ArrowLeft } from "lucide-react";
-import { AppShell } from "@/components/layout/app-shell";
 import { TaskDetailsPanel } from "@/components/tasks/task-details-panel";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
@@ -40,6 +39,8 @@ type TaskDetails = {
 type EntityOptionDocument = {
   _id: unknown;
   title: string;
+  parentType?: "task" | "project" | null;
+  parentId?: unknown;
   items?: Array<{
     title: string;
     isCompleted?: boolean;
@@ -97,7 +98,6 @@ export default async function TaskPage({ params, searchParams }: TaskPageProps) 
   const returnTo = getSafeReturnTo(searchParams?.returnTo, "/dashboard/tasks");
 
   return (
-    <AppShell>
       <section className="app-page">
         <Link
           href={returnTo}
@@ -123,7 +123,9 @@ export default async function TaskPage({ params, searchParams }: TaskPageProps) 
             items: (checklist.items ?? []).map((item) => ({
               title: item.title,
               isCompleted: Boolean(item.isCompleted)
-            }))
+            })),
+            parentType: checklist.parentType ?? null,
+            parentId: checklist.parentId ? String(checklist.parentId) : null
           }))}
           title={task.title}
           description={task.description ?? ""}
@@ -140,6 +142,5 @@ export default async function TaskPage({ params, searchParams }: TaskPageProps) 
           pinId={pin ? String(pin._id) : undefined}
         />
       </section>
-    </AppShell>
   );
 }

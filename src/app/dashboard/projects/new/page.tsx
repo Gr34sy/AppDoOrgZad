@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, FolderKanban } from "lucide-react";
-import { AppShell } from "@/components/layout/app-shell";
 import { ProjectForm } from "@/components/projects/project-form";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
@@ -41,7 +40,6 @@ export default async function NewProjectPage({ searchParams }: NewProjectPagePro
   const returnTo = getSafeReturnTo(searchParams?.returnTo, "/dashboard/projects");
 
   return (
-    <AppShell>
       <section className="app-page">
         <div className="grid gap-3">
           <Link
@@ -66,7 +64,7 @@ export default async function NewProjectPage({ searchParams }: NewProjectPagePro
             />
           </div>
         </div>
-        <div className="w-full max-w-4xl">
+        <div className="mx-auto w-full max-w-4xl">
           <ProjectForm
             mode="create"
             checklistOptions={checklists.map((checklist) => ({
@@ -81,6 +79,5 @@ export default async function NewProjectPage({ searchParams }: NewProjectPagePro
           />
         </div>
       </section>
-    </AppShell>
   );
 }

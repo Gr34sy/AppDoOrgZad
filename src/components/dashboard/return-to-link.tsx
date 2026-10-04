@@ -9,6 +9,7 @@ type ReturnToLinkProps = {
   className?: string;
   children: ReactNode;
   title?: string;
+  draggable?: boolean;
   "aria-label"?: string;
 };
 

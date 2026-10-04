@@ -94,7 +94,7 @@ function ExpandButton({
       ) : (
         <Maximize2 aria-hidden="true" className="h-4 w-4" />
       )}
-      {expanded ? "Restore view" : "Expand kanban"}
+      {expanded ? "Restore view" : "Expand View"}
     </button>
   );
 }
@@ -138,7 +138,7 @@ function ProjectTaskListItem({ task, column }: { task: Task; column?: Column }) 
 
 function ProjectTaskList({ projectId, columns, tasks }: ProjectTaskListProps) {
   return (
-    <section className="grid gap-4 rounded-md border border-zinc-200 bg-white p-4 shadow-sm sm:p-5 dark:border-zinc-800 dark:bg-zinc-950">
+    <section className="grid gap-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
@@ -200,7 +200,6 @@ export function ProjectTaskView({
     const previousView = view;
 
     setView(nextView);
-    setExpanded(false);
     setSavingView(true);
     setError("");
 
@@ -228,28 +227,28 @@ export function ProjectTaskView({
     >
       {!expanded ? projectInformation : null}
 
-      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <ViewToggle
-          view={view}
-          savingView={savingView}
-          onChange={(nextView) => void changeView(nextView)}
-        />
-        {view === "kanban" ? (
+      <div className={`grid gap-3 ${expanded ? "" : "mt-2"}`}>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <ViewToggle
+            view={view}
+            savingView={savingView}
+            onChange={(nextView) => void changeView(nextView)}
+          />
           <ExpandButton expanded={expanded} onToggle={() => setExpanded((value) => !value)} />
+        </div>
+
+        {error ? (
+          <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
+            {error}
+          </p>
         ) : null}
+
+        {view === "kanban" ? (
+          <ProjectKanbanBoard projectId={projectId} columns={columns} tasks={tasks} />
+        ) : (
+          <ProjectTaskList projectId={projectId} columns={columns} tasks={tasks} />
+        )}
       </div>
-
-      {error ? (
-        <p className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">
-          {error}
-        </p>
-      ) : null}
-
-      {view === "kanban" ? (
-        <ProjectKanbanBoard projectId={projectId} columns={columns} tasks={tasks} />
-      ) : (
-        <ProjectTaskList projectId={projectId} columns={columns} tasks={tasks} />
-      )}
     </div>
   );
 }

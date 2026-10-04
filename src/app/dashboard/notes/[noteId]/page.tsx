@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 import { isValidObjectId } from "mongoose";
 import { ArrowLeft } from "lucide-react";
-import { AppShell } from "@/components/layout/app-shell";
 import { NoteDetailsPanel } from "@/components/notes/note-details-panel";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
@@ -76,7 +75,6 @@ export default async function NotePage({ params, searchParams }: NotePageProps) 
   ];
 
   return (
-    <AppShell>
       <section className="app-page">
       <Link
         href={returnTo}
@@ -98,6 +96,5 @@ export default async function NotePage({ params, searchParams }: NotePageProps) 
         pinId={pin ? String(pin._id) : undefined}
       />
       </section>
-    </AppShell>
   );
 }

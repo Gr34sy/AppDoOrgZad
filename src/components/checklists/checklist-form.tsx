@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Save, Trash2, X } from "lucide-react";
+import { Check, Plus, Save, Trash2, X } from "lucide-react";
 import { FormShell } from "@/components/dashboard/form-shell";
 import { getCreatedEntityId } from "@/lib/created-entity-response";
 
@@ -121,12 +121,25 @@ export function ChecklistForm({
 
       <fieldset className="grid gap-3">
         <legend className="app-form-legend">Items</legend>
-        <div className="grid gap-2">
+        <div className="grid gap-1">
           {items.map((item, index) => (
             <div
               key={index}
-              className="grid min-w-0 gap-2 rounded-md bg-zinc-50/80 p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center dark:bg-zinc-900/70"
+              className="group relative flex min-w-0 items-center gap-3 rounded-md py-3 pl-3 pr-12 text-sm text-zinc-700 transition hover:bg-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-900"
             >
+              <button
+                type="button"
+                onClick={() => updateItem(index, { ...item, isCompleted: !item.isCompleted })}
+                aria-pressed={item.isCompleted}
+                aria-label={item.isCompleted ? `Mark item ${index + 1} as incomplete` : `Mark item ${index + 1} as complete`}
+                className={`grid h-5 w-5 shrink-0 place-items-center rounded border transition ${
+                  item.isCompleted
+                    ? "border-[var(--app-accent)] bg-[var(--app-accent)] text-white"
+                    : "border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-950"
+                }`}
+              >
+                {item.isCompleted ? <Check aria-hidden="true" className="h-3 w-3" /> : null}
+              </button>
               <label htmlFor={`item-${index}`} className="sr-only">
                 Item {index + 1}
               </label>
@@ -136,23 +149,14 @@ export function ChecklistForm({
                 value={item.title}
                 placeholder={`Item ${index + 1}`}
                 onChange={(event) => updateItem(index, { ...item, title: event.target.value })}
-                className={inputClass}
+                className={`min-w-0 flex-1 cursor-pointer rounded bg-transparent p-1 text-sm outline-none transition hover:bg-zinc-100/80 focus:bg-zinc-100/80 dark:hover:bg-zinc-800/70 dark:focus:bg-zinc-800/70 ${
+                  item.isCompleted ? "text-zinc-400 line-through dark:text-zinc-500" : ""
+                }`}
               />
-              <label className="app-form-checkbox-card h-11">
-                <input
-                  type="checkbox"
-                  checked={item.isCompleted}
-                  onChange={(event) =>
-                    updateItem(index, { ...item, isCompleted: event.target.checked })
-                  }
-                  className="app-form-checkbox"
-                />
-                Done
-              </label>
               <button
                 type="button"
                 onClick={() => removeItem(index)}
-                className="app-form-icon-button"
+                className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-md text-zinc-400 opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100 focus-visible:opacity-100 dark:hover:bg-red-500/10 dark:hover:text-red-300"
                 aria-label={`Remove item ${index + 1}`}
                 title="Remove item"
               >

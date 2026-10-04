@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, ClipboardList } from "lucide-react";
-import { AppShell } from "@/components/layout/app-shell";
 import { TaskForm } from "@/components/tasks/task-form";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
@@ -55,7 +54,6 @@ export default async function NewTaskPage({ searchParams }: NewTaskPageProps) {
   const returnTo = getSafeReturnTo(searchParams?.returnTo, "/dashboard/tasks");
 
   return (
-    <AppShell>
       <section className="app-page">
         <div className="grid gap-3">
           <Link
@@ -80,7 +78,7 @@ export default async function NewTaskPage({ searchParams }: NewTaskPageProps) {
             />
           </div>
         </div>
-        <div className="w-full max-w-4xl">
+        <div className="mx-auto w-full max-w-4xl">
           <TaskForm
             mode="create"
             projectOptions={projects.map((project) => ({
@@ -104,6 +102,5 @@ export default async function NewTaskPage({ searchParams }: NewTaskPageProps) {
           />
         </div>
       </section>
-    </AppShell>
   );
 }

@@ -53,6 +53,7 @@ const noteSortOptions = [
 ];
 
 const linkedOptions = [
+  { label: "Not Linked", value: "unlinked" },
   { label: "Linked", value: "linked" },
   { label: "Linked to Project", value: "project" },
   { label: "Linked to Task", value: "task" }
@@ -66,6 +67,7 @@ const controlConfig: Record<
     filterPlaceholder?: string;
     filterOptions?: SelectOption[];
     linkedFilter?: boolean;
+    defaultLinked: string;
     sortOptions: SelectOption[];
     defaultSort: string;
     defaultDirection: "asc" | "desc";
@@ -73,6 +75,7 @@ const controlConfig: Record<
 > = {
   notes: {
     linkedFilter: true,
+    defaultLinked: "",
     sortOptions: noteSortOptions,
     defaultSort: "position",
     defaultDirection: "asc"
@@ -83,12 +86,14 @@ const controlConfig: Record<
     filterPlaceholder: "all priorities",
     filterOptions: priorityOptions,
     linkedFilter: true,
+    defaultLinked: "",
     sortOptions: taskProjectSortOptions,
     defaultSort: "position",
     defaultDirection: "asc"
   },
   checklists: {
     linkedFilter: true,
+    defaultLinked: "",
     sortOptions: defaultSortOptions,
     defaultSort: "position",
     defaultDirection: "asc"
@@ -99,6 +104,7 @@ const controlConfig: Record<
     filterPlaceholder: "all priorities",
     filterOptions: priorityOptions,
     sortOptions: taskProjectSortOptions,
+    defaultLinked: "",
     defaultSort: "position",
     defaultDirection: "asc"
   }
@@ -124,7 +130,9 @@ export function ListControls({
   const hasLinkedFilter = Boolean(config.linkedFilter);
   const [query, setQuery] = useState(searchValue);
   const [selectedFilter, setSelectedFilter] = useState(filterValue);
-  const [selectedLinkedFilter, setSelectedLinkedFilter] = useState(linkedValue);
+  const [selectedLinkedFilter, setSelectedLinkedFilter] = useState(
+    linkedValue || config.defaultLinked
+  );
   const [selectedSort, setSelectedSort] = useState(sortValue);
   const [direction, setDirection] = useState<"asc" | "desc">(sortDirection);
   const hasSearchSettled = useRef(false);
@@ -156,7 +164,11 @@ export function ListControls({
       params.set(config.filterName, nextFilter);
     }
 
-    if (config.linkedFilter && nextLinkedFilter) {
+    if (
+      config.linkedFilter &&
+      nextLinkedFilter &&
+      nextLinkedFilter !== config.defaultLinked
+    ) {
       params.set("linked", nextLinkedFilter);
     }
 
@@ -185,6 +197,7 @@ export function ListControls({
     router.push(nextHref);
   }, [
     config.defaultDirection,
+    config.defaultLinked,
     config.defaultSort,
     config.filterName,
     config.linkedFilter,
@@ -202,8 +215,8 @@ export function ListControls({
   }, [filterValue]);
 
   useEffect(() => {
-    setSelectedLinkedFilter(linkedValue);
-  }, [linkedValue]);
+    setSelectedLinkedFilter(linkedValue || config.defaultLinked);
+  }, [config.defaultLinked, linkedValue]);
 
   useEffect(() => {
     setSelectedSort(sortValue);
@@ -298,7 +311,7 @@ export function ListControls({
   function resetControls() {
     setQuery("");
     setSelectedFilter("");
-    setSelectedLinkedFilter("");
+    setSelectedLinkedFilter(config.defaultLinked);
     setSelectedSort(config.defaultSort);
     setDirection(config.defaultDirection);
     router.replace(clearHref);
@@ -359,7 +372,7 @@ export function ListControls({
               onChange={handleLinkedFilterChange}
               className="app-select h-11 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition focus:border-[var(--app-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:bg-zinc-950"
             >
-              <option value="">all relations</option>
+              <option value="">All</option>
               {linkedOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}

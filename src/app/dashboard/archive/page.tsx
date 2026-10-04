@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { Archive } from "lucide-react";
 import { ArchiveItemsSearch } from "@/components/dashboard/archive-items-search";
-import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
 import { Checklist } from "@/models/checklist";
@@ -112,7 +111,6 @@ export default async function ArchivePage() {
   ];
 
   return (
-    <AppShell>
       <section className="app-page">
         <div className="app-page-header">
           <div className="app-page-heading">
@@ -129,6 +127,5 @@ export default async function ArchivePage() {
 
         <ArchiveItemsSearch items={archivedItems} />
       </section>
-    </AppShell>
   );
 }

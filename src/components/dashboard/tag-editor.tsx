@@ -22,7 +22,7 @@ export function TagEditor({ tags, onChange }: TagEditorProps) {
   return (
     <fieldset className="grid gap-3">
       <legend className="app-form-legend">Tags</legend>
-      <div className="rounded-md bg-zinc-50/80 p-3 shadow-sm dark:bg-zinc-900/70">
+      <div className="p-3">
         <div className="flex flex-wrap gap-2">
           {tagFields.map((tag, index) => (
             <label

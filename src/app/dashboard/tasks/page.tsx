@@ -5,7 +5,6 @@ import { ListControls } from "@/components/dashboard/list-controls";
 import { ObjectCard } from "@/components/dashboard/object-card";
 import { ReorderableList } from "@/components/dashboard/reorderable-list";
 import { ReturnToLink } from "@/components/dashboard/return-to-link";
-import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
 import { connectDatabase } from "@/lib/mongoose";
@@ -55,7 +54,8 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
   const ownerId = session.user.id;
   const search = getSearchParam(searchParams?.q).trim();
   const priority = getSearchParam(searchParams?.priority).trim();
-  const linked = getSearchParam(searchParams?.linked).trim();
+  const requestedLinked = getSearchParam(searchParams?.linked).trim();
+  const linked = requestedLinked === "all" ? "" : requestedLinked;
   const sort = getSearchParam(searchParams?.sort) || "position";
   const requestedDirection = getSearchParam(searchParams?.direction) === "desc" ? "desc" : "asc";
   const direction = sort === "position" ? "asc" : requestedDirection;
@@ -82,16 +82,20 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
     query.projectId = { $exists: true, $ne: null };
   }
 
+  if (linked === "unlinked") {
+    query.projectId = null;
+  }
+
   if (linked === "task") {
     query._id = null;
   }
 
   await connectDatabase();
   const tasks = await Task.find(query).sort(getTaskSort(sort, direction)).lean<ListedTask[]>();
-  const isReorderEnabled = sort === "position" && !search && !priority && !linked;
+  const isReorderEnabled =
+    sort === "position" && !search && !priority && !linked;
 
   return (
-    <AppShell>
       <section className="app-page">
         <div className="app-page-header">
           <div className="app-page-heading">
@@ -117,7 +121,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
           action={
             <ReturnToLink href="/dashboard/tasks/new" className="app-primary-action">
               <Plus aria-hidden="true" className="h-4 w-4" />
-              New task
+              New
             </ReturnToLink>
           }
         />
@@ -166,6 +170,5 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
           </div>
         )}
       </section>
-    </AppShell>
   );
 }

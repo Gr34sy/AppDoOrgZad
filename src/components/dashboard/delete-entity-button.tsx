@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Archive as ArchiveIcon } from "lucide-react";
 import { ConfirmationDialog } from "@/components/dashboard/confirmation-dialog";
+import { getSafeReturnTo } from "@/lib/return-to";
 
 type DeleteEntityButtonProps = {
   endpoint: string;
@@ -21,6 +22,7 @@ export function DeleteEntityButton({
   iconOnly = false
 }: DeleteEntityButtonProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
@@ -40,7 +42,7 @@ export function DeleteEntityButton({
     }
 
     setIsConfirming(false);
-    router.push(redirectTo);
+    router.push(getSafeReturnTo(searchParams.get("returnTo") ?? undefined, redirectTo));
     router.refresh();
   }
 

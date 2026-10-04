@@ -64,6 +64,7 @@ const sortFieldOptions = [
 ];
 
 const relationOptions = [
+  { label: "Not Linked", value: "unlinked" },
   { label: "Linked", value: "linked" },
   { label: "Linked to Project", value: "project" },
   { label: "Linked to Task", value: "task" }
@@ -107,6 +108,10 @@ function matchesRelationFilter(item: ArchiveItem, relationFilter: string) {
 
   if (relationFilter === "linked") {
     return item.relationTargets.length > 0;
+  }
+
+  if (relationFilter === "unlinked") {
+    return item.relationTargets.length === 0;
   }
 
   return item.relationTargets.includes(relationFilter as "project" | "task");
@@ -302,7 +307,7 @@ export function ArchiveItemsSearch({ items }: ArchiveItemsSearchProps) {
                   onChange={(event) => setRelationFilter(event.target.value)}
                   className="app-select h-11 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition focus:border-[var(--app-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:bg-zinc-950"
                 >
-                  <option value="">all relations</option>
+                  <option value="">All</option>
                   {relationOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -399,7 +404,7 @@ export function ArchiveItemsSearch({ items }: ArchiveItemsSearchProps) {
                       {item.title}
                     </h2>
                   </div>
-                  <p className="mt-2 text-xs font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-2 text-sm font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
                     {[item.typeLabel, item.status, item.priority].filter(Boolean).join(" / ")}
                   </p>
                   {isChecklist ? (

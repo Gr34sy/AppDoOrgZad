@@ -5,7 +5,6 @@ import { ListControls } from "@/components/dashboard/list-controls";
 import { ObjectCard } from "@/components/dashboard/object-card";
 import { ReorderableList } from "@/components/dashboard/reorderable-list";
 import { ReturnToLink } from "@/components/dashboard/return-to-link";
-import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
 import { connectDatabase } from "@/lib/mongoose";
@@ -69,13 +68,16 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
     };
   }
 
+  if (linked === "unlinked") {
+    query.linkedItems = { $size: 0 };
+  }
+
   await connectDatabase();
 
   const notes = await Note.find(query).sort(getNoteSort(sort, direction)).lean<ListedNote[]>();
   const isReorderEnabled = sort === "position" && !search && !linked;
 
   return (
-    <AppShell>
       <section className="app-page">
         <div className="app-page-header">
           <div className="app-page-heading">
@@ -100,7 +102,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
           action={
             <ReturnToLink href="/dashboard/notes/new" className="app-primary-action">
               <Plus aria-hidden="true" className="h-4 w-4" />
-              New note
+              New
             </ReturnToLink>
           }
         />
@@ -147,6 +149,5 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
           </div>
         )}
       </section>
-    </AppShell>
   );
 }

@@ -31,9 +31,9 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         className="fixed inset-0 z-30 hidden bg-zinc-950/30 backdrop-blur-[1px] peer-checked:block lg:!hidden"
         aria-label="Close navigation"
       />
-      <aside className="fixed inset-y-0 left-0 z-40 flex w-[min(18rem,calc(100vw-2rem))] -translate-x-full flex-col border-r border-zinc-200 bg-[var(--app-sidebar-background)] px-4 py-5 shadow-2xl shadow-zinc-950/10 transition-[transform,width] duration-300 peer-checked:translate-x-0 peer-checked:lg:w-20 lg:w-72 lg:translate-x-0 dark:border-zinc-800">
-        <div className="sidebar-user flex items-center gap-3 border-b border-zinc-200 pb-5 dark:border-zinc-800">
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-zinc-950 text-sm font-semibold text-white dark:bg-white dark:text-zinc-950">
+      <aside className="fixed inset-y-0 left-0 z-40 flex w-[min(18rem,calc(100vw-2rem))] -translate-x-full flex-col border-r border-zinc-200 bg-[var(--app-sidebar-background)] px-4 pb-5 pt-5 shadow-2xl shadow-zinc-950/10 transition-[transform,width] duration-300 peer-checked:translate-x-0 peer-checked:lg:w-20 lg:w-72 lg:translate-x-0 dark:border-zinc-800">
+        <div className="sidebar-user relative flex h-16 shrink-0 items-start gap-3 border-b border-zinc-200 dark:border-zinc-800">
+          <div className="sidebar-avatar grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-zinc-950 text-sm font-semibold text-white transition-[opacity,transform] duration-300 dark:bg-white dark:text-zinc-950">
             {userInitial}
           </div>
           <div className="sidebar-collapsible min-w-0">
@@ -42,18 +42,18 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <label
             htmlFor="app-sidebar-toggle"
-            className="ml-auto hidden h-8 w-8 cursor-pointer place-items-center rounded-md text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950 lg:grid dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-white"
+            className="sidebar-toggle absolute right-0 top-0 hidden h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-md text-zinc-500 transition-[right,top,width,height,transform,background-color,color] duration-300 hover:bg-zinc-100 hover:text-zinc-950 lg:grid dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-white"
             aria-label="Collapse navigation"
             title="Toggle sidebar"
           >
             <ChevronLeft
               aria-hidden="true"
-              className="sidebar-expanded-icon h-4 w-4"
+              className="sidebar-expanded-icon h-5 w-5"
               strokeWidth={2.5}
             />
             <ChevronRight
               aria-hidden="true"
-              className="sidebar-collapsed-icon hidden h-4 w-4"
+              className="sidebar-collapsed-icon absolute inset-0 m-auto h-5 w-5"
               strokeWidth={2.5}
             />
           </label>

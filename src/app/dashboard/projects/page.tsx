@@ -5,7 +5,6 @@ import { ListControls } from "@/components/dashboard/list-controls";
 import { ObjectCard } from "@/components/dashboard/object-card";
 import { ReorderableList } from "@/components/dashboard/reorderable-list";
 import { ReturnToLink } from "@/components/dashboard/return-to-link";
-import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
 import { connectDatabase } from "@/lib/mongoose";
@@ -76,7 +75,6 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   const isReorderEnabled = sort === "position" && !search && !priority;
 
   return (
-    <AppShell>
       <section className="app-page">
         <div className="app-page-header">
           <div className="app-page-heading">
@@ -101,7 +99,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
           action={
             <ReturnToLink href="/dashboard/projects/new" className="app-primary-action">
               <Plus aria-hidden="true" className="h-4 w-4" />
-              New project
+              New
             </ReturnToLink>
           }
         />
@@ -150,6 +148,5 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
           </div>
         )}
       </section>
-    </AppShell>
   );
 }

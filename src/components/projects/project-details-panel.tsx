@@ -49,8 +49,15 @@ function normalizeTags(tags: string[]) {
 function formatMetaValue(value: string) {
   const normalizedValue = value.replace(/_/g, " ").trim();
 
-  return normalizedValue ? normalizedValue[0].toUpperCase() + normalizedValue.slice(1) : value;
+  return normalizedValue ? normalizedValue[0].toUpperCase() + normalizedValue.slice(1) : "-";
 }
+
+function getProjectDatePayload(date: string) {
+  return date ? new Date(`${date}T00:00:00`).toISOString() : null;
+}
+
+const priorityOptions = ["low", "medium", "high", "urgent"];
+const lifecycleStatusOptions = ["active", "paused", "completed", "archived"];
 
 function ProjectTagPreview({ tags }: { tags: string[] }) {
   return <TagList tags={tags} showEmpty />;
@@ -78,29 +85,48 @@ export function ProjectDetailsPanel({
   const [draftTitle, setDraftTitle] = useState(title);
   const [draftDescription, setDraftDescription] = useState(description);
   const [draftTags, setDraftTags] = useState(tags.length ? tags : [""]);
+  const [draftPriority, setDraftPriority] = useState(priority);
+  const [draftLifecycleStatus, setDraftLifecycleStatus] = useState(lifecycleStatus);
+  const [draftDueDate, setDraftDueDate] = useState(dueDate);
+  const [editingMetaField, setEditingMetaField] = useState<
+    "status" | "priority" | "due" | null
+  >(null);
   const [isTagEditorOpen, setIsTagEditorOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
-  void dueDate;
-  void dueDateLabel;
   void kanbanColumns;
   void completedAtLabel;
   const normalizedDraftTags = normalizeTags(draftTags);
+  const dueDateDisplay = draftDueDate
+    ? draftDueDate === dueDate
+      ? dueDateLabel ?? draftDueDate
+      : draftDueDate
+    : "-";
   const isDirty =
     draftTitle.trim() !== title.trim() ||
     draftDescription !== description ||
+    draftPriority !== priority ||
+    draftLifecycleStatus !== lifecycleStatus ||
+    draftDueDate !== dueDate ||
     normalizedDraftTags.join("\n") !== tags.join("\n");
 
   useEffect(() => {
     setDraftTitle(title);
     setDraftDescription(description);
     setDraftTags(tags.length ? tags : [""]);
-  }, [title, description, tags]);
+    setDraftPriority(priority);
+    setDraftLifecycleStatus(lifecycleStatus);
+    setDraftDueDate(dueDate);
+  }, [title, description, tags, priority, lifecycleStatus, dueDate]);
 
   function resetDrafts() {
     setDraftTitle(title);
     setDraftDescription(description);
     setDraftTags(tags.length ? tags : [""]);
+    setDraftPriority(priority);
+    setDraftLifecycleStatus(lifecycleStatus);
+    setDraftDueDate(dueDate);
+    setEditingMetaField(null);
     setError("");
   }
 
@@ -137,6 +163,9 @@ export function ProjectDetailsPanel({
       body: JSON.stringify({
         title: draftTitle.trim(),
         description: draftDescription,
+        priority: draftPriority,
+        lifecycleStatus: draftLifecycleStatus,
+        dueDate: getProjectDatePayload(draftDueDate),
         tags: normalizedDraftTags
       })
     });
@@ -151,6 +180,11 @@ export function ProjectDetailsPanel({
     router.refresh();
   }
 
+  const inlineMetaControlClass =
+    "h-8 min-w-28 rounded-md bg-zinc-100/80 px-2 text-[0.9375rem] text-zinc-950 outline-none dark:bg-zinc-900 dark:text-zinc-50";
+  const inlineMetaButtonClass =
+    "rounded-md p-1 text-left transition hover:bg-zinc-100/80 focus-visible:bg-zinc-100/80 focus-visible:outline-none dark:hover:bg-zinc-900 dark:focus-visible:bg-zinc-900";
+
   return (
     <article className="grid gap-5">
       <div className="flex justify-end px-3">
@@ -162,7 +196,7 @@ export function ProjectDetailsPanel({
         />
       </div>
       <div className="rounded-md border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-zinc-200 pb-4 dark:border-zinc-800">
           <div className="flex min-w-0 flex-1 items-start gap-3">
             <FolderKanban
               aria-hidden="true"
@@ -173,7 +207,7 @@ export function ProjectDetailsPanel({
               onChange={setDraftTitle}
               required
               className="min-w-0 break-words p-1 text-2xl font-semibold tracking-normal text-zinc-950 sm:text-3xl dark:text-zinc-50"
-              inputClassName="w-full rounded-md border border-[var(--app-accent)] bg-white px-2 py-1 text-2xl font-semibold text-zinc-950 outline-none ring-2 ring-[var(--app-accent)]/15 sm:text-3xl dark:bg-zinc-900 dark:text-zinc-50"
+              inputClassName="w-full bg-transparent p-1 text-2xl font-semibold tracking-normal text-zinc-950 outline-none sm:text-3xl dark:text-zinc-50"
             />
           </div>
           <div className="app-action-row">
@@ -203,56 +237,125 @@ export function ProjectDetailsPanel({
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-zinc-600 dark:text-zinc-300">
-          <span className="inline-flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
+        <div className="my-6 grid gap-2 text-[0.9375rem] text-zinc-600 dark:text-zinc-300">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <span className="inline-flex items-center gap-1.5">
             <Gauge aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
-            <span>
-              <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Status:</strong>{" "}
-              {formatMetaValue(lifecycleStatus)}
-            </span>
-            <span aria-hidden="true" className="text-zinc-400 dark:text-zinc-500">
-              |
-            </span>
-            <span>
-              <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Priority:</strong>{" "}
-              {formatMetaValue(priority)}
-            </span>
+            {editingMetaField === "status" ? (
+              <select
+                autoFocus
+                aria-label="Status"
+                value={draftLifecycleStatus}
+                onChange={(event) => {
+                  setDraftLifecycleStatus(event.target.value);
+                  setEditingMetaField(null);
+                }}
+                onBlur={() => setEditingMetaField(null)}
+                className={inlineMetaControlClass}
+              >
+                {lifecycleStatusOptions.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setEditingMetaField("status")}
+                className={inlineMetaButtonClass}
+              >
+                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Status</strong>{" "}
+                {formatMetaValue(draftLifecycleStatus)}
+              </button>
+            )}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            {editingMetaField === "priority" ? (
+              <select
+                autoFocus
+                aria-label="Priority"
+                value={draftPriority}
+                onChange={(event) => {
+                  setDraftPriority(event.target.value);
+                  setEditingMetaField(null);
+                }}
+                onBlur={() => setEditingMetaField(null)}
+                className={inlineMetaControlClass}
+              >
+                {priorityOptions.map((priorityOption) => (
+                  <option key={priorityOption} value={priorityOption}>
+                    {priorityOption}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setEditingMetaField("priority")}
+                className={inlineMetaButtonClass}
+              >
+                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Priority</strong>{" "}
+                {formatMetaValue(draftPriority)}
+              </button>
+            )}
           </span>
           <span className="inline-flex items-center gap-1.5">
             <ListChecks aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
             {taskCount} {taskCount === 1 ? "task" : "tasks"}
           </span>
-          {checklistIds.length ? (
-            <span className="inline-flex items-center gap-1.5">
-              <ListChecks aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
-              Checklists: {checklistIds.length}
-            </span>
-          ) : null}
-          <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1">
+            {checklistIds.length ? (
+              <span className="inline-flex items-center gap-1.5">
+                <ListChecks aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
+                Checklists: {checklistIds.length}
+              </span>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
             <CalendarClock aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
+            {editingMetaField === "due" ? (
+              <input
+                autoFocus
+                type="date"
+                aria-label="Due"
+                value={draftDueDate}
+                onChange={(event) => setDraftDueDate(event.target.value)}
+                onBlur={() => setEditingMetaField(null)}
+                className={inlineMetaControlClass}
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => setEditingMetaField("due")}
+                className={inlineMetaButtonClass}
+              >
+                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Due</strong>{" "}
+                {dueDateDisplay}
+              </button>
+            )}
             {createdAtLabel ? (
-              <span>
-                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Created:</strong>{" "}
+              <span className="inline-flex items-center gap-1.5">
+                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Created</strong>{" "}
                 {createdAtLabel}
               </span>
             ) : null}
             {updatedAtLabel ? (
-              <span>
-                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Updated:</strong>{" "}
+              <span className="inline-flex items-center gap-1.5">
+                <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Updated</strong>{" "}
                 {updatedAtLabel}
               </span>
             ) : null}
-          </span>
+          </div>
         </div>
 
-        <div className="mt-6">
+        <div>
           {isTagEditorOpen ? (
-            <div className="rounded-md bg-zinc-50/80 p-3 shadow-sm dark:bg-zinc-900/70">
+            <div>
               <div className="flex flex-wrap gap-2">
                 {draftTags.map((tag, index) => (
                   <label
                     key={index}
-                    className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border border-[var(--app-accent)]/35 bg-white px-[0.78125rem] text-[0.9375rem] shadow-sm transition focus-within:border-[var(--app-accent)] focus-within:ring-2 focus-within:ring-[var(--app-accent)]/15 dark:bg-zinc-950"
+                    className="inline-flex min-h-8 max-w-full items-center gap-1.5 rounded-full border border-[var(--app-accent)]/35 bg-white px-[0.78125rem] text-[0.9375rem] shadow-sm transition focus-within:border-[var(--app-accent)] dark:bg-zinc-950"
                   >
                     <Tag aria-hidden="true" className="h-[1.09375rem] w-[1.09375rem] shrink-0 text-[var(--app-accent)]" />
                     <span className="sr-only">Tag {index + 1}</span>
@@ -267,7 +370,7 @@ export function ProjectDetailsPanel({
                     <button
                       type="button"
                       onClick={() => removeTag(index)}
-                      className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-zinc-400 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-300"
+                      className="grid h-5 w-5 shrink-0 place-items-center rounded-full text-zinc-400 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-300"
                       aria-label={`Remove tag ${index + 1}`}
                       title="Remove tag"
                     >
@@ -278,7 +381,7 @@ export function ProjectDetailsPanel({
                 <button
                   type="button"
                   onClick={() => setDraftTags((currentTags) => [...currentTags, ""])}
-                  className="inline-flex h-11 items-center gap-2 rounded-full border border-dashed border-[var(--app-accent)]/50 px-[0.78125rem] text-[0.9375rem] font-medium text-[var(--app-accent)] transition hover:border-[var(--app-accent)] hover:bg-[var(--app-accent)]/5"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-dashed border-[var(--app-accent)]/50 px-[0.78125rem] text-[0.9375rem] font-medium text-[var(--app-accent)] transition hover:border-[var(--app-accent)] hover:bg-[var(--app-accent)]/5"
                 >
                   <Plus aria-hidden="true" className="h-[1.09375rem] w-[1.09375rem]" />
                   Add tag
@@ -286,7 +389,7 @@ export function ProjectDetailsPanel({
                 <button
                   type="button"
                   onClick={() => setIsTagEditorOpen(false)}
-                  className="grid h-10 w-10 place-items-center rounded-full text-[var(--app-accent)] transition hover:bg-[var(--app-accent)]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/20"
+                  className="grid h-8 w-8 place-items-center rounded-full text-[var(--app-accent)] transition hover:bg-[var(--app-accent)]/5 focus-visible:outline-none"
                   aria-label="Back to tag preview"
                   title="Back to tag preview"
                 >
@@ -298,7 +401,7 @@ export function ProjectDetailsPanel({
             <button
               type="button"
               onClick={() => setIsTagEditorOpen(true)}
-              className="group -m-2 flex w-fit max-w-full rounded-md p-2 text-left transition hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/20 dark:hover:bg-zinc-900"
+              className="group -m-2 flex w-fit max-w-full rounded-md p-2 text-left focus-visible:outline-none"
             >
               <ProjectTagPreview tags={normalizedDraftTags} />
             </button>
@@ -311,10 +414,12 @@ export function ProjectDetailsPanel({
           multiline
           emptyLabel="No description yet."
           className="mt-6 whitespace-pre-wrap p-1 text-sm leading-7 text-zinc-700 dark:text-zinc-300"
-          inputClassName="mt-6 min-h-32 w-full rounded-md border border-[var(--app-accent)] bg-white px-3 py-3 text-sm leading-7 text-zinc-950 outline-none ring-2 ring-[var(--app-accent)]/15 dark:bg-zinc-900 dark:text-zinc-50"
+          inputClassName="mt-6 w-full rounded-md bg-zinc-100/80 p-1 text-sm leading-7 text-zinc-950 outline-none dark:bg-zinc-900 dark:text-zinc-50"
         />
 
         <LinkedChecklistList
+          parentType="project"
+          parentId={projectId}
           checklistIds={checklistIds}
           checklistOptions={checklistOptions}
           className="mt-6"

@@ -77,6 +77,30 @@ describe("ListControls", () => {
     );
   });
 
+  it("uses All as the default task relation filter", () => {
+    render(
+      <ListControls
+        entityType="tasks"
+        searchValue=""
+        filterValue=""
+        linkedValue=""
+        sortValue="position"
+        sortDirection="asc"
+        clearHref="/dashboard/tasks"
+      />
+    );
+
+    expect(screen.getByLabelText("Relation")).toHaveValue("");
+
+    fireEvent.change(screen.getByLabelText("Relation"), {
+      target: { value: "unlinked" }
+    });
+
+    expect(navigation.replace).toHaveBeenLastCalledWith(
+      "/dashboard/tasks?linked=unlinked"
+    );
+  });
+
   it("updates sort automatically and resets controls", () => {
     render(
       <ListControls

@@ -4,7 +4,6 @@ import { notFound, redirect } from "next/navigation";
 import { isValidObjectId } from "mongoose";
 import { ArrowLeft } from "lucide-react";
 import { ChecklistDetailsPanel } from "@/components/checklists/checklist-details-panel";
-import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
 import { getSafeReturnTo } from "@/lib/return-to";
@@ -72,7 +71,6 @@ export default async function ChecklistPage({ params, searchParams }: ChecklistP
   const returnTo = getSafeReturnTo(searchParams?.returnTo, "/dashboard/checklists");
 
   return (
-    <AppShell>
       <section className="app-page">
         <Link
           href={returnTo}
@@ -96,6 +94,5 @@ export default async function ChecklistPage({ params, searchParams }: ChecklistP
           pinId={pin ? String(pin._id) : undefined}
         />
       </section>
-    </AppShell>
   );
 }

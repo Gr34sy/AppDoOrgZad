@@ -2,7 +2,6 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { ArrowLeft, StickyNote } from "lucide-react";
-import { AppShell } from "@/components/layout/app-shell";
 import { NoteCreateForm } from "@/components/notes/note-create-form";
 import { authOptions } from "@/lib/auth";
 import { getSafeReturnTo } from "@/lib/return-to";
@@ -23,7 +22,6 @@ export default async function NewNotePage({ searchParams }: NewNotePageProps) {
   const returnTo = getSafeReturnTo(searchParams?.returnTo, "/dashboard/notes");
 
   return (
-    <AppShell>
       <section className="app-page">
         <Link
           href={returnTo}
@@ -49,7 +47,7 @@ export default async function NewNotePage({ searchParams }: NewNotePageProps) {
           />
         </div>
 
-        <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
+        <div className="mx-auto grid w-full min-w-0 max-w-4xl gap-6">
           <div className="grid gap-4">
             <NoteCreateForm returnTo={returnTo} />
           </div>
@@ -70,6 +68,5 @@ export default async function NewNotePage({ searchParams }: NewNotePageProps) {
           </aside>
         </div>
       </section>
-    </AppShell>
   );
 }

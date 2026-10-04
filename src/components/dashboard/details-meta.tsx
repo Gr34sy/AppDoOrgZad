@@ -9,7 +9,7 @@ export function DetailsMeta({ createdAtLabel, updatedAtLabel }: DetailsMetaProps
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500 sm:gap-3 dark:text-zinc-400">
+    <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-500 sm:gap-3 dark:text-zinc-400">
       {createdAtLabel ? <p>Created {createdAtLabel}</p> : null}
       {createdAtLabel && updatedAtLabel ? (
         <span aria-hidden="true" className="text-zinc-300 dark:text-zinc-700">

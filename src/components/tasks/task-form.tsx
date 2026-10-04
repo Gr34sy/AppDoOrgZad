@@ -152,8 +152,21 @@ export function TaskForm({
 
     if (mode === "create") {
       const createdTaskId = await getCreatedEntityId(response, "task");
+      const projectReturnPath = projectId
+        ? `/dashboard/projects/${projectId}`
+        : "";
+      const shouldReturnToProject = Boolean(
+        projectReturnPath &&
+        (returnTo === projectReturnPath || returnTo.startsWith(`${projectReturnPath}?`))
+      );
 
-      router.push(createdTaskId ? `/dashboard/tasks/${createdTaskId}` : returnTo);
+      router.push(
+        shouldReturnToProject
+          ? returnTo
+          : createdTaskId
+            ? `/dashboard/tasks/${createdTaskId}`
+            : returnTo
+      );
       router.refresh();
       return;
     }

@@ -3,9 +3,9 @@
 import { type DragEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  CalendarClock,
   Check,
   Edit2,
-  GripVertical,
   ListChecks,
   Plus,
   Trash2
@@ -71,6 +71,7 @@ export function ChecklistDetailsPanel({
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
   const [draggedItemId, setDraggedItemId] = useState("");
   const [activeDropItemId, setActiveDropItemId] = useState("");
+  const [activeDropPosition, setActiveDropPosition] = useState<"before" | "after">("before");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const itemSnapshot = getEditableItemSnapshot(savedItems);
@@ -229,18 +230,24 @@ export function ChecklistDetailsPanel({
     setError("");
   }
 
-  function moveDraftItem(draggedId: string, targetId: string) {
+  function moveDraftItem(
+    draggedId: string,
+    targetId: string,
+    dropPosition: "before" | "after"
+  ) {
     setDraftItems((currentItems) => {
       const draggedIndex = currentItems.findIndex((item) => item.localId === draggedId);
-      const targetIndex = currentItems.findIndex((item) => item.localId === targetId);
+      const hasTarget = currentItems.some((item) => item.localId === targetId);
 
-      if (draggedIndex < 0 || targetIndex < 0 || draggedIndex === targetIndex) {
+      if (draggedIndex < 0 || !hasTarget || draggedId === targetId) {
         return currentItems;
       }
 
       const nextItems = [...currentItems];
       const [draggedItem] = nextItems.splice(draggedIndex, 1);
-      nextItems.splice(targetIndex, 0, draggedItem);
+      const targetIndex = nextItems.findIndex((item) => item.localId === targetId);
+      const insertionIndex = targetIndex + (dropPosition === "after" ? 1 : 0);
+      nextItems.splice(insertionIndex, 0, draggedItem);
 
       return nextItems.map((item, index) => ({ ...item, position: index }));
     });
@@ -260,6 +267,8 @@ export function ChecklistDetailsPanel({
 
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
+    const bounds = event.currentTarget.getBoundingClientRect();
+    setActiveDropPosition(event.clientY < bounds.top + bounds.height / 2 ? "before" : "after");
     setActiveDropItemId(itemId);
   }
 
@@ -269,7 +278,7 @@ export function ChecklistDetailsPanel({
 
     setDraggedItemId("");
     setActiveDropItemId("");
-    moveDraftItem(itemId, targetId);
+    moveDraftItem(itemId, targetId, activeDropPosition);
   }
 
   function cancelItemEdit(index: number) {
@@ -308,18 +317,19 @@ export function ChecklistDetailsPanel({
                 onChange={setDraftTitle}
                 required
                 className="min-w-0 break-words p-1 text-2xl font-semibold tracking-normal text-zinc-950 sm:text-3xl dark:text-zinc-50"
-                inputClassName="w-full rounded-md border border-[var(--app-accent)] bg-white px-2 py-1 text-2xl font-semibold text-zinc-950 outline-none ring-2 ring-[var(--app-accent)]/15 sm:text-3xl dark:bg-zinc-900 dark:text-zinc-50"
+                inputClassName="w-full bg-transparent p-1 text-2xl font-semibold tracking-normal text-zinc-950 outline-none sm:text-3xl dark:text-zinc-50"
               />
-              <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500 dark:text-zinc-400">
+              <div className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.9375rem] text-zinc-500 dark:text-zinc-400">
+                <CalendarClock aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
                 {createdAtLabel ? (
                   <span>
-                    <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Created:</strong>{" "}
+                    <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Created</strong>{" "}
                     {createdAtLabel}
                   </span>
                 ) : null}
                 {updatedAtLabel ? (
-                  <span>
-                    <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Updated:</strong>{" "}
+                  <span className="inline-flex items-center gap-1.5">
+                    <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Updated</strong>{" "}
                     {updatedAtLabel}
                   </span>
                 ) : null}
@@ -368,20 +378,21 @@ export function ChecklistDetailsPanel({
                 onDragEnd={() => {
                   setDraggedItemId("");
                   setActiveDropItemId("");
+                  setActiveDropPosition("before");
                 }}
                 className={`group relative rounded-md text-sm text-zinc-700 transition [--app-checkbox-check-color:#fff] hover:bg-zinc-50 hover:[--app-checkbox-check-color:#fafafa] dark:text-zinc-200 dark:[--app-checkbox-check-color:#09090b] dark:hover:bg-zinc-900 dark:hover:[--app-checkbox-check-color:#18181b] ${
                   draggedItemId === item.localId ? "opacity-60" : ""
-                } ${
-                  activeDropItemId === item.localId
-                    ? "ring-2 ring-[var(--app-accent)]/30"
-                    : ""
                 }`}
               >
-                <div className="flex items-center gap-3 py-3 pl-3 pr-14">
-                  <GripVertical
+                {activeDropItemId === item.localId ? (
+                  <span
                     aria-hidden="true"
-                    className="h-4 w-4 shrink-0 cursor-grab text-zinc-400 active:cursor-grabbing"
+                    className={`pointer-events-none absolute inset-x-2 h-0.5 rounded-full bg-[var(--app-accent)] ${
+                      activeDropPosition === "before" ? "top-0" : "bottom-0"
+                    }`}
                   />
+                ) : null}
+                <div className="flex items-center gap-3 py-3 pl-3 pr-14">
                   <button
                     type="button"
                     onClick={() => toggleItem(index)}
@@ -412,14 +423,14 @@ export function ChecklistDetailsPanel({
                         }}
                         onBlur={() => setEditingItemIndex(null)}
                         onClick={(event) => event.stopPropagation()}
-                        className="w-full rounded-md border border-[var(--app-accent)] bg-white px-2 py-1 text-sm font-medium text-zinc-950 outline-none ring-2 ring-[var(--app-accent)]/15 dark:bg-zinc-900 dark:text-zinc-50"
+                        className="w-full cursor-pointer bg-transparent p-1 text-sm font-medium text-zinc-950 outline-none dark:text-zinc-50"
                       />
                     ) : (
                       <button
                         type="button"
                         onClick={() => toggleItem(index)}
                         aria-label={item.isCompleted ? `Mark ${item.title} as incomplete` : `Mark ${item.title} as complete`}
-                        className={`block w-full min-w-0 cursor-pointer break-words rounded p-1 text-left transition hover:text-[var(--app-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--app-accent)]/25 ${
+                        className={`block w-full min-w-0 cursor-pointer break-words rounded p-1 text-left transition hover:bg-zinc-100/80 focus-visible:bg-zinc-100/80 focus-visible:outline-none dark:hover:bg-zinc-900 dark:focus-visible:bg-zinc-900 ${
                           item.isCompleted ? "line-through opacity-70" : ""
                         }`}
                       >

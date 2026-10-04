@@ -646,7 +646,7 @@ export function ProjectForm({
               onDragOver={(event) => handleColumnDragOver(event, column.formId)}
               onDragLeave={() => setActiveDropColumnFormId("")}
               onDrop={(event) => handleColumnDrop(event, column.formId)}
-              className={`grid gap-3 rounded-md bg-zinc-50/80 p-3 shadow-sm transition sm:grid-cols-[auto_minmax(0,1fr)_7rem_auto_auto] sm:items-end dark:bg-zinc-900/70 ${
+              className={`grid gap-3 rounded-md bg-zinc-50/80 p-3 shadow-sm transition sm:grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] sm:items-end dark:bg-zinc-900/70 ${
                 activeDropColumnFormId === column.formId
                   ? "ring-2 ring-[var(--app-accent)]/30"
                   : ""

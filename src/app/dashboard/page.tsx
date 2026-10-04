@@ -1,6 +1,5 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { AppShell } from "@/components/layout/app-shell";
 import { PinnedBoard } from "@/components/dashboard/pinned-board";
 import { authOptions } from "@/lib/auth";
 import { connectDatabase } from "@/lib/mongoose";
@@ -283,12 +282,10 @@ export default async function DashboardPage() {
   ].filter((event) => event.date);
 
   return (
-    <AppShell>
       <PinnedBoard
         pinnedItems={pinnedItems}
         dashboardMetrics={dashboardMetrics}
         calendarEvents={calendarEvents}
       />
-    </AppShell>
   );
 }

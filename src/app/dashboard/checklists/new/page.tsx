@@ -3,7 +3,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, ListChecks } from "lucide-react";
 import { ChecklistForm } from "@/components/checklists/checklist-form";
-import { AppShell } from "@/components/layout/app-shell";
 import { authOptions } from "@/lib/auth";
 import { getSafeReturnTo } from "@/lib/return-to";
 
@@ -23,7 +22,6 @@ export default async function NewChecklistPage({ searchParams }: NewChecklistPag
   const returnTo = getSafeReturnTo(searchParams?.returnTo, "/dashboard/checklists");
 
   return (
-    <AppShell>
       <section className="app-page">
         <div className="grid gap-3">
           <Link
@@ -48,10 +46,9 @@ export default async function NewChecklistPage({ searchParams }: NewChecklistPag
             />
           </div>
         </div>
-        <div className="w-full max-w-4xl">
+        <div className="mx-auto w-full max-w-4xl">
           <ChecklistForm mode="create" returnTo={returnTo} />
         </div>
       </section>
-    </AppShell>
   );
 }

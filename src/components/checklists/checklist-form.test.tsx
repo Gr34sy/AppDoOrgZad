@@ -40,7 +40,7 @@ describe("ChecklistForm", () => {
 
     await user.type(screen.getByLabelText("Title"), "Release checklist");
     await user.type(screen.getByLabelText("Item 1"), "Run tests");
-    await user.click(screen.getByText("Done"));
+    await user.click(screen.getByRole("button", { name: "Mark item 1 as complete" }));
     await user.click(screen.getByRole("button", { name: /create checklist/i }));
 
     await waitFor(() => {

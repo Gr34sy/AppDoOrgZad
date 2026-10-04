@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Link2, Plus, StickyNote, Tag, X } from "lucide-react";
+import { ArrowLeft, CalendarClock, Link2, Plus, StickyNote, Tag, X } from "lucide-react";
 import { DeleteEntityButton } from "@/components/dashboard/delete-entity-button";
 import { InlineEditableField } from "@/components/dashboard/inline-editable-field";
 import { PinEntityButton } from "@/components/dashboard/pin-entity-button";
@@ -37,7 +37,7 @@ function normalizeTags(tags: string[]) {
 }
 
 function NoteTagPreview({ tags }: { tags: string[] }) {
-  return <TagList tags={tags} showEmpty tone="current" />;
+  return <TagList tags={tags} showEmpty />;
 }
 
 export function NoteDetailsPanel({
@@ -156,7 +156,7 @@ export function NoteDetailsPanel({
               onChange={setDraftTitle}
               required
               className="min-w-0 break-words p-1 text-2xl font-semibold tracking-normal sm:text-3xl"
-              inputClassName="w-full rounded-md border border-[var(--app-accent)] bg-white/80 px-2 py-1 text-2xl font-semibold outline-none ring-2 ring-[var(--app-accent)]/15 sm:text-3xl dark:bg-zinc-900 dark:text-zinc-50"
+              inputClassName="w-full bg-transparent p-1 text-2xl font-semibold tracking-normal outline-none sm:text-3xl dark:text-zinc-50"
             />
           </div>
           <div className="app-action-row">
@@ -186,27 +186,28 @@ export function NoteDetailsPanel({
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm opacity-75">
+        <div className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.9375rem] opacity-75">
+          <CalendarClock aria-hidden="true" className="h-4 w-4 text-[var(--app-accent)]" />
           {createdAtLabel ? (
             <span>
-              <strong className="font-semibold">Created:</strong> {createdAtLabel}
+              <strong className="font-semibold">Created</strong> {createdAtLabel}
             </span>
           ) : null}
           {updatedAtLabel ? (
-            <span>
-              <strong className="font-semibold">Updated:</strong> {updatedAtLabel}
+            <span className="inline-flex items-center gap-1.5">
+              <strong className="font-semibold">Updated</strong> {updatedAtLabel}
             </span>
           ) : null}
         </div>
 
         <div className="mt-6">
           {isTagEditorOpen ? (
-            <div className="rounded-md border border-black/10 bg-white/35 p-3 shadow-sm backdrop-blur-sm">
+            <div>
               <div className="flex flex-wrap gap-2">
                 {draftTags.map((tag, index) => (
                   <label
                     key={index}
-                    className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border border-current bg-white/35 px-[0.78125rem] text-[0.9375rem] shadow-sm transition focus-within:ring-2 focus-within:ring-black/10"
+                    className="inline-flex min-h-8 max-w-full items-center gap-1.5 rounded-full border border-current bg-white/35 px-[0.78125rem] text-[0.9375rem] shadow-sm transition"
                   >
                     <Tag aria-hidden="true" className="h-[1.09375rem] w-[1.09375rem] shrink-0 opacity-80" />
                     <span className="sr-only">Tag {index + 1}</span>
@@ -221,7 +222,7 @@ export function NoteDetailsPanel({
                     <button
                       type="button"
                       onClick={() => removeTag(index)}
-                      className="grid h-6 w-6 shrink-0 place-items-center rounded-full opacity-70 transition hover:bg-red-50 hover:text-red-600 hover:opacity-100"
+                      className="grid h-5 w-5 shrink-0 place-items-center rounded-full opacity-70 transition hover:bg-red-50 hover:text-red-600 hover:opacity-100"
                       aria-label={`Remove tag ${index + 1}`}
                       title="Remove tag"
                     >
@@ -232,7 +233,7 @@ export function NoteDetailsPanel({
                 <button
                   type="button"
                   onClick={() => setDraftTags((currentTags) => [...currentTags, ""])}
-                  className="inline-flex h-11 items-center gap-2 rounded-full border border-dashed border-current px-[0.78125rem] text-[0.9375rem] font-medium transition hover:bg-white/25"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-dashed border-current px-[0.78125rem] text-[0.9375rem] font-medium transition hover:bg-white/25"
                 >
                   <Plus aria-hidden="true" className="h-[1.09375rem] w-[1.09375rem]" />
                   Add tag
@@ -240,7 +241,7 @@ export function NoteDetailsPanel({
                 <button
                   type="button"
                   onClick={() => setIsTagEditorOpen(false)}
-                  className="grid h-10 w-10 place-items-center rounded-full transition hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/10"
+                  className="grid h-8 w-8 place-items-center rounded-full transition hover:bg-white/25 focus-visible:outline-none"
                   aria-label="Back to tag preview"
                   title="Back to tag preview"
                 >
@@ -252,7 +253,7 @@ export function NoteDetailsPanel({
             <button
               type="button"
               onClick={() => setIsTagEditorOpen(true)}
-              className="group -m-2 flex w-fit max-w-full rounded-md p-2 text-left transition hover:bg-white/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/10"
+              className="group -m-2 flex w-fit max-w-full rounded-md p-2 text-left focus-visible:outline-none"
             >
               <NoteTagPreview tags={normalizedDraftTags} />
             </button>
@@ -265,7 +266,7 @@ export function NoteDetailsPanel({
           multiline
           emptyLabel="No content yet."
           className="mt-6 whitespace-pre-wrap p-1 text-sm leading-7 opacity-90"
-          inputClassName="mt-6 min-h-40 w-full rounded-md border border-[var(--app-accent)] bg-white/80 px-3 py-3 text-sm leading-7 outline-none ring-2 ring-[var(--app-accent)]/15 dark:bg-zinc-900 dark:text-zinc-50"
+          inputClassName="mt-6 w-full rounded-md bg-zinc-100/80 p-1 text-sm leading-7 outline-none dark:bg-zinc-900 dark:text-zinc-50"
         />
 
         <section className="mt-8 border-t border-zinc-200 pt-5 dark:border-zinc-800">

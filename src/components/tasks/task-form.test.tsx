@@ -40,7 +40,7 @@ describe("TaskForm", () => {
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
-  it("creates a task and redirects to the created task", async () => {
+  it("creates a project task and returns to the project", async () => {
     const user = userEvent.setup();
 
     render(
@@ -93,7 +93,7 @@ describe("TaskForm", () => {
         noteIds: ["note-1"]
       })
     );
-    expect(navigation.push).toHaveBeenCalledWith("/dashboard/tasks/task-1");
+    expect(navigation.push).toHaveBeenCalledWith("/dashboard/projects/project-1");
     expect(navigation.refresh).toHaveBeenCalled();
   });
 });
