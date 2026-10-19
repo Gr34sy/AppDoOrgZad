@@ -4,226 +4,247 @@
 \ifPDFTeX
   \PackageError{prezentacja}{Ten dokument wymaga kompilatora XeLaTeX}{Ustaw kompilator na XeLaTeX.}
 \fi
+
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
 \setsansfont{Times New Roman}
+
 \usepackage[polish]{babel}
 \usepackage[a4paper,left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
 \usepackage{setspace}
 \usepackage{xurl}
 \usepackage[hidelinks]{hyperref}
 
+% Akapity rozpoczynaja sie bez wciecia i sa oddzielone jedna interlinia.
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{0.8\baselineskip}
+\setlength{\parskip}{\baselineskip}
+\setlength{\emergencystretch}{2em}
 \onehalfspacing
 
+% Pierwszy slajd nie potrzebuje separatora. Przed kazdym kolejnym slajdem
+% automatycznie pojawia sie poziomy divider.
+\newif\iffirstslide
+\firstslidetrue
+
 \newcommand{\Slide}[2]{%
-  \section*{Slajd #1. #2}
-  \addcontentsline{toc}{section}{Slajd #1. #2}
+  \iffirstslide
+    \global\firstslidefalse
+  \else
+    \par\vspace{1.5\baselineskip}%
+    \noindent\rule{\textwidth}{0.8pt}%
+    \par\vspace{1.5\baselineskip}%
+  \fi
+  {\LARGE\bfseries Slajd #1. #2\par}%
+  \vspace{2\baselineskip}%
+}
+
+\newcommand{\Source}[1]{%
+  \par\vspace{0.5\baselineskip}%
+  {\small\itshape Źródło do powtórzenia: #1\par}%
 }
 
 \begin{document}
 
-\begin{center}
-  {\Large\bfseries Scenariusz wypowiedzi do prezentacji pracy inżynierskiej\par}
-  \vspace{0.7cm}
-  {\large Zaawansowana aplikacja webowa do organizacji zadań\par}
-  \vspace{0.4cm}
-  {\large Piotr Słupski\par}
-  \vspace{0.2cm}
-  {\large Promotor: dr Leszek Grocholski\par}
-\end{center}
-
-\newpage
-\tableofcontents
-\newpage
-
 \Slide{1}{Strona tytułowa}
 
-Dzień dobry, nazywam się Piotr Słupski i chciałbym przedstawić pracę inżynierską pod tytułem „Zaawansowana aplikacja webowa do organizacji zadań”. Praca została przygotowana pod kierunkiem dr. Leszka Grocholskiego.
+Dzień dobry, nazywam się Piotr Słupski. Chciałbym przedstawić moją pracę inżynierską pod tytułem ,,Zaawansowana aplikacja webowa do organizacji zadań''.
 
-Tematem projektu było stworzenie aplikacji internetowej, która pomaga użytkownikowi indywidualnemu porządkować zadania, checklisty, notatki oraz projekty. W prezentacji omówię najpierw cel i zakres pracy, następnie przejdę przez wymagania, wykorzystane technologie, architekturę systemu, bazę danych, najważniejsze mechanizmy oraz testy.
+Praca została przygotowana pod kierunkiem promotora, dr. Leszka Grocholskiego.
 
 \Slide{2}{Spis treści}
 
-Prezentacja została ułożona tak, aby najpierw pokazać, jaki problem rozwiązuje aplikacja i jakie założenia przyjęto podczas jej projektowania. Następnie przedstawione zostaną wymagania funkcjonalne i niefunkcjonalne oraz krótkie porównanie podobnych narzędzi.
-
-W dalszej części omówię podstawy technologiczne frontendu i backendu, sposób działania autentykacji i autoryzacji, wybór bazy danych oraz architekturę aplikacji. Na końcu przejdę do najważniejszych mechanizmów, testów, krótkiej demonstracji aplikacji, podsumowania i bibliografii.
+Na początku przedstawię cel i zakres pracy, porównanie podobnych aplikacji oraz wymagania funkcjonalne i niefunkcjonalne. Następnie omówię ogólną architekturę aplikacji, technologie frontendu i backendu, autentykację i autoryzację oraz wybór bazy danych. W dalszej części zaprezentuję schemat bazy danych, diagram komponentów i diagramy przepływu danych. Na końcu przedstawię testy, przejdę do demonstracji aplikacji i podsumowania, a prezentację zamknie bibliografia.
 
 \Slide{3}{Cel pracy}
 
-Celem pracy było zaprojektowanie i zaimplementowanie aplikacji internetowej wspierającej indywidualną organizację zadań. Aplikacja miała pozwalać użytkownikowi tworzyć taski, checklisty, notatki oraz projekty, a następnie łączyć te elementy ze sobą w wygodny sposób.
+Celem głównym niniejszej pracy było zaprojektowanie oraz zaimplementowanie aplikacji internetowej wspierającej użytkowników indywidualnych w organizacji zarówno złożonych zadań, jak i codziennych obowiązków.
 
-Istotnym założeniem było ograniczenie rozproszenia informacji. W praktyce użytkownik często korzysta z kilku osobnych narzędzi: osobno zapisuje zadania, osobno notatki, a jeszcze gdzie indziej przechowuje większe projekty. W mojej aplikacji te elementy zostały zebrane w jednym miejscu.
-
-Drugim ważnym celem było przygotowanie systemu, który będzie prostszy niż rozbudowane narzędzia zespołowe. Aplikacja nie próbuje zastąpić dużych platform do zarządzania firmą, tylko skupia się na codziennej pracy pojedynczego użytkownika.
+Cele szczegółowe obejmowały przede wszystkim zaprojektowanie interfejsu graficznego, opracowanie logiki frontendowej i backendowej obsługującej zarządzanie zadaniami w formach widocznych na ekranie, implementację obsługi kont użytkowników oraz zaprojektowanie bazy danych.
 
 \Slide{4}{Zakres pracy}
 
-Zakres pracy obejmował kilka etapów. Najpierw przeanalizowane zostały podobne aplikacje oraz potrzeby użytkownika, aby określić, jakie funkcje będą najważniejsze w pierwszej wersji systemu.
+Zakres pracy obejmował:
 
-Następnie omówione zostały technologie wykorzystane w projekcie aplikacji. W pracy opisano zarówno warstwę frontendową, jak i backendową, a także sposób przechowywania danych.
+\begin{itemize}
+  \item analizę podobnych aplikacji oraz wymagań użytkownika;
+  \item omówienie technologii wykorzystanych w projekcie;
+  \item zaprojektowanie interfejsu użytkownika na podstawie scenariuszy przypadków użycia;
+  \item implementację kodu po stronie frontendu i backendu;
+  \item przygotowanie testów jednostkowych wybranych funkcjonalności aplikacji.
+\end{itemize}
 
-Kolejnym elementem było przygotowanie projektu interfejsu użytkownika na podstawie scenariuszy przypadków użycia. Dzięki temu widoki aplikacji nie powstawały przypadkowo, tylko wynikały z czynności, które użytkownik faktycznie ma wykonywać.
+\clearpage
+\Slide{5}{Podobne aplikacje}
 
-Ostatnia część zakresu obejmowała implementację kodu po stronie frontendu i backendu oraz przygotowanie testów jednostkowych dla wybranych elementów aplikacji.
+Przed rozpoczęciem projektowania przeanalizowałem trzy aplikacje do organizacji zadań i zarządzania projektami: Trello, ClickUp oraz Asanę.
 
-\Slide{5}{Wymagania funkcjonalne}
+Trello opiera organizację pracy na tablicach Kanban i kartach zadań, które można uzupełniać o listy kontrolne. ClickUp łączy wiele widoków pracy ze wspólnymi dokumentami, pomiarem czasu i pulpitami analitycznymi. Asana wspiera planowanie projektów za pomocą harmonogramów, zależności między zadaniami oraz kontroli obciążenia zespołu.
 
-Najważniejszym wymaganiem funkcjonalnym było logowanie oraz tworzenie konta użytkownika przez zewnętrznego dostawcę. Dzięki temu aplikacja nie musi samodzielnie przechowywać haseł, a użytkownik może zalogować się przy użyciu istniejącego konta.
+Z porównania wyciągnąłem przede wszystkim wniosek dotyczący zakresu własnego projektu: użytkownik indywidualny potrzebuje szybkiego dostępu do bieżących zadań i związanych z nimi informacji. Dlatego w mojej aplikacji połączyłem taski, checklisty, notatki i projekty oraz możliwość przypinania wybranych elementów do dashboardu. Nacisk położyłem na czytelność interfejsu i powiązania między tymi elementami, pozostawiając rozbudowane raportowanie i mechanizmy zespołowe poza zakresem pracy.
 
-System umożliwia tworzenie, edycję, odczyt oraz archiwizację elementów aplikacji. Dotyczy to przede wszystkim tasków, checklist, notatek i projektów. Archiwizacja została wybrana zamiast trwałego usuwania, ponieważ pozwala zachować spójność danych i powiązań.
+\Source{Oficjalne strony aplikacji Trello, ClickUp i Asana, wymienione w bibliografii}
 
-Ważną funkcją jest przypinanie wybranych elementów do strony głównej. Dzięki temu użytkownik może szybko wrócić do rzeczy, które są dla niego aktualnie najważniejsze. Aplikacja pozwala również łączyć ze sobą różne elementy, na przykład taski z projektami albo notatki z innymi zasobami.
+\Slide{6}{Wymagania funkcjonalne}
 
-Projekty mogą być wyświetlane w formie tablicy Kanban, co ułatwia śledzenie postępu prac. Dodatkowo użytkownik może wyszukiwać, filtrować oraz sortować dane, co ma znaczenie wtedy, gdy liczba elementów w aplikacji rośnie.
+Wymagania funkcjonalne określiłem na podstawie analizy potrzeb użytkownika indywidualnego, porównania podobnych aplikacji oraz przygotowanych historii użytkownika. Opisywały one czynności, które użytkownik powinien móc wykonać w systemie, i obejmowały:
 
-\Slide{6}{Uzupełnienie wymagań funkcjonalnych}
-
-Ten slajd traktuję jako miejsce na krótkie dopowiedzenie, że wymagania funkcjonalne zostały dobrane pod konkretny sposób pracy użytkownika. Aplikacja nie ogranicza się do samej listy zadań, tylko pozwala budować kontekst wokół pracy: projekt może zawierać taski, checklista może zostać przypięta do dashboardu, a notatki mogą uzupełniać inne elementy.
-
-Warto podkreślić, że funkcje wyszukiwania i filtrowania nie są dodatkiem kosmetycznym. Przy większej liczbie tasków albo checklist stają się mechanizmem potrzebnym do sprawnego korzystania z aplikacji.
+\begin{itemize}
+  \item logowanie i tworzenie konta za pośrednictwem zewnętrznego dostawcy;
+  \item obsługę operacji CRUD dla tasków, notatek, checklist i projektów;
+  \item przypinanie wybranych elementów do dashboardu;
+  \item tworzenie powiązań pomiędzy różnymi elementami aplikacji;
+  \item wyświetlanie tasków projektu w formie listy lub tablicy Kanban;
+  \item wyszukiwanie, filtrowanie i sortowanie elementów.
+\end{itemize}
 
 \Slide{7}{Wymagania niefunkcjonalne}
 
-Wymagania niefunkcjonalne dotyczyły przede wszystkim jakości działania aplikacji. Interfejs miał być czytelny, responsywny i spójny graficznie, ponieważ aplikacja do organizacji pracy powinna pomagać użytkownikowi, a nie dokładać mu chaosu.
+Wymagania niefunkcjonalne dotyczyły jakości działania aplikacji oraz sposobu jej dalszego utrzymania. Obejmowały:
 
-Drugim ważnym wymaganiem było bezpieczeństwo danych. Użytkownik powinien mieć dostęp wyłącznie do własnych zasobów, dlatego w operacjach backendowych sprawdzany jest identyfikator właściciela danych.
+\begin{itemize}
+  \item czytelny, responsywny i spójny graficznie interfejs;
+  \item dostęp użytkownika wyłącznie do własnych danych;
+  \item sprawną walidację danych przesyłanych do API;
+  \item strukturę kodu umożliwiającą dalszy rozwój aplikacji.
+\end{itemize}
 
-Kolejnym wymaganiem była walidacja danych przesyłanych do API. Dzięki temu backend nie zapisuje przypadkowych albo niepełnych danych, nawet jeśli żądanie zostanie wysłane poza interfejsem aplikacji.
+\Slide{8}{Ogólna architektura aplikacji}
 
-Znaczenie miała też struktura kodu. Projekt został napisany tak, aby można było rozwijać go dalej, na przykład dodając kolejne typy elementów, rozszerzając wyszukiwanie albo rozbudowując mechanizmy uprawnień.
+Aplikacja została zaprojektowana w architekturze klient--serwer. Klientem jest interfejs uruchamiany w przeglądarce, który prezentuje dane, obsługuje działania użytkownika i wysyła żądania. Część serwerowa została zrealizowana w Next.js za pomocą Route Handlerów. Odbiera ona żądania, sprawdza sesję użytkownika, waliduje dane, wykonuje logikę aplikacji i komunikuje się z bazą MongoDB.
 
-\Slide{8}{Podobne aplikacje}
+Komunikacja przebiega w modelu żądanie--odpowiedź. Przykładowo formularz wysyła do odpowiedniego endpointu dane nowego taska, serwer sprawdza ich poprawność i zapisuje dokument, a następnie zwraca rezultat operacji. Frontend nie łączy się bezpośrednio z bazą danych, dzięki czemu reguły dostępu oraz operacje zapisu pozostają po stronie serwera.
 
-Przed rozpoczęciem projektowania przeanalizowane zostały popularne aplikacje do organizacji pracy, takie jak Trello, Asana i ClickUp. Każda z nich rozwiązuje podobny problem, ale robi to w trochę inny sposób.
+Zaletą tego rozwiązania jest rozdzielenie odpowiedzialności. Zmiany interfejsu nie muszą wpływać na model danych, a wspólna warstwa API zapewnia jedno miejsce dla walidacji, kontroli właściciela dokumentu i obsługi błędów. Taki podział zwiększa bezpieczeństwo, ułatwia testowanie poszczególnych części oraz pozwala rozwijać aplikację bez przebudowy całego systemu.
 
-Trello jest najbardziej kojarzone z tablicami Kanban i prostym układem kart. Asana jest bardziej rozbudowana i mocniej nastawiona na zarządzanie projektami zespołowymi. ClickUp oferuje bardzo wiele funkcji i widoków, ale właśnie przez to może być zbyt złożony dla użytkownika indywidualnego.
+\Source{Canva, \emph{Creating a Data Flow Diagram: How-tos, Templates, and Tips}}
 
-Własna aplikacja została zaprojektowana jako prostsza alternatywa. Jej celem nie było kopiowanie wszystkich funkcji tych narzędzi, lecz wybranie rozwiązań najbardziej przydatnych w indywidualnej organizacji zadań.
+\Slide{9}{Technologie frontendu}
 
-\Slide{9}{Uzupełnienie podobnych aplikacji}
+Lucide to biblioteka spójnych ikon wykorzystanych w przyciskach, nawigacji i oznaczeniach poszczególnych elementów interfejsu.
 
-Jeżeli na slajdzie znajduje się grafika lub porównanie narzędzi, warto omówić je przez wskazanie różnic między aplikacjami. Trello można przedstawić jako narzędzie najprostsze i najbardziej wizualne, Asanę jako narzędzie mocniejsze organizacyjnie, a ClickUp jako najbardziej rozbudowane.
+Tailwind CSS to narzędzie do stylowania za pomocą klas narzędziowych, które ułatwiło przygotowanie spójnego i responsywnego wyglądu aplikacji.
 
-Na tym tle moja aplikacja znajduje się bliżej prostoty Trello, ale jednocześnie rozszerza zakres pracy o checklisty, notatki, projekty i dashboard z przypiętymi elementami. Dzięki temu użytkownik może przechowywać więcej typów informacji bez wchodzenia w poziom złożoności typowy dla dużych systemów zespołowych.
+Zod to biblioteka służąca do definiowania schematów oraz walidowania po stronie API danych przesyłanych z formularzy.
 
-\Slide{10}{Podstawy technologiczne frontendu}
+Vitest to środowisko uruchamiania testów, wykorzystane do sprawdzania wybranych formularzy, komponentów i mechanizmów aplikacji.
 
-Frontend aplikacji został oparty na technologiach webowych, które umożliwiają budowę interaktywnego interfejsu użytkownika. Podstawą są HTML, CSS i JavaScript, czyli technologie odpowiadające kolejno za strukturę, wygląd oraz zachowanie strony.
+TypeScript jest statycznie typowanym rozszerzeniem języka JavaScript, które pomaga wykrywać niezgodności typów już podczas tworzenia aplikacji.
 
-W projekcie ważną rolę pełni React. Biblioteka ta pozwala budować interfejs z komponentów, czyli mniejszych, wielokrotnie używanych części aplikacji. Dzięki temu formularze, karty obiektów czy sekcje dashboardu mogą być rozwijane w bardziej uporządkowany sposób.
+\Slide{10}{Technologie backendu}
 
-Do projektu wykorzystano również TypeScript, który pomaga kontrolować typy danych przekazywanych między komponentami i funkcjami. Stylowanie interfejsu zostało zrealizowane przy użyciu Tailwind CSS, co pozwoliło szybko tworzyć spójne widoki za pomocą klas narzędziowych.
+Node.js jest środowiskiem uruchomieniowym JavaScript, w którym wykonywana jest serwerowa część aplikacji.
 
-\Slide{11}{Podstawy technologiczne backendu}
+NextAuth.js, obecnie rozwijany jako Auth.js, odpowiada za logowanie przez zewnętrznych dostawców oraz tworzenie i obsługę sesji użytkownika.
 
-Backend aplikacji został oparty na mechanizmach dostępnych w Next.js. Dzięki temu frontend i backend znajdują się w jednym projekcie, ale nadal pełnią odrębne role. Interfejs odpowiada za prezentację danych, a część serwerowa za obsługę żądań, walidację i komunikację z bazą danych.
+Mongoose jest biblioteką pośredniczącą w komunikacji z MongoDB, umożliwiającą definiowanie modeli i schematów dokumentów aplikacji.
 
-W aplikacji wykorzystane zostały Route Handlers, czyli mechanizm Next.js pozwalający tworzyć endpointy API. Endpointy obsługują między innymi operacje pobierania, tworzenia, aktualizacji i archiwizacji danych.
+\Slide{11}{Autentykacja i autoryzacja}
 
-Ważnym elementem backendu jest też walidacja danych wejściowych. Dzięki niej serwer sprawdza, czy przesłane dane mają poprawny format, zanim zostaną zapisane w bazie.
+Obsługę logowania zaimplementowałem przy użyciu Auth.js oraz dostawców OAuth Google i GitHub. Identyfikatory klientów i sekrety są pobierane ze zmiennych środowiskowych, a dostawca jest włączany tylko wtedy, gdy jego konfiguracja jest kompletna. Dzięki temu dane uwierzytelniające nie znajdują się bezpośrednio w kodzie aplikacji.
 
-\Slide{12}{Autentykacja i autoryzacja}
+Adapter MongoDB zapisuje informacje potrzebne do obsługi użytkowników i kont dostawców, natomiast sesja wykorzystuje strategię JWT. Konta Google i GitHub są traktowane osobno nawet wtedy, gdy dostawcy zwrócą ten sam adres e-mail, co zapobiega automatycznemu łączeniu kont bez potwierdzenia użytkownika.
 
-W aplikacji rozróżniono dwa pojęcia: autentykację i autoryzację. Autentykacja odpowiada na pytanie, kim jest użytkownik, natomiast autoryzacja określa, do jakich danych i operacji ten użytkownik ma dostęp.
+Callback sesji pobiera identyfikator użytkownika z tokenu i umieszcza go w polu \nolinkurl{session.user.id}. Route Handlery odczytują następnie ten identyfikator przez wspólną funkcję \nolinkurl{getCurrentUserId}. Brak poprawnej sesji powoduje zwrócenie odpowiedzi HTTP 401, a operacje na danych są wykonywane z filtrem \nolinkurl{ownerId}. W rezultacie zalogowany użytkownik może pobierać i modyfikować wyłącznie należące do niego taski, checklisty, notatki oraz projekty.
 
-Logowanie zostało oparte na zewnętrznych dostawcach, takich jak Google i GitHub. Do obsługi tego mechanizmu wykorzystano Auth.js, znany wcześniej jako NextAuth.js. Dzięki temu nie trzeba było tworzyć całego przepływu logowania od podstaw.
+\Source{S.-T. Sun, K. Beznosov, \emph{The Devil is in the (Implementation) Details: An Empirical Analysis of OAuth SSO Systems}}
 
-Po zalogowaniu aplikacja korzysta z danych sesji użytkownika. Przy operacjach na danych backend sprawdza, czy dokument należy do aktualnego użytkownika, najczęściej przez pole \texttt{ownerId}. W ten sposób jeden użytkownik nie powinien mieć dostępu do zasobów innej osoby.
+\Slide{12}{Wybór bazy danych}
 
-\Slide{13}{Wybór bazy danych}
+Podczas wyboru bazy danych porównałem relacyjny model MySQL z dokumentowym modelem MongoDB. MySQL przechowuje informacje w tabelach o zdefiniowanych kolumnach, a relacje pomiędzy rekordami realizuje za pomocą kluczy głównych i obcych. Takie podejście zapewnia ścisłą kontrolę integralności danych i dobrze sprawdza się w systemach o stabilnej strukturze oraz precyzyjnie określonych zależnościach.
 
-Do przechowywania danych wybrano MongoDB, czyli dokumentową bazę danych. Decyzja ta wynikała z charakteru aplikacji, ponieważ taski, checklisty, notatki i projekty mają elastyczną strukturę oraz różne typy powiązań.
+MongoDB przechowuje dane jako dokumenty o strukturze zbliżonej do obiektów JSON. Pozwala zarówno osadzać powiązane dane wewnątrz dokumentu, jak i tworzyć relacje przez identyfikatory innych dokumentów. W aplikacji wykorzystałem oba rozwiązania: elementy checklisty są zagnieżdżone w jej dokumencie, natomiast relacje pomiędzy taskami, projektami, notatkami i przypięciami są zapisywane przy użyciu identyfikatorów.
 
-W relacyjnej bazie danych wiele takich zależności wymagałoby dodatkowych tabel pomocniczych. W MongoDB część danych można zapisać jako dokumenty, a część powiązać przez identyfikatory. Dobrze pasuje to na przykład do checklist, które składają się z wielu elementów, oraz do projektów z własnymi kolumnami Kanban.
+MongoDB zostało wybrane ze względu na strukturę danych aplikacji. Projekty przechowują własne kolumny Kanban, checklisty zawierają tablice elementów, a poszczególne typy dokumentów mają różne pola opcjonalne i powiązania. Model dokumentowy pozwala odwzorować te obiekty bez tworzenia wielu tabel pomocniczych i ułatwia rozwijanie ich struktury. Elastyczność bazy została uzupełniona modelami Mongoose, które definiują oczekiwane pola, typy i reguły zapisu, dlatego dane nadal pozostają kontrolowane po stronie aplikacji.
 
-W projekcie wykorzystano również Mongoose, czyli bibliotekę, która pozwala opisywać schematy dokumentów i pracować z bazą w bardziej uporządkowany sposób. Dzięki temu mimo elastyczności MongoDB struktura danych pozostaje kontrolowana przez modele aplikacji.
+\Slide{13}{Schemat bazy danych}
 
-\Slide{14}{Ogólna architektura aplikacji}
+Schemat przedstawia najważniejsze kolekcje znajdujące się w bazie danych aplikacji oraz zapisane w nich pola. Widoczne powiązania pokazują, w jaki sposób dokumenty użytkowników, tasków, projektów, checklist, notatek i przypięć odwołują się do siebie za pomocą identyfikatorów.
 
-Na slajdzie z ogólną architekturą aplikacji należy zwrócić uwagę na podział systemu na warstwę klienta, warstwę serwerową oraz bazę danych. Użytkownik korzysta z aplikacji w przeglądarce, a interfejs komunikuje się z backendem przez endpointy API.
+\Slide{14}{Diagram komponentów aplikacji}
 
-Backend odpowiada za sprawdzenie sesji użytkownika, walidację danych, wykonanie logiki biznesowej oraz zapis lub odczyt informacji z bazy. Baza danych nie jest dostępna bezpośrednio z poziomu przeglądarki, co zwiększa bezpieczeństwo i pozwala kontrolować operacje po stronie serwera.
+Diagram przedstawia najważniejsze komponenty systemu: interfejs użytkownika, warstwę API, logikę serwerową, bazę danych oraz zewnętrznych dostawców logowania. Strzałki pokazują kierunki komunikacji pomiędzy tymi elementami podczas wykonywania operacji przez użytkownika.
 
-W architekturze widoczna jest również rola zewnętrznych dostawców logowania. Są oni wykorzystywani tylko w procesie autentykacji, natomiast dane aplikacji są przechowywane w MongoDB.
+\Slide{15}{Diagram przepływu danych poziomu 0}
 
-\Slide{15}{Diagram komponentów aplikacji}
+Diagram poziomu 0 przedstawia całą aplikację jako jeden proces komunikujący się z użytkownikiem, dostawcą autentykacji i bazą danych. Pokazuje granice systemu oraz główne kierunki przepływu informacji bez prezentowania jego wewnętrznych procesów.
 
-Diagram komponentów pokazuje, z jakich głównych części składa się system. Po stronie użytkownika znajduje się interfejs aplikacji, zbudowany z widoków i komponentów React. Ta część odpowiada za formularze, listy, dashboard, tablicę Kanban oraz interakcje użytkownika.
+\Source{Canva, \emph{Creating a Data Flow Diagram: How-tos, Templates, and Tips}}
 
-Po stronie backendu znajdują się endpointy API oraz funkcje pomocnicze odpowiedzialne za obsługę sesji, walidację i przygotowanie odpowiedzi. Endpointy komunikują się z modelami Mongoose, które reprezentują kolekcje w bazie danych.
+\Slide{16}{Diagram przepływu danych poziomu 1}
 
-Diagram dobrze pokazuje, że aplikacja nie jest jedną płaską strukturą. Każda warstwa ma własną odpowiedzialność, a dane przepływają między nimi w określonym kierunku.
+Diagram poziomu 1 rozwija poprzedni schemat i rozdziela aplikację na procesy odpowiedzialne za logowanie oraz obsługę tasków, projektów, notatek i checklist. Pokazuje również, które procesy odczytują dane z odpowiednich kolekcji lub zapisują w nich zmiany.
 
-\Slide{16}{Diagramy przepływu danych}
+\Source{Canva, \emph{Creating a Data Flow Diagram: How-tos, Templates, and Tips}}
 
-Diagram przepływu danych poziomu 0 pokazuje system w uproszczony sposób, jako jeden główny proces. Z jednej strony znajduje się użytkownik, który wykonuje akcje w aplikacji, a z drugiej baza danych i zewnętrzni dostawcy logowania.
+\Slide{17}{Testy}
 
-Ten slajd można potraktować jako ogólne wyjaśnienie, skąd dane wchodzą do systemu i dokąd trafiają. Użytkownik wysyła żądania przez interfejs, aplikacja przetwarza je po stronie serwera, a następnie pobiera lub zapisuje dane w bazie.
+Na slajdzie przedstawiono test schematu walidacji danych wykorzystywanych podczas tworzenia taska. Funkcja \nolinkurl{taskCreateSchema.safeParse} sprawdza kompletny zestaw pól i zwraca wynik bez przerywania działania testu wyjątkiem, natomiast asercje \texttt{expect} weryfikują powodzenie walidacji oraz poprawne usunięcie zbędnych spacji z tytułu, statusu, tagów i tytułu nowej checklisty.
 
-Na tym poziomie nie analizujemy jeszcze szczegółowych endpointów ani modeli. Najważniejsze jest pokazanie granic systemu oraz jego relacji z otoczeniem.
+Strukturę zestawu testów tworzą funkcje \texttt{describe} oraz \texttt{it}: pierwsza grupuje przypadki dotyczące schematów taska, a druga opisuje pojedynczy sprawdzany scenariusz. Tak przygotowany test potwierdza nie tylko przyjęcie prawidłowego payloadu, ale także jego normalizację przed dalszym wykorzystaniem przez API.
 
-\Slide{17}{Diagram przepływu danych poziomu 1}
+\Slide{18}{Demonstracja aplikacji}
 
-Diagram poziomu 1 rozwija poprzedni widok i pokazuje system bardziej szczegółowo. Można na nim wyróżnić proces autentykacji, obsługę elementów aplikacji, komunikację z bazą danych oraz zwracanie danych do interfejsu użytkownika.
+\begin{center}
+  {\Huge\bfseries DEMONSTRACJA}
+\end{center}
 
-Ten diagram pomaga wyjaśnić, co dzieje się po wykonaniu typowej akcji w aplikacji. Na przykład po utworzeniu taska formularz wysyła dane do endpointu API, backend sprawdza użytkownika i poprawność danych, zapisuje dokument w bazie, a potem zwraca odpowiedź do frontendu.
+\Slide{19}{Podsumowanie}
 
-Dzięki takiemu rozbiciu łatwiej pokazać, że aplikacja nie tylko wyświetla formularz, ale obsługuje cały przepływ: od akcji użytkownika, przez walidację, po zapis i aktualizację widoku.
+W ramach pracy zaprojektowałem i zaimplementowałem działającą aplikację internetową wspierającą indywidualną organizację tasków, checklist, notatek oraz projektów. Zrealizowany system łączy responsywny interfejs z bezpieczną warstwą serwerową, dokumentową bazą danych oraz mechanizmami logowania, walidacji i testowania.
 
-\Slide{18}{Schemat bazy danych}
+\Slide{20}{Bibliografia}
 
-Schemat bazy danych przedstawia najważniejsze kolekcje wykorzystywane w aplikacji. Wśród nich znajdują się między innymi \texttt{accounts}, \texttt{tasks}, \texttt{projects}, \texttt{checklists}, \texttt{notes} oraz \texttt{pins}.
+\begingroup
+\sloppy
+\begin{list}{}{\setlength{\leftmargin}{0pt}\setlength{\itemindent}{0pt}\setlength{\labelwidth}{0pt}\setlength{\labelsep}{0pt}\setlength{\itemsep}{0.5\baselineskip}}
 
-Warto podkreślić, że jest to schemat dokumentowy przygotowany pod MongoDB i Mongoose, a nie klasyczny relacyjny diagram ERD. Relacje między dokumentami są realizowane głównie przez identyfikatory, na przykład \texttt{ownerId}, \texttt{projectId} albo tablice identyfikatorów.
+\item Ahmad M. O., Dennehy D., Conboy K., Oivo M., \emph{Kanban in Software Engineering: A Systematic Mapping Study}, ``Journal of Systems and Software'' 2018, Vol. 137, s. 96--113, \url{https://doi.org/10.1016/j.jss.2017.11.045} (dostęp: 31.07.2026 r.).
 
-Kolekcja \texttt{accounts} wspiera mechanizm logowania przez zewnętrznych dostawców. Kolekcja \texttt{projects} przechowuje dane projektów oraz ustawienia kolumn Kanban. Kolekcja \texttt{pins} odpowiada za elementy przypięte do dashboardu, czyli za szybki dostęp do najważniejszych zasobów.
+\item Albiorix Technology, \emph{Web Application Architecture Layers}, grafika przedstawiająca warstwy architektury aplikacji internetowej, [b.r.], \url{https://www.albiorixtech.com/wp-content/uploads/2025/12/web-application-architecture-layers.jpg} (dostęp: 03.02.2026 r.).
 
-\Slide{19}{Najważniejsze mechanizmy aplikacji}
+\item Asana Inc., \emph{Asana}, strona internetowa aplikacji do zarządzania pracą, [b.r.], \url{https://asana.com} (dostęp: 17.07.2026 r.).
 
-Jednym z najważniejszych mechanizmów aplikacji jest przypinanie elementów do dashboardu. Pozwala ono użytkownikowi wyróżnić te taski, checklisty, notatki albo projekty, do których chce wracać najczęściej.
+\item Atlassian, \emph{Trello}, strona internetowa aplikacji Kanban do zarządzania zadaniami, [b.r.], \url{https://trello.com} (dostęp: 17.07.2026 r.).
 
-Drugim istotnym mechanizmem jest powiązywanie elementów ze sobą. Task może należeć do projektu, notatka może uzupełniać inne elementy, a projekt może zawierać zadania prezentowane w różnych widokach.
+\item Auth.js, \emph{Auth.js}, dokumentacja biblioteki do obsługi uwierzytelniania, [b.r.], \url{https://authjs.dev} (dostęp: 17.07.2026 r.).
 
-W aplikacji ważną rolę pełni również tablica Kanban. Zadania są przypisywane do kolumn statusów, co ułatwia śledzenie postępu pracy. Oprócz tego zastosowano walidację danych, archiwizację elementów oraz zapisywanie wybranych zdarzeń aktywności.
+\item Auth.js, \emph{Auth.js Core Reference}, dokumentacja callbacków biblioteki Auth.js, [b.r.], \url{https://authjs.dev/reference/core\#callbacks} (dostęp: 16.08.2026 r.).
 
-\Slide{20}{Testy}
+\item Canva, \emph{Creating a Data Flow Diagram: How-tos, Templates, and Tips}, artykuł dotyczący tworzenia diagramów przepływu danych, [b.r.], \url{https://www.canva.com/online-whiteboard/data-flow-diagrams/} (dostęp: 03.02.2026 r.).
 
-W projekcie przygotowano testy jednostkowe dla wybranych mechanizmów związanych z taskami. Testy uruchamiane są poleceniem \texttt{npm test}, które wykonuje zestaw testów przy użyciu narzędzia Vitest.
+\item ClickUp, \emph{ClickUp}, strona internetowa aplikacji do zarządzania projektami, [b.r.], \url{https://clickup.com} (dostęp: 17.07.2026 r.).
 
-Testy obejmują między innymi walidację danych taska. Dzięki temu można sprawdzić, czy aplikacja przyjmuje poprawne dane i odrzuca przypadki niezgodne z założonym schematem.
+\item Dean J., \emph{Web Programming with HTML5, CSS, and JavaScript}, Jones \& Bartlett Learning, Burlington 2017.
 
-Przetestowane zostały również wybrane endpointy API odpowiedzialne za tworzenie i aktualizację tasków. W testach zastosowano atrapy zależności, czyli mocki, dzięki czemu można było sprawdzić logikę handlerów bez łączenia się z rzeczywistą bazą danych.
+\item \emph{Frontend vs Backend}, grafika przedstawiająca porównanie warstwy frontendowej i backendowej, [b.r.], \url{https://d1zruf9db62p8s.cloudfront.net/2025/08/Frontend-vs-Backend.webp} (dostęp: 02.02.2026 r.).
 
-\Slide{21}{Demonstracja aplikacji}
+\item Microsoft, \emph{TypeScript Documentation}, dokumentacja języka TypeScript, [b.r.], \url{https://www.typescriptlang.org/docs/} (dostęp: 25.07.2026 r.).
 
-W tym miejscu prezentacji przechodzę do krótkiego pokazu działania aplikacji. Najpierw warto pokazać logowanie, ponieważ od niego zaczyna się dostęp do danych użytkownika.
+\item MongoDB Inc., \emph{Welcome to the MongoDB Docs}, dokumentacja systemu MongoDB, [b.r.], \url{https://www.mongodb.com/docs/} (dostęp: 02.02.2026 r.).
 
-Następnie można omówić dashboard i przypięte elementy. To dobry moment, aby pokazać, że aplikacja nie jest zwykłą listą zadań, tylko pozwala wyróżniać najważniejsze zasoby.
+\item Mongoose, \emph{Schemas}, dokumentacja biblioteki Mongoose dotycząca schematów danych, [b.r.], \url{https://mongoosejs.com/docs/guide.html} (dostęp: 16.08.2026 r.).
 
-W dalszej części demonstracji warto utworzyć task, pokazać checklistę oraz przejść do projektu. W projekcie najlepiej pokazać oba sposoby prezentacji zadań: listę oraz tablicę Kanban.
+\item Oracle, \emph{MySQL Documentation}, dokumentacja systemu zarządzania bazą danych MySQL, [b.r.], \url{https://dev.mysql.com/doc/} (dostęp: 25.07.2026 r.).
 
-\Slide{22}{Podsumowanie}
+\item React, \emph{Built-in React Hooks}, dokumentacja hooków biblioteki React, [b.r.], \url{https://react.dev/reference/react/hooks} (dostęp: 16.08.2026 r.).
 
-W ramach pracy udało się osiągnąć główny cel, czyli przygotować działającą aplikację internetową do organizacji zadań. System pozwala użytkownikowi tworzyć i porządkować taski, checklisty, notatki oraz projekty.
+\item React, \emph{React: The Library for Web and Native Interfaces}, dokumentacja biblioteki React, [b.r.], \url{https://react.dev} (dostęp: 28.01.2026 r.).
 
-Projekt pokazał również praktyczne zastosowanie technologii omawianych w pracy, takich jak React, Next.js, TypeScript, MongoDB, Mongoose i Auth.js. Ważne było nie tylko stworzenie interfejsu, ale także zaprojektowanie przepływu danych, autoryzacji, struktury bazy i testów.
+\item Sun S.-T., Beznosov K., \emph{The Devil is in the (Implementation) Details: An Empirical Analysis of OAuth SSO Systems}, [w:] \emph{Proceedings of the 2012 ACM Conference on Computer and Communications Security}, 2012, s. 378--390, DOI: 10.1145/2382196.2382238, \url{https://doi.org/10.1145/2382196.2382238} (dostęp: 31.07.2026 r.).
 
-Aplikację można dalej rozwijać. Najbardziej naturalne kierunki to rozszerzenie testów o scenariusze integracyjne, dodanie mechanizmów automatyzujących, powiadomień, współdzielenia projektów oraz dokładniejszego modelu uprawnień.
+\item Tailwind Labs, \emph{Tailwind CSS}, dokumentacja frameworka CSS, [b.r.], \url{https://tailwindcss.com} (dostęp: 28.01.2026 r.).
 
-\Slide{23}{Bibliografia}
+\item Testing Library, \emph{React Testing Library API}, dokumentacja API biblioteki React Testing Library, [b.r.], \url{https://testing-library.com/docs/react-testing-library/api/} (dostęp: 03.08.2026 r.).
 
-Na slajdzie bibliograficznym zostały wskazane najważniejsze źródła wykorzystane przy omawianiu technologii i architektury. Wśród nich znajduje się dokumentacja Next.js, ponieważ framework ten jest podstawą zarówno routingu, jak i części serwerowej aplikacji.
+\item Vercel, \emph{Next.js Docs}, dokumentacja frameworka Next.js, [b.r.], \url{https://nextjs.org/docs} (dostęp: 29.01.2026 r.).
 
-Drugim ważnym źródłem jest dokumentacja MongoDB, ponieważ projekt korzysta z dokumentowego modelu danych. W bibliografii znalazło się również źródło dotyczące architektury modularnej, które pomagało opisać sposób uporządkowania aplikacji.
+\item Vercel, \emph{Route Handlers}, dokumentacja Next.js dotycząca obsługi endpointów, [b.r.], \url{https://nextjs.org/docs/app/getting-started/route-handlers} (dostęp: 16.08.2026 r.).
 
-W trakcie wypowiedzi nie trzeba szczegółowo omawiać każdej pozycji bibliograficznej. Wystarczy zaznaczyć, że źródła zostały dobrane do konkretnych fragmentów pracy: technologii, architektury oraz bazy danych.
+\item Vitest, \emph{Writing Tests}, dokumentacja pisania testów w Vitest, [b.r.], \url{https://vitest.dev/guide/learn/writing-tests.html} (dostęp: 03.08.2026 r.).
 
-\Slide{24}{Dziękuję za uwagę}
+\item Zod, \emph{Defining schemas}, dokumentacja biblioteki Zod dotycząca definiowania schematów walidacji, [b.r.], \url{https://zod.dev/api?id=property} (dostęp: 16.08.2026 r.).
 
-Na koniec dziękuję komisji za uwagę i sygnalizuję gotowość do pytań. W tym miejscu warto przejść do rozmowy spokojnie, bez dopowiadania kolejnych technicznych szczegółów, chyba że komisja o nie zapyta.
-
-Jeżeli pojawi się pytanie o projekt, najlepiej odpowiadać przez konkretne przykłady z aplikacji: jak działa logowanie, jak backend sprawdza właściciela danych, jak wygląda zapis taska albo dlaczego wybrano MongoDB zamiast bazy relacyjnej.
+\end{list}
+\endgroup
 
 \end{document}

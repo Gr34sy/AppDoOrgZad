@@ -1,0 +1,492 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+\documentclass[
+  polish,
+  12pt,
+  a4paper,
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{Times New Roman}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage{setspace}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\ifLuaTeX
+\usepackage[bidi=basic,shorthands=off]{babel}
+\else
+\usepackage[bidi=default,shorthands=off]{babel}
+\fi
+\ifPDFTeX
+\else
+\babelfont{rm}[]{Times New Roman}
+\fi
+\ifLuaTeX
+  \usepackage{selnolig} % disable illegal ligatures
+\fi
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+% fallback for those not using the hyperref driver hyperxmp:
+\makeatletter
+\@ifundefined{xmpquote}{\newcommand{\xmpquote}[1]{#1}}{}
+\makeatother
+\hypersetup{
+  pdflang={pl-PL},
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\definecolor{heading}{HTML}{243447}
+\definecolor{speech}{HTML}{F2F4F7}
+
+\titleformat{\section}
+  {\LARGE\bfseries\color{heading}}{}{0pt}{}
+\titleformat{\subsection}
+  {\Large\bfseries\color{heading}}{}{0pt}{}
+\titleformat{\subsubsection}
+  {\large\bfseries\color{heading}}{}{0pt}{}
+\titlespacing*{\section}{0pt}{2.2em}{1em}
+\titlespacing*{\subsection}{0pt}{1.8em}{0.8em}
+\titlespacing*{\subsubsection}{0pt}{1.4em}{0.6em}
+
+\renewenvironment{quote}
+  {\list{}{\leftmargin=1.2em\rightmargin=0.6em}%
+   \item\relax\color{black}\setlength{\parskip}{0.7em}}
+  {\endlist}
+
+\pagestyle{fancy}
+\setlength{\headheight}{14pt}
+\fancyhf{}
+\fancyhead[L]{\small Scenariusz demonstracji aplikacji}
+\fancyhead[R]{\small Obrona pracy inzynierskiej}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\setstretch{1.2}
+\section{Demonstracja aplikacji}\label{demonstracja-aplikacji}
+
+\subsection{Plan czasowy}\label{plan-czasowy}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Przeglad wszystkich funkcjonalnosci projektu - okolo 5 minut.
+\item
+  Dashboard, przypinanie, filtrowanie i sortowanie - okolo 4-5 minut.
+\item
+  Tworzenie i edycja notatki - okolo 3 minut.
+\item
+  Tworzenie i edycja checklisty - okolo 4 minut.
+\item
+  Podsumowanie - okolo 1 minuty.
+\end{enumerate}
+
+\section{Czesc I. Gotowa wypowiedz podczas
+demonstracji}\label{czesc-i-gotowa-wypowiedz-podczas-demonstracji}
+
+Podane czasy obejmuja wypowiedz i obsluge aplikacji. Wprowadzenie jest
+czescia pieciominutowego przegladu funkcjonalnosci, dlatego nie stanowi
+osobnej pozycji planu.
+
+\subsection{1. Przeglad wszystkich funkcjonalnosci projektu - okolo 5
+minut}\label{1-przeglad-wszystkich-funkcjonalnosci-projektu---okolo-5-minut}
+
+\subsubsection{1.1. Krotkie wprowadzenie - okolo 40
+sekund}\label{11-krotkie-wprowadzenie---okolo-40-sekund}
+
+\textbf{Dzialanie:} Otworz dashboard. Sidebar powinien byc rozwiniety.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+Przedstawiona aplikacja sluzy do organizacji zadan oraz informacji
+zwiazanych z ich realizacja. Uzytkownik moze tworzyc taski, checklisty,
+notatki i projekty, a nastepnie laczyc je ze soba. Pozwala to przejsc od
+prostej notatki do projektu zarzadzanego za pomoca tablicy Kanban bez
+korzystania z kilku niezaleznych narzedzi.
+
+Po lewej stronie znajduje sie wspolna nawigacja, a centralna czesc
+widoku zmienia sie zaleznie od wybranego modulu. Dostep do danych jest
+chroniony sesja uzytkownika utworzona po zalogowaniu przez zewnetrznego
+dostawce OAuth.
+\end{quote}
+
+\subsubsection{1.2. Nawigacja i glowne typy elementow - okolo 50
+sekund}\label{12-nawigacja-i-glowne-typy-elementow---okolo-50-sekund}
+
+\textbf{Dzialanie:} Wskaz pozycje Dashboard, Tasks, Checklists, Notes,
+Projects, Archive i Settings. Nie otwieraj jeszcze formularzy.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+Aplikacja zostala podzielona na glowne moduly widoczne w sidebarze.
+Dashboard stanowi ekran startowy i agreguje najwazniejsze informacje.
+Task jest podstawowym elementem reprezentujacym zadanie. Checklista
+sklada sie z mniejszych czynnosci, ktore mozna kolejno oznaczac jako
+wykonane. Notatki sluza do przechowywania swobodnej tresci i moga zostac
+powiazane z innymi elementami. Projekty grupuja taski i checklisty oraz
+udostepniaja widok Kanban. Osobny modul Archive przechowuje elementy
+zarchiwizowane, a Settings odpowiada za wyglad aplikacji.
+
+Na stronach list dostepne sa wspolne mechanizmy wyszukiwania,
+filtrowania i sortowania. Elementy mozna takze ustawiac we wlasnej
+kolejnosci przez drag and drop, a podobne operacje zachowuja sie
+jednakowo w poszczegolnych modulach.
+\end{quote}
+
+\subsubsection{1.3. Taski i relacje - okolo 50
+sekund}\label{13-taski-i-relacje---okolo-50-sekund}
+
+\textbf{Dzialanie:} Otworz strone Tasks, pokaz kafelki i kontrolki
+wyszukiwania. Otworz jeden przygotowany task, ale nie edytuj go
+szczegolowo.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+Task zawiera tytul, opis, priorytet, termin, status, tagi oraz
+opcjonalne powiazanie z projektem. Moze tez zawierac podlaczone
+checklisty. Najwazniejsze pola, tytul i opis mozna edytowac bezposrednio
+w widoku szczegolow.
+
+Istotnym elementem jest zachowanie kontekstu nawigacji. Jezeli task
+zostal otwarty z projektu albo z tablicy Kanban, przycisk Back oraz
+przekierowanie po archiwizacji prowadza do poprzedniego widoku, a nie
+zawsze do glownej listy taskow.
+\end{quote}
+
+\subsubsection{1.4. Projekty i Kanban - okolo 1 minuty i 50
+sekund}\label{14-projekty-i-kanban---okolo-1-minuty-i-50-sekund}
+
+\textbf{Dzialanie:} Otworz przygotowany projekt. Pokaz informacje
+projektu, sekcje checklist i tablice Kanban. Przeciagnij jeden task w
+obrebie kolumny, drugi pomiedzy kolumnami, a nastepnie przestaw dwie
+kolumny.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+Projekt grupuje zadania dotyczace wspolnego celu. Taski mozna
+przedstawic jako liste albo tablice Kanban. Kolumny maja wlasne nazwy,
+kolory i kolejnosc; mozna je dodawac, edytowac, przestawiac oraz usuwac.
+
+Przeniesienie taska do innej kolumny zmienia jego status, natomiast
+przeniesienie w pionie aktualizuje pozycje w kolumnie. Linia pomocnicza
+wskazuje miejsce wstawienia, a wynik operacji zostaje zapisany w bazie
+danych.
+
+Nad tablica znajduje sie sekcja checklist powiazanych z projektem.
+Checkliste mozna rozwinac i obslugiwac bez opuszczania widoku projektu.
+Mozna zmieniac stan jej elementow, edytowac ich nazwy, dodawac nowe
+pozycje i zmieniac kolejnosc. Pozostaje ona jednoczesnie samodzielnym
+dokumentem w bazie.
+\end{quote}
+
+\subsubsection{1.5. Archiwum i ustawienia - okolo 50
+sekund}\label{15-archiwum-i-ustawienia---okolo-50-sekund}
+
+\textbf{Dzialanie:} Krotko otworz Archive, a nastepnie Settings. Pokaz
+akcje przywracania i trwalego usuwania bez ich zatwierdzania. W
+ustawieniach zmien motyw i wroc do poprzedniego.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+Standardowe usuniecie elementu oznacza archiwizacje. Dokument znika z
+aktywnych list, ale w archiwum mozna go przywrocic albo usunac trwale.
+Obie operacje wymagaja potwierdzenia, co ogranicza ryzyko przypadkowej
+utraty danych.
+
+Aplikacja obsluguje motyw jasny, ciemny i systemowy. Dostepne sa motywy
+domyslne oraz motywy utworzone przez uzytkownika. Kolory sa zapisywane
+jako preferencje uzytkownika i przekazywane do interfejsu przez zmienne
+CSS, dlatego zmiana jest widoczna w calej aplikacji.
+\end{quote}
+
+\subsection{2. Dashboard, przypinanie, filtrowanie i sortowanie - okolo
+4-5
+minut}\label{2-dashboard-przypinanie-filtrowanie-i-sortowanie---okolo-4-5-minut}
+
+\textbf{Dzialanie:} Wroc do dashboardu.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+Dashboard jest ekranem zbiorczym aplikacji. Jego pierwsza czesc zawiera
+skroty Quick create, dzieki ktorym mozna od razu przejsc do utworzenia
+taska, checklisty, notatki albo projektu. Ponizej znajduja sie liczniki
+poszczegolnych typow elementow oraz kalendarz oparty na terminach
+zapisanych w taskach i projektach. Najechanie na licznik pozwala szybko
+podejrzec ostatnio aktualizowane elementy.
+
+Glowna czesc dashboardu jest przeznaczona na elementy przypiete przez
+uzytkownika. Przypiecie nie kopiuje obiektu. W bazie powstaje osobny
+dokument Pin zawierajacy typ i identyfikator elementu docelowego. Dzieki
+temu na jednej tablicy moga wystepowac rozne typy danych, natomiast
+oryginalne notatki, checklisty, taski i projekty nadal pozostaja w
+swoich kolekcjach.
+\end{quote}
+
+\subsubsection{2.1. Przypinanie elementu}\label{21-przypinanie-elementu}
+
+\textbf{Dzialanie:} Otworz przygotowana notatke albo checkliste. Kliknij
+Pin. Wroc do dashboardu i wskaz nowy element. Nastepnie mozesz pokazac
+Unpin.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+Kazdy element, ktory moze byc przypiety, ma przycisk Pin w widoku
+szczegolow. Po przypieciu serwer zapisuje odniesienie do elementu, a
+dashboard pobiera dokumenty pinow nalezace do aktualnego uzytkownika i
+uzupelnia je danymi obiektow docelowych. Przycisk zmienia stan na Unpin,
+dlatego ta sama kontrolka obsluguje obie operacje.
+
+Piny mozna rowniez ustawiac metoda drag and drop. Pole position
+przechowuje kolejnosc wybrana przez uzytkownika. Jest to domyslny sposob
+prezentacji elementow, dopoki uzytkownik nie wybierze innego sortowania.
+\end{quote}
+
+\subsubsection{2.2. Wyszukiwanie i
+filtrowanie}\label{22-wyszukiwanie-i-filtrowanie}
+
+\textbf{Dzialanie:} Wpisz fragment tytulu przypietego elementu.
+Nastepnie wyczysc tekst, wybierz typ, np. Checklists, i pokaz filtr
+Relation: Linked, Linked to Project, Linked to Task oraz Not Linked.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+Wyszukiwanie dziala na biezaco, dlatego nie wymaga przycisku Apply.
+Wpisanie fragmentu tytulu natychmiast ogranicza zestaw wynikow. Ponizej
+znajduja sie filtry charakterystyczne dla dashboardu. Pierwszy pozwala
+wybrac rodzaj elementu, a filtr Relation rozroznia elementy
+niepowiazane, dowolnie powiazane, powiazane z projektem oraz powiazane z
+taskiem.
+
+Projekty nie sa ukrywane przez filtr relacji, poniewaz w modelu
+aplikacji sa elementami nadrzednymi i same nie sa podpinane do innych
+projektow lub taskow. Przycisk Reset przywraca wartosci domyslne
+wszystkich kontrolek, lacznie z wyszukiwanym tekstem.
+\end{quote}
+
+\subsubsection{2.3. Sortowanie}\label{23-sortowanie}
+
+\textbf{Dzialanie:} Pokaz opcje sortowania. Wybierz tytul albo date
+aktualizacji, zmien Ascending/\allowbreak Descending, a na koncu wybierz
+User\textquotesingle s Order.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+Elementy mozna sortowac wedlug dostepnych cech, na przyklad tytulu lub
+daty aktualizacji. Dla takich kryteriow mozna wybrac kierunek rosnacy
+albo malejacy. Opcja User\textquotesingle s Order korzysta natomiast z
+pozycji zapisanej podczas drag and drop, dlatego kontrolka kierunku
+sortowania znika - odwrocenie kolejnosci nie mialoby tu znaczenia
+zgodnego z intencja uzytkownika.
+
+Ten sam podstawowy komponent kontrolek jest wykorzystywany na stronach
+notatek, checklist, taskow i projektow. Dashboard rozszerza go jedynie o
+filtry typu elementu, poniewaz prezentuje dane z kilku kolekcji
+jednoczesnie.
+\end{quote}
+
+\subsection{3. Tworzenie i edycja notatki - okolo 3
+minut}\label{3-tworzenie-i-edycja-notatki---okolo-3-minut}
+
+\subsubsection{3.1. Utworzenie notatki}\label{31-utworzenie-notatki}
+
+\textbf{Dzialanie:} Uzyj Quick create lub przycisku \texttt{+\ New} na
+stronie Notes. Wpisz przygotowany tytul, krotka tresc i dwa tagi. Utworz
+notatke.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+Notatka jest najprostszym elementem aplikacji i sluzy do szybkiego
+zapisania informacji. Formularz zawiera wymagany tytul, opcjonalna tresc
+oraz tagi. Tagi mozna dynamicznie dodawac i usuwac. Przed wyslaniem dane
+sa normalizowane, czyli usuwane sa puste tagi i zbedne spacje.
+
+Po zatwierdzeniu formularz wysyla zadanie POST do endpointu notatek.
+Backend sprawdza sesje, waliduje dane i zapisuje dokument z
+identyfikatorem wlasciciela. Odpowiedz zawiera identyfikator nowej
+notatki, dlatego aplikacja moze od razu przejsc do jej widoku szczegolow
+zamiast wracac do ogolnej listy.
+\end{quote}
+
+\subsubsection{3.2. Edycja inline i
+powiazania}\label{32-edycja-inline-i-powiazania}
+
+\textbf{Dzialanie:} Kliknij tytul, zmien go i zakoncz edycje Enterem.
+Kliknij tresc i dopisz zdanie. Edytuj tagi. Pokaz sekcje Linked items i
+podlacz przygotowany task lub projekt. Zapisz zmiany.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+Widok szczegolow wykorzystuje edycje inline. Tekst w trybie podgladu
+zmienia sie w pole dopiero po kliknieciu, przy czym zachowuje swoj
+rozmiar, aby interfejs nie przesuwal sie podczas edycji. Enter
+zatwierdza pojedyncza linie, a opuszczenie pola konczy edycje. Lokalny
+stan komponentu przechowuje wersje robocza, natomiast przycisk Save
+zapisuje komplet zmian przez zadanie PATCH.
+
+Notatke mozna powiazac z innymi elementami aplikacji. Sekcja Linked
+items zapisuje typ i identyfikator obiektu docelowego. Pozwala to
+wykorzystac notatke jako dodatkowy kontekst dla taska, checklisty lub
+projektu bez kopiowania jej tresci. Po zapisaniu relacja jest odtwarzana
+przy kolejnym pobraniu dokumentu.
+
+Z poziomu szczegolow notatke mozna przypiac do dashboardu albo przeniesc
+do archiwum. Jezeli widok zostal otwarty z innego miejsca aplikacji,
+parametr returnTo zachowuje informacje o poprzednim adresie i pozwala do
+niego wrocic.
+\end{quote}
+
+\subsection{4. Tworzenie i edycja checklisty - okolo 4
+minut}\label{4-tworzenie-i-edycja-checklisty---okolo-4-minut}
+
+\subsubsection{4.1. Utworzenie
+checklisty}\label{41-utworzenie-checklisty}
+
+\textbf{Dzialanie:} Otworz formularz nowej checklisty. Wpisz tytul i co
+najmniej trzy elementy. Zmien ich kolejnosc przez drag and drop, usun
+jeden i dodaj go ponownie. Utworz checkliste.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+Checklista sklada sie z tytulu oraz tablicy elementow. Kazdy element
+zawiera tresc, informacje o wykonaniu oraz pozycje. Formularz pozwala
+dodawac i usuwac wiersze, a kolejnosc mozna zmieniac metoda drag and
+drop jeszcze przed zapisaniem dokumentu.
+
+Przed wyslaniem puste wiersze sa odrzucane, a pozostale elementy
+otrzymuja kolejne wartosci position. Dane trafiaja do endpointu
+checklist przez POST. Podobnie jak w przypadku notatki, po utworzeniu
+aplikacja odczytuje identyfikator dokumentu i przechodzi bezposrednio do
+jego szczegolow.
+\end{quote}
+
+\subsubsection{4.2. Realizacja i edycja
+elementow}\label{42-realizacja-i-edycja-elementow}
+
+\textbf{Dzialanie:} Zaznacz i odznacz element, klikajac caly wiersz.
+Przenies element w inne miejsce. Uruchom edycje nazwy ikona olowka,
+zmien tekst i zapisz. Dodaj nowy element.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+W widoku checklisty klikniecie w wiersz zmienia stan wykonania elementu.
+Dla istniejacych pozycji ta operacja jest zapisywana od razu, poniewaz
+uzytkownik oczekuje natychmiastowego zachowania statusu. Data wykonania
+jest ustawiana przy zaznaczeniu i usuwana przy odznaczeniu.
+
+Nazwa elementu jest edytowana dopiero po uzyciu ikony olowka. Zapobiega
+to przypadkowemu uruchamianiu pola podczas zaznaczania checklisty. Drag
+and drop nie zamienia tylko dwoch wartosci miejscami. Element jest
+usuwany ze starego indeksu i wstawiany w nowe miejsce, a wszystkie
+pozycje zostaja ponownie przeliczone.
+
+Tytul i strukturalne zmiany checklisty korzystaja z wersji roboczej oraz
+przycisku Save. Aplikacja porownuje stan poczatkowy z aktualnym, dzieki
+czemu wie, czy wystepuja niezapisane zmiany. Uzytkownik moze tez uzyc
+Cancel, aby przywrocic dane pobrane z serwera.
+\end{quote}
+
+\subsubsection{4.3. Checklista zagniezdzona w tasku lub
+projekcie}\label{43-checklista-zagniezdzona-w-tasku-lub-projekcie}
+
+\textbf{Dzialanie:} Jezeli pozostalo wystarczajaco czasu, otworz task
+albo projekt z podlaczona checklista. Rozwin ja, zaznacz element, zmien
+kolejnosc i wskaz ikony odlaczenia oraz otwarcia pelnego widoku.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+Ta sama checklista moze zostac podlaczona do taska albo projektu. W
+widoku zagniezdzonym zachowuje podstawowe funkcje: rozwijanie,
+zaznaczanie, edycje, dodawanie, usuwanie i zmiane kolejnosci. Zmiany sa
+zapisywane bez osobnego przycisku Save.
+
+Komponent ogranicza jednak liczbe zbednych zapytan. Wpisywanie nazwy nie
+wysyla zadania po kazdym znaku - zapis odbywa sie po zakonczeniu edycji.
+Dodatkowo zapamietywany jest ostatni zapisany stan checklisty. Jezeli
+dane sie nie zmienily, kolejne zadanie PATCH nie jest wykonywane.
+\end{quote}
+
+\subsection{5. Podsumowanie - okolo 1
+minuty}\label{5-podsumowanie---okolo-1-minuty}
+
+\textbf{Dzialanie:} Wroc do dashboardu, aby zakonczyc prezentacje na
+ekranie zbiorczym.
+
+\textbf{Wypowiedz:}
+
+\begin{quote}
+Podsumowujac, aplikacja laczy proste elementy organizacyjne z bardziej
+rozbudowanym zarzadzaniem projektami. Uzytkownik moze rozpoczac od
+notatki lub checklisty, utworzyc task, polaczyc te dane z projektem, a
+nastepnie kontrolowac realizacje na tablicy Kanban. Dashboard zapewnia
+szybki dostep do najwazniejszych informacji, a wspolne filtrowanie,
+sortowanie, przypinanie i archiwizacja utrzymuja spojne zachowanie
+calego systemu.
+
+Od strony technicznej aplikacja laczy frontend React i Next.js z
+backendowymi Route Handlers oraz baza MongoDB obslugiwana przez
+Mongoose. Operacje sa chronione sesja uzytkownika, dane sa walidowane
+przed zapisem, a kluczowe formularze, endpointy i mechanizmy interfejsu
+zostaly objete testami automatycznymi.
+\end{quote}
+
+\end{document}
