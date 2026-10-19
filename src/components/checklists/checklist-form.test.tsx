@@ -24,6 +24,23 @@ describe("ChecklistForm", () => {
     );
   });
 
+  it.each(["create", "edit"] as const)("focuses each new item in %s mode", async (mode) => {
+    const user = userEvent.setup();
+    render(<ChecklistForm mode={mode} checklistId="checklist-1" />);
+
+    expect(screen.getByLabelText("Item 1")).not.toHaveFocus();
+    await user.click(screen.getByRole("button", { name: "Add item" }));
+    expect(screen.getByLabelText("Item 2")).toHaveFocus();
+    await user.keyboard("Milk");
+    expect(screen.getByLabelText("Item 2")).toHaveValue("Milk");
+    await user.click(screen.getByRole("button", { name: "Add item" }));
+    expect(screen.getByLabelText("Item 3")).toHaveFocus();
+    await user.click(screen.getByRole("button", { name: "Remove item 2" }));
+    await user.click(screen.getByRole("button", { name: "Add item" }));
+    expect(screen.getByLabelText("Item 3")).toHaveFocus();
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
   it("shows an English validation message when title is missing", async () => {
     const { container } = render(<ChecklistForm mode="create" />);
 

@@ -25,6 +25,7 @@ vi.mock("next/navigation", () => ({
 describe("ListControls", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ preference: {} })));
     vi.useFakeTimers();
     navigation.pathname = "/dashboard/tasks";
     navigation.searchParams = "";
@@ -33,6 +34,7 @@ describe("ListControls", () => {
   afterEach(() => {
     vi.runOnlyPendingTimers();
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   it("debounces search changes and preserves the selected sort", () => {
@@ -52,7 +54,7 @@ describe("ListControls", () => {
     fireEvent.change(screen.getByLabelText("Search"), { target: { value: "release" } });
     vi.advanceTimersByTime(260);
 
-    expect(navigation.replace).toHaveBeenCalledWith("/dashboard/tasks?q=release&sort=due");
+    expect(navigation.replace).toHaveBeenCalledWith("/dashboard/tasks?q=release&priority=&linked=&sort=due&direction=asc");
   });
 
   it("applies priority and relation filters", () => {
@@ -69,11 +71,11 @@ describe("ListControls", () => {
     );
 
     fireEvent.change(screen.getByLabelText("Priority"), { target: { value: "high" } });
-    expect(navigation.replace).toHaveBeenLastCalledWith("/dashboard/tasks?priority=high");
+    expect(navigation.replace).toHaveBeenLastCalledWith("/dashboard/tasks?priority=high&linked=&sort=position&direction=asc");
 
     fireEvent.change(screen.getByLabelText("Relation"), { target: { value: "project" } });
     expect(navigation.replace).toHaveBeenLastCalledWith(
-      "/dashboard/tasks?priority=high&linked=project"
+      "/dashboard/tasks?priority=high&linked=project&sort=position&direction=asc"
     );
   });
 
@@ -97,7 +99,7 @@ describe("ListControls", () => {
     });
 
     expect(navigation.replace).toHaveBeenLastCalledWith(
-      "/dashboard/tasks?linked=unlinked"
+      "/dashboard/tasks?priority=&linked=unlinked&sort=position&direction=asc"
     );
   });
 
@@ -118,11 +120,11 @@ describe("ListControls", () => {
     vi.advanceTimersByTime(260);
 
     expect(navigation.replace).toHaveBeenCalledWith(
-      "/dashboard/tasks?q=demo&priority=medium&linked=task&sort=priority"
+      "/dashboard/tasks?q=demo&priority=medium&linked=task&sort=priority&direction=asc"
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Reset" }));
 
-    expect(navigation.replace).toHaveBeenLastCalledWith("/dashboard/tasks");
+    expect(navigation.replace).toHaveBeenLastCalledWith("/dashboard/tasks?sort=position&direction=asc&priority=&linked=");
   });
 });

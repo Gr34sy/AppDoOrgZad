@@ -1,6 +1,6 @@
 "use client";
 
-import { DragEvent, FormEvent, useState } from "react";
+import { DragEvent, FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { GripVertical, Plus, Save, Trash2, X } from "lucide-react";
 import { FormShell } from "@/components/dashboard/form-shell";
@@ -141,7 +141,10 @@ export function ProjectForm({
   const [draggedColumnFormId, setDraggedColumnFormId] = useState("");
   const [activeDropColumnFormId, setActiveDropColumnFormId] = useState("");
 
+  const pendingChecklistFocus = useRef<number | null>(null);
+
   function addNewChecklist() {
+    pendingChecklistFocus.current = newChecklistTitles.length;
     setNewChecklistTitles((currentTitles) => [...currentTitles, ""]);
   }
 
@@ -457,6 +460,12 @@ export function ProjectForm({
                   <span className={labelClass}>New checklist title</span>
                   <input
                     type="text"
+                    ref={(input) => {
+                      if (input && pendingChecklistFocus.current === index) {
+                        input.focus();
+                        pendingChecklistFocus.current = null;
+                      }
+                    }}
                     value={newChecklistTitle}
                     onChange={(event) => updateNewChecklist(index, event.target.value)}
                     className={inputClass}

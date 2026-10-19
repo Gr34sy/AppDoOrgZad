@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Archive } from "lucide-react";
 import { ArchiveItemsSearch } from "@/components/dashboard/archive-items-search";
 import { authOptions } from "@/lib/auth";
+import { getListSettings } from "@/lib/server-list-preferences";
 import { connectDatabase } from "@/lib/mongoose";
 import { Checklist } from "@/models/checklist";
 import { Note } from "@/models/note";
@@ -86,6 +87,7 @@ export default async function ArchivePage() {
   }
 
   const ownerId = session.user.id;
+  const listSettings = await getListSettings(ownerId, "archive");
 
   await connectDatabase();
   const [notes, checklists, tasks, projects] = await Promise.all([
@@ -125,7 +127,7 @@ export default async function ArchivePage() {
           />
         </div>
 
-        <ArchiveItemsSearch items={archivedItems} />
+        <ArchiveItemsSearch items={archivedItems} initialListSettings={listSettings} />
       </section>
   );
 }

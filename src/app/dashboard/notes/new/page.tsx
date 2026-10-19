@@ -22,13 +22,13 @@ export default async function NewNotePage({ searchParams }: NewNotePageProps) {
   const returnTo = getSafeReturnTo(searchParams?.returnTo, "/dashboard/notes");
 
   return (
-      <section className="app-page">
+      <section className="app-page mx-auto max-w-4xl">
         <Link
           href={returnTo}
-          className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
+          className="mb-2 inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
         >
           <ArrowLeft aria-hidden="true" className="h-4 w-4" />
-          Back to notes
+          Back
         </Link>
 
         <div className="app-page-header">
@@ -47,11 +47,7 @@ export default async function NewNotePage({ searchParams }: NewNotePageProps) {
           />
         </div>
 
-        <div className="mx-auto grid w-full min-w-0 max-w-4xl gap-6">
-          <div className="grid gap-4">
-            <NoteCreateForm returnTo={returnTo} />
-          </div>
-
+        <div className="grid min-w-0 gap-6">
           <aside className="app-form-hint p-5">
             <StickyNote
               aria-hidden="true"
@@ -66,6 +62,9 @@ export default async function NewNotePage({ searchParams }: NewNotePageProps) {
               find later.
             </p>
           </aside>
+          <div className="grid gap-4">
+            <NoteCreateForm returnTo={returnTo} />
+          </div>
         </div>
       </section>
   );

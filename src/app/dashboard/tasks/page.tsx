@@ -7,6 +7,7 @@ import { ReorderableList } from "@/components/dashboard/reorderable-list";
 import { ReturnToLink } from "@/components/dashboard/return-to-link";
 import { authOptions } from "@/lib/auth";
 import { escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
+import { getListSettings } from "@/lib/server-list-preferences";
 import { connectDatabase } from "@/lib/mongoose";
 import { Task } from "@/models/task";
 
@@ -52,13 +53,12 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
   }
 
   const ownerId = session.user.id;
+  const settings = await getListSettings(ownerId, "tasks", searchParams);
   const search = getSearchParam(searchParams?.q).trim();
-  const priority = getSearchParam(searchParams?.priority).trim();
-  const requestedLinked = getSearchParam(searchParams?.linked).trim();
-  const linked = requestedLinked === "all" ? "" : requestedLinked;
-  const sort = getSearchParam(searchParams?.sort) || "position";
-  const requestedDirection = getSearchParam(searchParams?.direction) === "desc" ? "desc" : "asc";
-  const direction = sort === "position" ? "asc" : requestedDirection;
+  const priority = settings.priority;
+  const linked = settings.linked;
+  const sort = settings.sort;
+  const direction = settings.direction;
   const query: Record<string, unknown> = {
     ownerId,
     archivedAt: null

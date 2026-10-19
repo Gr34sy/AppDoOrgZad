@@ -54,14 +54,14 @@ export default async function NewTaskPage({ searchParams }: NewTaskPageProps) {
   const returnTo = getSafeReturnTo(searchParams?.returnTo, "/dashboard/tasks");
 
   return (
-      <section className="app-page">
-        <div className="grid gap-3">
+      <section className="app-page mx-auto max-w-4xl">
+        <div className="grid gap-8">
           <Link
             href={returnTo}
             className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
           >
             <ArrowLeft aria-hidden="true" className="h-4 w-4" />
-            Back to tasks
+            Back
           </Link>
           <div className="app-page-header">
             <div className="app-page-heading">
@@ -78,7 +78,20 @@ export default async function NewTaskPage({ searchParams }: NewTaskPageProps) {
             />
           </div>
         </div>
-        <div className="mx-auto w-full max-w-4xl">
+        <div className="grid min-w-0 gap-6">
+          <aside className="app-form-hint p-5">
+            <ClipboardList
+              aria-hidden="true"
+              className="h-8 w-8 text-[var(--app-accent)]"
+              strokeWidth={2.25}
+            />
+            <h2 className="mt-4 text-base font-semibold text-zinc-950 dark:text-zinc-50">
+              Tasks turn plans into action
+            </h2>
+            <p className="mt-2">
+              Add a title, set a priority and due date, then link a project or checklist when you need more context.
+            </p>
+          </aside>
           <TaskForm
             mode="create"
             projectOptions={projects.map((project) => ({

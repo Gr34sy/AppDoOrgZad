@@ -7,6 +7,7 @@ import { ReorderableList } from "@/components/dashboard/reorderable-list";
 import { ReturnToLink } from "@/components/dashboard/return-to-link";
 import { authOptions } from "@/lib/auth";
 import { escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
+import { getListSettings } from "@/lib/server-list-preferences";
 import { connectDatabase } from "@/lib/mongoose";
 import { Project } from "@/models/project";
 
@@ -51,11 +52,11 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   }
 
   const ownerId = session.user.id;
+  const settings = await getListSettings(ownerId, "projects", searchParams);
   const search = getSearchParam(searchParams?.q).trim();
-  const priority = getSearchParam(searchParams?.priority).trim();
-  const sort = getSearchParam(searchParams?.sort) || "position";
-  const requestedDirection = getSearchParam(searchParams?.direction) === "desc" ? "desc" : "asc";
-  const direction = sort === "position" ? "asc" : requestedDirection;
+  const priority = settings.priority;
+  const sort = settings.sort;
+  const direction = settings.direction;
   const query: Record<string, unknown> = {
     ownerId,
     archivedAt: null

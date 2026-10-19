@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { getServerSession } from "next-auth";
 import { RealtimeRefresh } from "@/components/layout/realtime-refresh";
 import { SignOutButton } from "@/components/layout/sign-out-button";
@@ -21,7 +21,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
       <input id="app-sidebar-toggle" type="checkbox" className="peer sr-only" aria-hidden="true" />
       <label
         htmlFor="app-sidebar-toggle"
-        className="fixed left-4 top-4 z-50 grid h-10 w-10 cursor-pointer place-items-center rounded-md bg-white text-zinc-900 shadow-lg shadow-zinc-950/10 transition hover:bg-zinc-100 lg:hidden dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+        className="fixed left-4 top-4 z-50 grid h-10 w-10 cursor-pointer place-items-center rounded-md bg-white text-zinc-900 shadow-lg shadow-zinc-950/10 transition hover:bg-zinc-100 peer-checked:hidden lg:hidden dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
         aria-label="Toggle navigation"
       >
         <ChevronRight aria-hidden="true" className="h-5 w-5" strokeWidth={2.25} />
@@ -31,15 +31,23 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         className="fixed inset-0 z-30 hidden bg-zinc-950/30 backdrop-blur-[1px] peer-checked:block lg:!hidden"
         aria-label="Close navigation"
       />
-      <aside className="fixed inset-y-0 left-0 z-40 flex w-[min(18rem,calc(100vw-2rem))] -translate-x-full flex-col border-r border-zinc-200 bg-[var(--app-sidebar-background)] px-4 pb-5 pt-5 shadow-2xl shadow-zinc-950/10 transition-[transform,width] duration-300 peer-checked:translate-x-0 peer-checked:lg:w-20 lg:w-72 lg:translate-x-0 dark:border-zinc-800">
+      <aside className="fixed inset-y-0 left-0 z-40 flex w-[min(18rem,calc(100vw-2rem))] -translate-x-full flex-col overflow-y-auto border-r border-zinc-200 bg-[var(--app-sidebar-background)] px-4 pb-5 pt-5 shadow-2xl shadow-zinc-950/10 transition-[transform,width] duration-300 peer-checked:translate-x-0 peer-checked:lg:w-20 lg:w-72 lg:translate-x-0 dark:border-zinc-800">
         <div className="sidebar-user relative flex h-16 shrink-0 items-start gap-3 border-b border-zinc-200 dark:border-zinc-800">
           <div className="sidebar-avatar grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-zinc-950 text-sm font-semibold text-white transition-[opacity,transform] duration-300 dark:bg-white dark:text-zinc-950">
             {userInitial}
           </div>
-          <div className="sidebar-collapsible min-w-0">
+          <div className="sidebar-collapsible min-w-0 pr-10 lg:pr-0">
             <p className="truncate text-sm font-semibold">{userName}</p>
             <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">Task Manager</p>
           </div>
+          <label
+            htmlFor="app-sidebar-toggle"
+            className="absolute right-0 top-0 grid h-10 w-10 cursor-pointer place-items-center rounded-md text-zinc-500 hover:bg-zinc-100 lg:hidden dark:hover:bg-zinc-900"
+            aria-label="Close navigation"
+            title="Close navigation"
+          >
+            <X aria-hidden="true" className="h-5 w-5" />
+          </label>
           <label
             htmlFor="app-sidebar-toggle"
             className="sidebar-toggle absolute right-0 top-0 hidden h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-md text-zinc-500 transition-[right,top,width,height,transform,background-color,color] duration-300 hover:bg-zinc-100 hover:text-zinc-950 lg:grid dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-white"
@@ -61,7 +69,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
 
         <SidebarNav />
 
-        <div className="sidebar-collapsible mt-auto grid gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+        <div className="sidebar-collapsible mt-auto grid shrink-0 gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
           <SignOutButton />
         </div>
       </aside>

@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Plus, Save, Trash2, X } from "lucide-react";
 import { FormShell } from "@/components/dashboard/form-shell";
@@ -37,6 +37,13 @@ export function ChecklistForm({
   const [items, setItems] = useState<ChecklistItemInput[]>(
     initialItems.length ? initialItems : [{ title: "", isCompleted: false }]
   );
+
+  const pendingItemFocus = useRef<number | null>(null);
+
+  function addItem() {
+    pendingItemFocus.current = items.length;
+    setItems([...items, { title: "", isCompleted: false }]);
+  }
 
   function updateItem(index: number, item: ChecklistItemInput) {
     const nextItems = [...items];
@@ -144,6 +151,12 @@ export function ChecklistForm({
                 Item {index + 1}
               </label>
               <input
+                ref={(input) => {
+                  if (input && pendingItemFocus.current === index) {
+                    input.focus();
+                    pendingItemFocus.current = null;
+                  }
+                }}
                 id={`item-${index}`}
                 type="text"
                 value={item.title}
@@ -167,7 +180,7 @@ export function ChecklistForm({
         </div>
         <button
           type="button"
-          onClick={() => setItems([...items, { title: "", isCompleted: false }])}
+          onClick={addItem}
           className="app-form-secondary-button"
         >
           <Plus aria-hidden="true" className="h-4 w-4" />

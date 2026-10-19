@@ -17,6 +17,39 @@ describe("LinkedChecklistList", () => {
     vi.unstubAllGlobals();
   });
 
+  it.each(["task", "project"] as const)("returns focus to the correct item input in a %s", async (parentType) => {
+    const user = userEvent.setup();
+    const fetchMock = vi.fn().mockResolvedValue(Response.json({ checklist: {} }));
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <LinkedChecklistList
+        parentType={parentType}
+        parentId="parent-1"
+        checklistIds={["first", "second"]}
+        checklistOptions={[
+          { id: "first", title: "First checklist", items: [] },
+          { id: "second", title: "Second checklist", items: [] }
+        ]}
+      />
+    );
+    await user.click(screen.getByRole("button", { name: "Expand First checklist" }));
+    await user.click(screen.getByRole("button", { name: "Expand Second checklist" }));
+    const input = screen.getByLabelText("Add item to Second checklist");
+    await user.type(input, "Milk");
+    await user.click(input.parentElement!.querySelector("button")!);
+    expect(input).toHaveFocus();
+    expect(input).toHaveValue("");
+    await user.keyboard("Bread{Enter}");
+    expect(input).toHaveFocus();
+    expect(screen.getByText("Milk")).toBeInTheDocument();
+    expect(screen.getByText("Bread")).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      "/api/checklists/second",
+      expect.objectContaining({ method: "PATCH" })
+    );
+  });
+
   it("expands and edits a linked checklist", async () => {
     const user = userEvent.setup();
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ checklist: {} }), {

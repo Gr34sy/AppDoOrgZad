@@ -11,6 +11,8 @@ import {
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ArrowDownUp, Filter, RotateCcw } from "lucide-react";
 import { defaultSortOptions, descriptionSortOption } from "@/lib/list-query";
+import { defaultListSettings, resolveListSettings } from "@/lib/list-preferences";
+import { useListPreferences } from "@/components/dashboard/use-list-preferences";
 import { SearchInput } from "@/components/dashboard/search-input";
 import { SortDirectionButton } from "@/components/dashboard/sort-direction-button";
 
@@ -135,6 +137,13 @@ export function ListControls({
   );
   const [selectedSort, setSelectedSort] = useState(sortValue);
   const [direction, setDirection] = useState<"asc" | "desc">(sortDirection);
+  const preferenceError = useListPreferences(entityType, resolveListSettings(entityType, {
+    ...defaultListSettings(entityType),
+    sort: selectedSort,
+    direction,
+    priority: selectedFilter,
+    linked: selectedLinkedFilter
+  }));
   const hasSearchSettled = useRef(false);
   const isUserOrderSort = selectedSort === "position";
 
@@ -160,25 +169,11 @@ export function ListControls({
       params.set("q", trimmedQuery);
     }
 
-    if (config.filterName && nextFilter) {
-      params.set(config.filterName, nextFilter);
-    }
-
-    if (
-      config.linkedFilter &&
-      nextLinkedFilter &&
-      nextLinkedFilter !== config.defaultLinked
-    ) {
-      params.set("linked", nextLinkedFilter);
-    }
-
-    if (nextSort && nextSort !== config.defaultSort) {
-      params.set("sort", nextSort);
-    }
-
-    if (nextSort !== "position" && nextDirection !== config.defaultDirection) {
-      params.set("direction", nextDirection);
-    }
+    if (config.filterName) params.set(config.filterName, nextFilter);
+    if (config.linkedFilter) params.set("linked", nextLinkedFilter);
+    // Explicit defaults override previously saved choices, including during Reset.
+    params.set("sort", nextSort || config.defaultSort);
+    params.set("direction", nextSort === "position" ? "asc" : nextDirection);
 
     const queryString = params.toString();
     const nextHref = queryString ? `${pathname}?${queryString}` : pathname;
@@ -196,8 +191,6 @@ export function ListControls({
 
     router.push(nextHref);
   }, [
-    config.defaultDirection,
-    config.defaultLinked,
     config.defaultSort,
     config.filterName,
     config.linkedFilter,
@@ -314,7 +307,10 @@ export function ListControls({
     setSelectedLinkedFilter(config.defaultLinked);
     setSelectedSort(config.defaultSort);
     setDirection(config.defaultDirection);
-    router.replace(clearHref);
+    const params = new URLSearchParams({ sort: config.defaultSort, direction: config.defaultDirection });
+    if (config.filterName) params.set(config.filterName, "");
+    if (config.linkedFilter) params.set("linked", config.defaultLinked);
+    router.replace(`${clearHref}?${params.toString()}`);
   }
 
   return (
@@ -323,6 +319,7 @@ export function ListControls({
       className="app-controls-panel"
     >
       <div aria-hidden="true" className="app-controls-accent" />
+      {preferenceError ? <p role="status" className="text-sm text-red-600 dark:text-red-300">{preferenceError}</p> : null}
       <div className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
         <SearchInput
           id={`${entityType}-search`}

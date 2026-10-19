@@ -1,5 +1,8 @@
 "use client";
 
+import { defaultListSettings, resolveListSettings, type ListControlSettings } from "@/lib/list-preferences";
+import { useListPreferences } from "@/components/dashboard/use-list-preferences";
+
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -40,6 +43,7 @@ type ArchiveItem = {
 };
 
 type ArchiveItemsSearchProps = {
+  initialListSettings?: ListControlSettings;
   items: ArchiveItem[];
 };
 
@@ -117,19 +121,26 @@ function matchesRelationFilter(item: ArchiveItem, relationFilter: string) {
   return item.relationTargets.includes(relationFilter as "project" | "task");
 }
 
-export function ArchiveItemsSearch({ items }: ArchiveItemsSearchProps) {
+export function ArchiveItemsSearch({ items, initialListSettings = defaultListSettings("archive") }: ArchiveItemsSearchProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<EntityType[]>(() =>
-    typeFilters.map((filter) => filter.value)
+    [...initialListSettings.types]
   );
-  const [relationFilter, setRelationFilter] = useState("");
-  const [sortField, setSortField] = useState("archived");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [relationFilter, setRelationFilter] = useState<string>(initialListSettings.linked);
+  const [sortField, setSortField] = useState<string>(initialListSettings.sort);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">(initialListSettings.direction);
   const [pendingItemId, setPendingItemId] = useState("");
   const [confirmation, setConfirmation] = useState<ArchiveConfirmation | null>(null);
   const [error, setError] = useState("");
   const selectedTypeSet = useMemo(() => new Set(selectedTypes), [selectedTypes]);
+  const preferenceError = useListPreferences("archive", resolveListSettings("archive", {
+    ...defaultListSettings("archive"),
+    sort: sortField,
+    direction: sortDirection,
+    linked: relationFilter,
+    types: selectedTypes.map((type) => type.toLowerCase())
+  }));
   const normalizedQuery = query.trim().toLowerCase();
 
   const filteredItems = useMemo(() => {
@@ -247,6 +258,7 @@ export function ArchiveItemsSearch({ items }: ArchiveItemsSearchProps) {
     <div className="grid gap-6">
       <section className="app-controls-panel">
         <div aria-hidden="true" className="app-controls-accent" />
+        {preferenceError ? <p role="status" className="text-sm text-red-600 dark:text-red-300">{preferenceError}</p> : null}
         <p className="text-sm text-zinc-500 dark:text-zinc-400">{countLabel}</p>
         <div className="grid gap-3">
           <SearchInput

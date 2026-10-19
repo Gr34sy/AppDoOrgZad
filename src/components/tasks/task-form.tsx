@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Save, Trash2, X } from "lucide-react";
 import { FormShell } from "@/components/dashboard/form-shell";
@@ -77,7 +77,10 @@ export function TaskForm({
   );
   const isProjectTask = Boolean(selectedProjectId);
 
+  const pendingChecklistFocus = useRef<number | null>(null);
+
   function addNewChecklist() {
+    pendingChecklistFocus.current = newChecklistTitles.length;
     setNewChecklistTitles((currentTitles) => [...currentTitles, ""]);
   }
 
@@ -327,6 +330,12 @@ export function TaskForm({
                   <span className="app-form-label">New checklist title</span>
                   <input
                     type="text"
+                    ref={(input) => {
+                      if (input && pendingChecklistFocus.current === index) {
+                        input.focus();
+                        pendingChecklistFocus.current = null;
+                      }
+                    }}
                     value={newChecklistTitle}
                     onChange={(event) => updateNewChecklist(index, event.target.value)}
                     className="app-form-control"

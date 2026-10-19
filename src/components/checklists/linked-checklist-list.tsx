@@ -93,6 +93,7 @@ export function LinkedChecklistList({
     itemId: string;
     position: "before" | "after";
   } | null>(null);
+  const newItemInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
   const suppressItemClickRef = useRef(false);
   const persistedSnapshotsRef = useRef<Map<string, string>>(new Map());
 
@@ -345,6 +346,7 @@ export function LinkedChecklistList({
     };
     updateLocalChecklist(checklist.id, () => nextChecklist);
     setNewItemTitles((current) => ({ ...current, [checklist.id]: "" }));
+    newItemInputRefs.current.get(checklist.id)?.focus();
     await persistChecklist(nextChecklist);
   }
 
@@ -644,6 +646,13 @@ export function LinkedChecklistList({
                   <div className="mt-2 flex min-w-0 items-center gap-2">
                     <Plus aria-hidden="true" className="h-4 w-4 shrink-0 text-zinc-400" />
                     <input
+                      ref={(input) => {
+                        if (input) {
+                          newItemInputRefs.current.set(checklist.id, input);
+                        } else {
+                          newItemInputRefs.current.delete(checklist.id);
+                        }
+                      }}
                       aria-label={`Add item to ${checklist.title}`}
                       value={newItemTitles[checklist.id] ?? ""}
                       onChange={(event) => setNewItemTitles((current) => ({ ...current, [checklist.id]: event.target.value }))}

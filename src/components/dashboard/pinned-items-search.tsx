@@ -1,5 +1,8 @@
 "use client";
 
+import { defaultListSettings, resolveListSettings, type ListControlSettings } from "@/lib/list-preferences";
+import { useListPreferences } from "@/components/dashboard/use-list-preferences";
+
 import {
   ArrowDownUp,
   ClipboardList,
@@ -41,6 +44,7 @@ type PinnedItem = {
 };
 
 type PinnedItemsSearchProps = {
+  initialListSettings?: ListControlSettings;
   pinnedItems: PinnedItem[];
 };
 
@@ -103,14 +107,21 @@ const iconByType = {
   Project: FolderKanban
 };
 
-export function PinnedItemsSearch({ pinnedItems }: PinnedItemsSearchProps) {
+export function PinnedItemsSearch({ pinnedItems, initialListSettings = defaultListSettings("dashboard") }: PinnedItemsSearchProps) {
   const [query, setQuery] = useState("");
   const [selectedTypes, setSelectedTypes] = useState<string[]>(() =>
-    typeFilters.map((filter) => filter.value)
+    typeFilters.filter((filter) => initialListSettings.types.includes(filter.value.toLowerCase() as ListControlSettings["types"][number])).map((filter) => filter.value)
   );
-  const [relationFilter, setRelationFilter] = useState("");
-  const [sortField, setSortField] = useState("position");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [relationFilter, setRelationFilter] = useState<string>(initialListSettings.linked);
+  const [sortField, setSortField] = useState<string>(initialListSettings.sort);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">(initialListSettings.direction);
+  const preferenceError = useListPreferences("dashboard", resolveListSettings("dashboard", {
+    ...defaultListSettings("dashboard"),
+    sort: sortField,
+    direction: sortDirection,
+    linked: relationFilter,
+    types: selectedTypes.map((type) => type.toLowerCase())
+  }));
   const normalizedQuery = query.trim().toLowerCase();
   const selectedTypeSet = useMemo(() => new Set(selectedTypes), [selectedTypes]);
   const filteredItems = useMemo(() => {
@@ -191,6 +202,7 @@ export function PinnedItemsSearch({ pinnedItems }: PinnedItemsSearchProps) {
     <div className="grid gap-6">
       <section className="app-controls-panel">
         <div aria-hidden="true" className="app-controls-accent" />
+        {preferenceError ? <p role="status" className="text-sm text-red-600 dark:text-red-300">{preferenceError}</p> : null}
         <div>
           <h2 className="text-xl font-semibold tracking-normal">Pinned items</h2>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{countLabel}</p>

@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { PinnedBoard } from "@/components/dashboard/pinned-board";
 import { authOptions } from "@/lib/auth";
+import { getListSettings } from "@/lib/server-list-preferences";
 import { connectDatabase } from "@/lib/mongoose";
 import { Checklist } from "@/models/checklist";
 import { Note } from "@/models/note";
@@ -79,6 +80,7 @@ export default async function DashboardPage() {
   }
 
   const ownerId = session.user.id;
+  const listSettings = await getListSettings(ownerId, "dashboard");
 
   await connectDatabase();
   const now = new Date();
@@ -283,6 +285,7 @@ export default async function DashboardPage() {
 
   return (
       <PinnedBoard
+        initialListSettings={listSettings}
         pinnedItems={pinnedItems}
         dashboardMetrics={dashboardMetrics}
         calendarEvents={calendarEvents}

@@ -1,4 +1,5 @@
-import Link from "next/link";
+import type { ListControlSettings } from "@/lib/list-preferences";
+import { DashboardMetricTile, type DashboardMetric } from "@/components/dashboard/dashboard-metric-tile";
 import { PinnedItemsSearch } from "@/components/dashboard/pinned-items-search";
 import { QuickCreateActions } from "@/components/dashboard/quick-create-actions";
 
@@ -20,20 +21,6 @@ type PinnedItem = {
   href: string;
 };
 
-type DashboardMetric = {
-  title: string;
-  count: number;
-  colorKey: "notes" | "checklists" | "tasks" | "projects";
-  items: Array<{
-    id: string;
-    title: string;
-    href: string;
-    updatedAt: string;
-    meta: string;
-    priority?: string;
-  }>;
-};
-
 type CalendarEvent = {
   id: string;
   title: string;
@@ -45,6 +32,7 @@ type CalendarEvent = {
 };
 
 type PinnedBoardProps = {
+  initialListSettings?: ListControlSettings;
   pinnedItems: PinnedItem[];
   dashboardMetrics: DashboardMetric[];
   calendarEvents: CalendarEvent[];
@@ -55,13 +43,6 @@ const priorityStyles: Record<string, string> = {
   medium: "bg-sky-400",
   high: "bg-fuchsia-400",
   urgent: "bg-rose-500"
-};
-
-const dashboardMetricStyles: Record<DashboardMetric["colorKey"], string> = {
-  notes: "bg-[var(--dashboard-notes-color)]",
-  checklists: "bg-[var(--dashboard-checklists-color)]",
-  tasks: "bg-[var(--dashboard-tasks-color)]",
-  projects: "bg-[var(--dashboard-projects-color)]"
 };
 
 function buildCalendarDays(events: CalendarEvent[]) {
@@ -85,60 +66,7 @@ function buildCalendarDays(events: CalendarEvent[]) {
   });
 }
 
-function formatUpdatedAt(date: string) {
-  return date ? `Updated ${new Date(date).toLocaleDateString("en")}` : "Recently updated";
-}
-
-function MetricOverlay({
-  emptyLabel,
-  items
-}: {
-  emptyLabel: string;
-  items: Array<{
-    id: string;
-    title: string;
-    href: string;
-    meta?: string;
-    priority?: string;
-    updatedAt?: string;
-  }>;
-}) {
-  return (
-    <div className="absolute left-0 top-full z-30 hidden w-[min(20rem,calc(100vw-2rem))] pt-2 group-hover:block">
-      <div className="rounded-lg border border-zinc-200 bg-white p-3 text-zinc-950 shadow-xl shadow-zinc-950/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50">
-        {items.length ? (
-          <div className="grid">
-            {items.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                className="grid grid-cols-[auto_1fr] gap-3 rounded-lg border-b border-zinc-200 p-2 transition last:border-b-0 hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-950/60"
-              >
-                <span
-                  className={`mt-1 h-2.5 w-2.5 rounded-full ${
-                    priorityStyles[item.priority ?? ""] ?? "bg-[var(--dashboard-accent)]"
-                  }`}
-                />
-                <span className="min-w-0">
-                  <span className="block truncate text-sm font-semibold">{item.title}</span>
-                  <span className="mt-0.5 block truncate text-xs text-zinc-500 dark:text-zinc-400">
-                    {[item.meta, item.updatedAt ? formatUpdatedAt(item.updatedAt) : null]
-                      .filter(Boolean)
-                      .join(" / ")}
-                  </span>
-                </span>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">{emptyLabel}</p>
-        )}
-      </div>
-    </div>
-  );
-}
-
-export function PinnedBoard({ pinnedItems, dashboardMetrics, calendarEvents }: PinnedBoardProps) {
+export function PinnedBoard({ pinnedItems, dashboardMetrics, calendarEvents, initialListSettings }: PinnedBoardProps) {
   const calendarDays = buildCalendarDays(calendarEvents);
   const monthLabel = new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(
     new Date()
@@ -151,31 +79,12 @@ export function PinnedBoard({ pinnedItems, dashboardMetrics, calendarEvents }: P
       <section className="grid gap-3">
         <div className="grid min-w-0 items-stretch gap-4 md:grid-cols-[minmax(0,412px)_minmax(18rem,340px)] md:justify-start">
           <div className="grid h-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:grid-rows-2">
-            {dashboardMetrics.map((metric) => (
-              <div
+            {dashboardMetrics.map((metric, index) => (
+              <DashboardMetricTile
                 key={metric.title}
-                className={`group relative z-0 rounded-lg ${
-                  dashboardMetricStyles[metric.colorKey] ?? "bg-zinc-900"
-                } p-3 shadow-lg shadow-black/20 transition hover:z-20 hover:-translate-y-0.5 hover:shadow-xl focus-within:z-20`}
-              >
-                <div className="flex h-full flex-col items-center justify-center text-center">
-                  <p className="text-[11px] font-medium uppercase text-zinc-200">
-                    {metric.title}
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold text-zinc-100">{metric.count}</p>
-                </div>
-                <MetricOverlay
-                  emptyLabel={`No recently updated ${metric.title.toLowerCase()}`}
-                  items={metric.items.map((item) => ({
-                    id: item.id,
-                    title: item.title,
-                    href: item.href,
-                    meta: item.meta,
-                    priority: item.priority,
-                    updatedAt: item.updatedAt
-                  }))}
-                />
-              </div>
+                metric={metric}
+                alignRight={index % 2 === 1}
+              />
             ))}
           </div>
 
@@ -223,7 +132,7 @@ export function PinnedBoard({ pinnedItems, dashboardMetrics, calendarEvents }: P
         </div>
       </section>
 
-      <PinnedItemsSearch pinnedItems={pinnedItems} />
+      <PinnedItemsSearch pinnedItems={pinnedItems} initialListSettings={initialListSettings} />
     </div>
   );
 }

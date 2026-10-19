@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { listControlUpdateSchema } from "@/lib/list-preferences";
 const hexColorSchema = z.string().regex(/^#[0-9a-f]{6}$/i);
 
 export const colorSettingsSchema = z.object({
@@ -138,10 +139,11 @@ export const projectUpdateSchema = projectCreateSchema.partial().refine(
 export const userPreferenceUpdateSchema = z
   .object({
     colorMode: colorModeSchema.optional(),
-    colors: partialColorSettingsSchema.optional()
+    colors: partialColorSettingsSchema.optional(),
+    listControls: listControlUpdateSchema.optional()
   })
   .strict()
-  .refine((payload) => payload.colorMode || payload.colors, "At least one preference field is required");
+  .refine((payload) => payload.colorMode || payload.colors || payload.listControls, "At least one preference field is required");
 
 export const savedThemeCreateSchema = z
   .object({

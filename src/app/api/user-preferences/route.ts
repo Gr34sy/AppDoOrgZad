@@ -16,6 +16,7 @@ import type { ColorMode, ColorSettings } from "@/types/domain";
 const colorModes: ColorMode[] = ["system", "light", "dark"];
 
 type PreferencePayload = {
+  listControls?: Record<string, unknown>;
   theme?: ColorMode;
   colorMode?: ColorMode;
   colors?: Partial<ColorSettings>;
@@ -42,6 +43,7 @@ function serializePreference(preference: PreferencePayload | null) {
 
   return {
     colorMode,
+    listControls: safePreference.listControls ?? {},
     colors: normalizeColorSettings(colorMode, safePreference.colors),
     savedThemes: (safePreference.savedThemes ?? []).map(
       (savedTheme: {
@@ -119,20 +121,20 @@ export async function PUT(request: NextRequest) {
     return unauthorizedResponse();
   }
 
+  const { data, error } = await parseJsonBody(request, userPreferenceUpdateSchema);
+
+  if (!data) {
+    return badRequestResponse(error);
+  }
+
   const rateLimit = checkRateLimit({
-    key: `preferences:update:${ownerId}`,
-    limit: 30,
+    key: `preferences:${data.listControls ? "list-controls" : "update"}:${ownerId}`,
+    limit: data.listControls ? 120 : 30,
     windowMs: 60_000
   });
 
   if (!rateLimit.allowed) {
     return tooManyRequestsResponse(rateLimit.retryAfterSeconds);
-  }
-
-  const { data, error } = await parseJsonBody(request, userPreferenceUpdateSchema);
-
-  if (!data) {
-    return badRequestResponse(error);
   }
 
   const updates: Record<string, unknown> = {};
@@ -143,6 +145,10 @@ export async function PUT(request: NextRequest) {
 
   if (data.colors) {
     updates.colors = data.colors;
+  }
+
+  if (data.listControls) {
+    updates[`listControls.${data.listControls.scope}`] = data.listControls.settings;
   }
 
   let preference: PreferencePayload | null;

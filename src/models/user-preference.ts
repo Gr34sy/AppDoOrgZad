@@ -1,5 +1,14 @@
 import { Schema, model, models, type InferSchemaType } from "mongoose";
+import { listPreferenceScopes } from "@/lib/list-preferences";
 import type { ColorMode } from "@/types/domain";
+
+const listSettingsSchema = new Schema({
+  sort: { type: String, required: true },
+  direction: { type: String, enum: ["asc", "desc"], required: true },
+  priority: { type: String, default: "" },
+  linked: { type: String, default: "" },
+  types: { type: [String], default: undefined }
+}, { _id: false });
 
 const userPreferenceSchema = new Schema(
   {
@@ -10,6 +19,7 @@ const userPreferenceSchema = new Schema(
       unique: true,
       index: true
     },
+    listControls: Object.fromEntries(listPreferenceScopes.map((scope) => [scope, { type: listSettingsSchema, default: undefined }])),
     colorMode: {
       type: String,
       enum: ["system", "light", "dark"] satisfies ColorMode[],
