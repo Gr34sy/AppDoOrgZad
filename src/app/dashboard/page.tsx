@@ -1,3 +1,4 @@
+import { formatPriority } from "@/lib/priority";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { PinnedBoard } from "@/components/dashboard/pinned-board";
@@ -165,7 +166,7 @@ export default async function DashboardPage() {
         const meta =
           target.description ??
           target.content ??
-          (target.items ? `items: ${target.items.length}` : target.priority ?? "Pinned");
+          (target.items ? `items: ${target.items.length}` : target.priority ? formatPriority(target.priority) : "Pinned");
         const relationTargets: RelationTarget[] = [];
 
         if (pin.targetType === "task" && Boolean(target.projectId)) {
@@ -243,7 +244,7 @@ export default async function DashboardPage() {
         title: task.title,
         href: `/dashboard/tasks/${String(task._id)}`,
         updatedAt: task.updatedAt ? new Date(task.updatedAt).toISOString() : "",
-        meta: task.statusId ?? task.priority ?? "Task",
+        meta: task.statusId ?? (task.priority ? formatPriority(task.priority) : "Task"),
         priority: task.priority
       }))
     },
@@ -256,7 +257,7 @@ export default async function DashboardPage() {
         title: project.title,
         href: `/dashboard/projects/${String(project._id)}`,
         updatedAt: project.updatedAt ? new Date(project.updatedAt).toISOString() : "",
-        meta: project.lifecycleStatus ?? project.priority ?? "Project",
+        meta: project.lifecycleStatus ?? (project.priority ? formatPriority(project.priority) : "Project"),
         priority: project.priority
       }))
     }

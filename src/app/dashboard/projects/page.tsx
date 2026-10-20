@@ -7,6 +7,7 @@ import { ReorderableList } from "@/components/dashboard/reorderable-list";
 import { ReturnToLink } from "@/components/dashboard/return-to-link";
 import { authOptions } from "@/lib/auth";
 import { escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
+import { withPinnedFilter } from "@/lib/pinned-filter";
 import { getListSettings } from "@/lib/server-list-preferences";
 import { connectDatabase } from "@/lib/mongoose";
 import { Project } from "@/models/project";
@@ -14,6 +15,7 @@ import { Project } from "@/models/project";
 type ProjectsPageProps = {
   searchParams?: {
     q?: string | string[];
+    pinned?: string | string[];
     priority?: string | string[];
     sort?: string | string[];
     direction?: string | string[];
@@ -55,6 +57,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   const settings = await getListSettings(ownerId, "projects", searchParams);
   const search = getSearchParam(searchParams?.q).trim();
   const priority = settings.priority;
+  const pinned = settings.pinned;
   const sort = settings.sort;
   const direction = settings.direction;
   const query: Record<string, unknown> = {
@@ -72,8 +75,9 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   }
 
   await connectDatabase();
-  const projects = await Project.find(query).sort(getProjectSort(sort, direction)).lean<ListedProject[]>();
-  const isReorderEnabled = sort === "position" && !search && !priority;
+  const filteredQuery = await withPinnedFilter(query, ownerId, "project", pinned);
+  const projects = await Project.find(filteredQuery).sort(getProjectSort(sort, direction)).lean<ListedProject[]>();
+  const isReorderEnabled = sort === "position" && !pinned && !search && !priority;
 
   return (
       <section className="app-page">
@@ -96,6 +100,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
           filterValue={priority}
           sortValue={sort}
           sortDirection={direction}
+          pinnedValue={pinned}
           clearHref="/dashboard/projects"
           action={
             <ReturnToLink href="/dashboard/projects/new" className="app-primary-action">

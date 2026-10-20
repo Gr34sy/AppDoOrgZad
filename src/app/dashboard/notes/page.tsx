@@ -7,6 +7,7 @@ import { ReorderableList } from "@/components/dashboard/reorderable-list";
 import { ReturnToLink } from "@/components/dashboard/return-to-link";
 import { authOptions } from "@/lib/auth";
 import { escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
+import { withPinnedFilter } from "@/lib/pinned-filter";
 import { getListSettings } from "@/lib/server-list-preferences";
 import { connectDatabase } from "@/lib/mongoose";
 import { Note } from "@/models/note";
@@ -14,6 +15,7 @@ import { Note } from "@/models/note";
 type NotesPageProps = {
   searchParams?: {
     q?: string | string[];
+    pinned?: string | string[];
     linked?: string | string[];
     sort?: string | string[];
     direction?: string | string[];
@@ -49,6 +51,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
   const settings = await getListSettings(ownerId, "notes", searchParams);
   const search = getSearchParam(searchParams?.q).trim();
   const linked = settings.linked;
+  const pinned = settings.pinned;
   const sort = settings.sort;
   const direction = settings.direction;
   const query: Record<string, unknown> = {
@@ -75,8 +78,9 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
 
   await connectDatabase();
 
-  const notes = await Note.find(query).sort(getNoteSort(sort, direction)).lean<ListedNote[]>();
-  const isReorderEnabled = sort === "position" && !search && !linked;
+  const filteredQuery = await withPinnedFilter(query, ownerId, "note", pinned);
+  const notes = await Note.find(filteredQuery).sort(getNoteSort(sort, direction)).lean<ListedNote[]>();
+  const isReorderEnabled = sort === "position" && !pinned && !search && !linked;
 
   return (
       <section className="app-page">
@@ -99,6 +103,7 @@ export default async function NotesPage({ searchParams }: NotesPageProps) {
           linkedValue={linked}
           sortValue={sort}
           sortDirection={direction}
+          pinnedValue={pinned}
           clearHref="/dashboard/notes"
           action={
             <ReturnToLink href="/dashboard/notes/new" className="app-primary-action">

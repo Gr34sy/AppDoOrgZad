@@ -7,6 +7,7 @@ const listSettingsSchema = new Schema({
   direction: { type: String, enum: ["asc", "desc"], required: true },
   priority: { type: String, default: "" },
   linked: { type: String, default: "" },
+  pinned: { type: Boolean, default: false },
   types: { type: [String], default: undefined }
 }, { _id: false });
 

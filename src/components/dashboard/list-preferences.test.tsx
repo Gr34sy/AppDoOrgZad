@@ -48,6 +48,9 @@ describe("list preference persistence", () => {
 
     await user.click(screen.getByRole("button", { name: "Reset" }));
     await waitFor(() => expect(savedRequest()).toEqual({ scope, settings: defaultListSettings(scope) }));
+    expect(screen.getByLabelText("Sort")).toHaveValue(scope === "archive" ? "archived" : "created");
+    expect(screen.getByRole("button", { name: "Sort descending. Click to reverse." })).toBeInTheDocument();
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === "/api/user-preferences")).toBe(true);
   });
 
   it.each(["notes", "checklists", "tasks", "projects"] as const)("saves %s controls without persisting the search text", async (scope) => {
@@ -68,8 +71,13 @@ describe("list preference persistence", () => {
         linked: scope !== "projects" ? "project" : ""
       }
     }));
+    await user.selectOptions(screen.getByLabelText("Pinned"), "true");
+    await waitFor(() => expect(savedRequest().settings.pinned).toBe(true));
     await user.click(screen.getByRole("button", { name: "Reset" }));
     await waitFor(() => expect(savedRequest()).toEqual({ scope, settings: defaultListSettings(scope) }));
+    expect(screen.getByLabelText("Sort")).toHaveValue("created");
+    expect(screen.getByRole("button", { name: "Sort descending. Click to reverse." })).toBeInTheDocument();
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === "/api/user-preferences")).toBe(true);
   });
 
   it("reports failed saves", async () => {
@@ -96,6 +104,25 @@ describe("list preference persistence", () => {
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
     expect(savedRequest().settings.direction).toBe("asc");
     expect(vi.mocked(fetch).mock.calls[1]?.[1]?.keepalive).toBe(true);
+  });
+
+  it("restores the same manual order after Reset and switching back to User's Order", async () => {
+    const user = userEvent.setup();
+    const items = [
+      { id: "first", position: 0, title: "First manually", createdAt: "2025-01-01", updatedAt: "2025-01-01" },
+      { id: "second", position: 1, title: "Newest", createdAt: "2026-01-01", updatedAt: "2026-01-01" }
+    ].map((item) => ({
+      ...item, type: "Note", description: "", meta: "Note", status: "", tags: [],
+      canFilterRelation: true, relationTargets: [], href: `/dashboard/notes/${item.id}`
+    }));
+    render(<PinnedItemsSearch pinnedItems={items} initialListSettings={{ ...defaultListSettings("dashboard"), sort: "position", direction: "asc" }} />);
+    expect(screen.getAllByRole("link")[0]).toHaveTextContent("First manually");
+    await user.click(screen.getByRole("button", { name: "Reset" }));
+    await waitFor(() => expect(screen.getAllByRole("link")[0]).toHaveTextContent("Newest"));
+    await user.selectOptions(screen.getByLabelText("Sort"), "position");
+    await waitFor(() => expect(screen.getAllByRole("link")[0]).toHaveTextContent("First manually"));
+    expect(items.map((item) => item.position)).toEqual([0, 1]);
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === "/api/user-preferences")).toBe(true);
   });
 
 });

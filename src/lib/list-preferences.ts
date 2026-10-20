@@ -9,6 +9,7 @@ export const listControlSettingsSchema = z.object({
   sort: z.enum(["position", "updated", "created", "title", "description", "due", "priority", "archived"]),
   direction: z.enum(["asc", "desc"]),
   priority: z.enum(["", "low", "medium", "high", "urgent"]),
+  pinned: z.boolean().default(false),
   linked: z.enum(["", "unlinked", "linked", "project", "task"]),
   types: z.array(z.enum(entityTypes)).max(4)
 }).strict();
@@ -16,10 +17,11 @@ export type ListControlSettings = z.infer<typeof listControlSettingsSchema>;
 
 export function defaultListSettings(scope: ListPreferenceScope): ListControlSettings {
   return {
-    sort: scope === "archive" ? "archived" : "position",
-    direction: scope === "archive" ? "desc" : "asc",
+    sort: scope === "archive" ? "archived" : "created",
+    direction: "desc",
     priority: "",
     linked: "",
+    pinned: false,
     types: [...entityTypes]
   };
 }
@@ -53,7 +55,8 @@ export function resolveListSettings(
   const defaults = parsed.success ? parsed.data.settings : defaultListSettings(scope);
   const requested = {
     ...defaults,
-    ...(params?.sort !== undefined ? { sort: getSearchParam(params.sort) || "position" } : {}),
+    ...(params?.pinned !== undefined ? { pinned: getSearchParam(params.pinned) === "true" } : {}),
+    ...(params?.sort !== undefined ? { sort: getSearchParam(params.sort) || defaultListSettings(scope).sort } : {}),
     ...(params?.direction !== undefined ? { direction: getSearchParam(params.direction) } : {}),
     ...(params?.priority !== undefined ? { priority: getSearchParam(params.priority) } : {}),
     ...(params?.linked !== undefined ? { linked: getSearchParam(params.linked) === "all" ? "" : getSearchParam(params.linked) } : {})

@@ -7,6 +7,7 @@ import { ReorderableList } from "@/components/dashboard/reorderable-list";
 import { ReturnToLink } from "@/components/dashboard/return-to-link";
 import { authOptions } from "@/lib/auth";
 import { escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
+import { withPinnedFilter } from "@/lib/pinned-filter";
 import { getListSettings } from "@/lib/server-list-preferences";
 import { connectDatabase } from "@/lib/mongoose";
 import { Checklist } from "@/models/checklist";
@@ -14,6 +15,7 @@ import { Checklist } from "@/models/checklist";
 type ChecklistsPageProps = {
   searchParams?: {
     q?: string | string[];
+    pinned?: string | string[];
     linked?: string | string[];
     sort?: string | string[];
     direction?: string | string[];
@@ -38,6 +40,7 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
   const settings = await getListSettings(ownerId, "checklists", searchParams);
   const search = getSearchParam(searchParams?.q).trim();
   const linked = settings.linked;
+  const pinned = settings.pinned;
   const sort = settings.sort;
   const direction = settings.direction;
   const query: Record<string, unknown> = {
@@ -61,8 +64,9 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
 
   await connectDatabase();
 
-  const checklists = await Checklist.find(query).sort(getListSort(sort, direction)).lean<ListedChecklist[]>();
-  const isReorderEnabled = sort === "position" && !search && !linked;
+  const filteredQuery = await withPinnedFilter(query, ownerId, "checklist", pinned);
+  const checklists = await Checklist.find(filteredQuery).sort(getListSort(sort, direction)).lean<ListedChecklist[]>();
+  const isReorderEnabled = sort === "position" && !pinned && !search && !linked;
 
   return (
       <section className="app-page">
@@ -85,6 +89,7 @@ export default async function ChecklistsPage({ searchParams }: ChecklistsPagePro
           linkedValue={linked}
           sortValue={sort}
           sortDirection={direction}
+          pinnedValue={pinned}
           clearHref="/dashboard/checklists"
           action={
             <ReturnToLink href="/dashboard/checklists/new" className="app-primary-action">

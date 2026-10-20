@@ -1,3 +1,4 @@
+import { formatPriority } from "@/lib/priority";
 import type { LucideIcon } from "lucide-react";
 import { CardDeleteButton } from "@/components/dashboard/card-delete-button";
 import { ReturnToLink } from "@/components/dashboard/return-to-link";
@@ -63,8 +64,10 @@ export function ObjectCard({
         </div>
 
         {hasMeta ? (
-          <p className="mt-2 text-sm font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
-            {[status, priority].filter(Boolean).map((value) => formatMeta(String(value))).join(" / ")}
+          <p className="mt-2 text-sm font-medium tracking-normal text-zinc-500 dark:text-zinc-400">
+            {status ? <span className="uppercase">{formatMeta(status)}</span> : null}
+            {status && priority ? " / " : null}
+            {priority ? formatPriority(priority) : null}
           </p>
         ) : null}
 

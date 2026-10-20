@@ -3,6 +3,7 @@
 import { defaultListSettings, resolveListSettings, type ListControlSettings } from "@/lib/list-preferences";
 import { useListPreferences } from "@/components/dashboard/use-list-preferences";
 
+import { formatPriority } from "@/lib/priority";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -234,11 +235,12 @@ export function ArchiveItemsSearch({ items, initialListSettings = defaultListSet
   }
 
   function resetControls() {
+    const defaults = defaultListSettings("archive");
     setQuery("");
     setSelectedTypes(typeFilters.map((filter) => filter.value));
-    setRelationFilter("");
-    setSortField("archived");
-    setSortDirection("desc");
+    setRelationFilter(defaults.linked);
+    setSortField(defaults.sort);
+    setSortDirection(defaults.direction);
   }
 
   const hasActiveFilters =
@@ -416,8 +418,9 @@ export function ArchiveItemsSearch({ items, initialListSettings = defaultListSet
                       {item.title}
                     </h2>
                   </div>
-                  <p className="mt-2 text-sm font-medium uppercase tracking-normal text-zinc-500 dark:text-zinc-400">
-                    {[item.typeLabel, item.status, item.priority].filter(Boolean).join(" / ")}
+                  <p className="mt-2 text-sm font-medium tracking-normal text-zinc-500 dark:text-zinc-400">
+                    <span className="uppercase">{[item.typeLabel, item.status].filter(Boolean).join(" / ")}</span>
+                    {item.priority ? ` / ${formatPriority(item.priority)}` : null}
                   </p>
                   {isChecklist ? (
                     item.items?.length ? (

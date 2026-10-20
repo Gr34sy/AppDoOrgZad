@@ -182,11 +182,12 @@ export function PinnedItemsSearch({ pinnedItems, initialListSettings = defaultLi
   }
 
   function resetControls() {
+    const defaults = defaultListSettings("dashboard");
     setQuery("");
     setSelectedTypes(typeFilters.map((filter) => filter.value));
-    setRelationFilter("");
-    setSortField("position");
-    setSortDirection("asc");
+    setRelationFilter(defaults.linked);
+    setSortField(defaults.sort);
+    setSortDirection(defaults.direction);
   }
 
   const hasActiveFilters = Boolean(normalizedQuery) || selectedTypes.length !== typeFilters.length || Boolean(relationFilter);

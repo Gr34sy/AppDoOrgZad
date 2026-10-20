@@ -7,6 +7,7 @@ import { ReorderableList } from "@/components/dashboard/reorderable-list";
 import { ReturnToLink } from "@/components/dashboard/return-to-link";
 import { authOptions } from "@/lib/auth";
 import { escapeRegex, getListSort, getSearchParam } from "@/lib/list-query";
+import { withPinnedFilter } from "@/lib/pinned-filter";
 import { getListSettings } from "@/lib/server-list-preferences";
 import { connectDatabase } from "@/lib/mongoose";
 import { Task } from "@/models/task";
@@ -14,6 +15,7 @@ import { Task } from "@/models/task";
 type TasksPageProps = {
   searchParams?: {
     q?: string | string[];
+    pinned?: string | string[];
     priority?: string | string[];
     linked?: string | string[];
     sort?: string | string[];
@@ -57,6 +59,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
   const search = getSearchParam(searchParams?.q).trim();
   const priority = settings.priority;
   const linked = settings.linked;
+  const pinned = settings.pinned;
   const sort = settings.sort;
   const direction = settings.direction;
   const query: Record<string, unknown> = {
@@ -91,9 +94,10 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
   }
 
   await connectDatabase();
-  const tasks = await Task.find(query).sort(getTaskSort(sort, direction)).lean<ListedTask[]>();
+  const filteredQuery = await withPinnedFilter(query, ownerId, "task", pinned);
+  const tasks = await Task.find(filteredQuery).sort(getTaskSort(sort, direction)).lean<ListedTask[]>();
   const isReorderEnabled =
-    sort === "position" && !search && !priority && !linked;
+    sort === "position" && !pinned && !search && !priority && !linked;
 
   return (
       <section className="app-page">
@@ -117,6 +121,7 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
           linkedValue={linked}
           sortValue={sort}
           sortDirection={direction}
+          pinnedValue={pinned}
           clearHref="/dashboard/tasks"
           action={
             <ReturnToLink href="/dashboard/tasks/new" className="app-primary-action">

@@ -9,7 +9,7 @@ import {
   type ReactNode
 } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ArrowDownUp, Filter, RotateCcw } from "lucide-react";
+import { ArrowDownUp, Filter, Pin, RotateCcw } from "lucide-react";
 import { defaultSortOptions, descriptionSortOption } from "@/lib/list-query";
 import { defaultListSettings, resolveListSettings } from "@/lib/list-preferences";
 import { useListPreferences } from "@/components/dashboard/use-list-preferences";
@@ -32,14 +32,15 @@ type ListControlsProps = {
   filterValue?: string;
   filterOptions?: SelectOption[];
   linkedValue?: string;
+  pinnedValue?: boolean;
   action?: ReactNode;
 };
 
 const priorityOptions = [
-  { label: "low", value: "low" },
-  { label: "medium", value: "medium" },
-  { label: "high", value: "high" },
-  { label: "urgent", value: "urgent" }
+  { label: "Low", value: "low" },
+  { label: "Medium", value: "medium" },
+  { label: "High", value: "high" },
+  { label: "Urgent", value: "urgent" }
 ];
 
 const taskProjectSortOptions = [
@@ -71,44 +72,34 @@ const controlConfig: Record<
     linkedFilter?: boolean;
     defaultLinked: string;
     sortOptions: SelectOption[];
-    defaultSort: string;
-    defaultDirection: "asc" | "desc";
   }
 > = {
   notes: {
     linkedFilter: true,
     defaultLinked: "",
     sortOptions: noteSortOptions,
-    defaultSort: "position",
-    defaultDirection: "asc"
   },
   tasks: {
     filterName: "priority",
     filterLabel: "Priority",
-    filterPlaceholder: "all priorities",
+    filterPlaceholder: "All",
     filterOptions: priorityOptions,
     linkedFilter: true,
     defaultLinked: "",
     sortOptions: taskProjectSortOptions,
-    defaultSort: "position",
-    defaultDirection: "asc"
   },
   checklists: {
     linkedFilter: true,
     defaultLinked: "",
     sortOptions: defaultSortOptions,
-    defaultSort: "position",
-    defaultDirection: "asc"
   },
   projects: {
     filterName: "priority",
     filterLabel: "Priority",
-    filterPlaceholder: "all priorities",
+    filterPlaceholder: "All",
     filterOptions: priorityOptions,
     sortOptions: taskProjectSortOptions,
     defaultLinked: "",
-    defaultSort: "position",
-    defaultDirection: "asc"
   }
 };
 
@@ -121,12 +112,14 @@ export function ListControls({
   filterValue = "",
   filterOptions,
   linkedValue = "",
+  pinnedValue = false,
   action
 }: ListControlsProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const config = controlConfig[entityType];
+  const defaults = defaultListSettings(entityType);
   const resolvedFilterOptions = filterOptions ?? config.filterOptions ?? [];
   const hasFilter = Boolean(config.filterName);
   const hasLinkedFilter = Boolean(config.linkedFilter);
@@ -135,6 +128,7 @@ export function ListControls({
   const [selectedLinkedFilter, setSelectedLinkedFilter] = useState(
     linkedValue || config.defaultLinked
   );
+  const [selectedPinned, setSelectedPinned] = useState(pinnedValue);
   const [selectedSort, setSelectedSort] = useState(sortValue);
   const [direction, setDirection] = useState<"asc" | "desc">(sortDirection);
   const preferenceError = useListPreferences(entityType, resolveListSettings(entityType, {
@@ -142,7 +136,8 @@ export function ListControls({
     sort: selectedSort,
     direction,
     priority: selectedFilter,
-    linked: selectedLinkedFilter
+    linked: selectedLinkedFilter,
+    pinned: selectedPinned
   }));
   const hasSearchSettled = useRef(false);
   const isUserOrderSort = selectedSort === "position";
@@ -153,6 +148,7 @@ export function ListControls({
     nextLinkedFilter,
     nextSort,
     nextDirection,
+    nextPinned = selectedPinned,
     replace
   }: {
     nextQuery: string;
@@ -160,6 +156,7 @@ export function ListControls({
     nextLinkedFilter: string;
     nextSort: string;
     nextDirection: "asc" | "desc";
+    nextPinned?: boolean;
     replace: boolean;
   }) => {
     const params = new URLSearchParams();
@@ -172,8 +169,9 @@ export function ListControls({
     if (config.filterName) params.set(config.filterName, nextFilter);
     if (config.linkedFilter) params.set("linked", nextLinkedFilter);
     // Explicit defaults override previously saved choices, including during Reset.
-    params.set("sort", nextSort || config.defaultSort);
+    params.set("sort", nextSort || defaults.sort);
     params.set("direction", nextSort === "position" ? "asc" : nextDirection);
+    params.set("pinned", String(nextPinned));
 
     const queryString = params.toString();
     const nextHref = queryString ? `${pathname}?${queryString}` : pathname;
@@ -191,12 +189,13 @@ export function ListControls({
 
     router.push(nextHref);
   }, [
-    config.defaultSort,
+    defaults.sort,
     config.filterName,
     config.linkedFilter,
     pathname,
     router,
-    searchParams
+    searchParams,
+    selectedPinned
   ]);
 
   useEffect(() => {
@@ -210,6 +209,10 @@ export function ListControls({
   useEffect(() => {
     setSelectedLinkedFilter(linkedValue || config.defaultLinked);
   }, [config.defaultLinked, linkedValue]);
+
+  useEffect(() => {
+    setSelectedPinned(pinnedValue);
+  }, [pinnedValue]);
 
   useEffect(() => {
     setSelectedSort(sortValue);
@@ -301,13 +304,29 @@ export function ListControls({
     });
   }
 
+  function handlePinnedChange(event: ChangeEvent<HTMLSelectElement>) {
+    const nextPinned = event.target.value === "true";
+    setSelectedPinned(nextPinned);
+    navigateWithControls({
+      nextQuery: query,
+      nextFilter: selectedFilter,
+      nextLinkedFilter: selectedLinkedFilter,
+      nextSort: selectedSort,
+      nextDirection: direction,
+      nextPinned,
+      replace: true
+    });
+  }
+
   function resetControls() {
     setQuery("");
+    setSelectedPinned(false);
     setSelectedFilter("");
     setSelectedLinkedFilter(config.defaultLinked);
-    setSelectedSort(config.defaultSort);
-    setDirection(config.defaultDirection);
-    const params = new URLSearchParams({ sort: config.defaultSort, direction: config.defaultDirection });
+    setSelectedSort(defaults.sort);
+    setDirection(defaults.direction);
+    const params = new URLSearchParams({ sort: defaults.sort, direction: defaults.direction });
+    params.set("pinned", "false");
     if (config.filterName) params.set(config.filterName, "");
     if (config.linkedFilter) params.set("linked", config.defaultLinked);
     router.replace(`${clearHref}?${params.toString()}`);
@@ -334,6 +353,22 @@ export function ListControls({
       </div>
 
       <div className="grid min-w-0 items-end gap-3 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(10rem,auto))] lg:justify-start">
+
+        <label className="grid min-w-0 gap-1">
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase text-zinc-500 dark:text-zinc-400">
+            <Pin aria-hidden="true" className="h-3.5 w-3.5 text-[var(--app-accent)]" />
+            Pinned
+          </span>
+          <select
+            name="pinned"
+            value={String(selectedPinned)}
+            onChange={handlePinnedChange}
+            className="app-select h-11 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-950 outline-none transition focus:border-[var(--app-accent)] focus:bg-white focus:ring-2 focus:ring-[var(--app-accent)]/15 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:bg-zinc-950"
+          >
+            <option value="false">All</option>
+            <option value="true">Pinned only</option>
+          </select>
+        </label>
 
         {hasFilter ? (
           <label className="grid min-w-0 gap-1">

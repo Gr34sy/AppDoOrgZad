@@ -163,7 +163,7 @@ describe("/api/user-preferences", () => {
     for (const listControls of [
       { scope: "otherUser", settings: defaultListSettings("notes") },
       { scope: "notes", settings: { ...defaultListSettings("notes"), sort: "archived" } },
-      { scope: "tasks", settings: { ...defaultListSettings("tasks"), direction: "desc" } }
+      { scope: "tasks", settings: { ...defaultListSettings("tasks"), sort: "position", direction: "desc" } }
     ]) {
       const response = await PUT(createJsonRequest({ listControls }) as never);
       expect(response.status).toBe(400);

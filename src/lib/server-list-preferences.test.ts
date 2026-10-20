@@ -24,6 +24,10 @@ describe("saved list controls", () => {
   it.each(listPreferenceScopes)("provides defaults for %s when preferences are missing", async (scope) => {
     query.lean.mockResolvedValue(null);
     expect(await getListSettings("user-2", scope)).toEqual(defaultListSettings(scope));
+    expect(await getListSettings("user-2", scope)).toMatchObject({
+      sort: scope === "archive" ? "archived" : "created",
+      direction: "desc", priority: "", linked: "", pinned: false
+    });
   });
 
   it("lets explicit URL defaults override saved filters and sorting", async () => {
@@ -31,7 +35,7 @@ describe("saved list controls", () => {
       ...defaultListSettings("tasks"), sort: "due", direction: "desc", priority: "high", linked: "project"
     } } });
     expect(await getListSettings("user-1", "tasks", {
-      sort: "position", direction: "asc", priority: "", linked: ""
+      sort: "created", direction: "desc", priority: "", linked: ""
     })).toEqual(defaultListSettings("tasks"));
     expect(await getListSettings("user-1", "tasks", { sort: "title" })).toMatchObject({
       sort: "title", direction: "desc", priority: "high", linked: "project"
@@ -46,6 +50,18 @@ describe("saved list controls", () => {
     expect(await getListSettings("user-a", scope)).toMatchObject({ direction: "asc" });
     expect(await getListSettings("user-b", scope)).toMatchObject({ direction: "desc" });
     expect(await getListSettings("user-a", scope)).toMatchObject({ direction: "asc" });
+  });
+
+  it("preserves legacy settings that do not yet include the pinned filter", async () => {
+    const legacy = { sort: "title", direction: "asc", priority: "high", linked: "", types: ["task"] };
+    query.lean.mockResolvedValue({ listControls: { tasks: legacy } });
+    expect(await getListSettings("user-1", "tasks")).toEqual({ ...legacy, pinned: false });
+  });
+
+  it("restores the pinned preference and lets the URL clear it", async () => {
+    query.lean.mockResolvedValue({ listControls: { notes: { ...defaultListSettings("notes"), pinned: true } } });
+    expect(await getListSettings("user-1", "notes")).toMatchObject({ pinned: true });
+    expect(await getListSettings("user-1", "notes", { pinned: "false" })).toMatchObject({ pinned: false });
   });
 
 });

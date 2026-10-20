@@ -54,7 +54,7 @@ describe("ListControls", () => {
     fireEvent.change(screen.getByLabelText("Search"), { target: { value: "release" } });
     vi.advanceTimersByTime(260);
 
-    expect(navigation.replace).toHaveBeenCalledWith("/dashboard/tasks?q=release&priority=&linked=&sort=due&direction=asc");
+    expect(navigation.replace).toHaveBeenCalledWith("/dashboard/tasks?q=release&priority=&linked=&sort=due&direction=asc&pinned=false");
   });
 
   it("applies priority and relation filters", () => {
@@ -71,11 +71,11 @@ describe("ListControls", () => {
     );
 
     fireEvent.change(screen.getByLabelText("Priority"), { target: { value: "high" } });
-    expect(navigation.replace).toHaveBeenLastCalledWith("/dashboard/tasks?priority=high&linked=&sort=position&direction=asc");
+    expect(navigation.replace).toHaveBeenLastCalledWith("/dashboard/tasks?priority=high&linked=&sort=position&direction=asc&pinned=false");
 
     fireEvent.change(screen.getByLabelText("Relation"), { target: { value: "project" } });
     expect(navigation.replace).toHaveBeenLastCalledWith(
-      "/dashboard/tasks?priority=high&linked=project&sort=position&direction=asc"
+      "/dashboard/tasks?priority=high&linked=project&sort=position&direction=asc&pinned=false"
     );
   });
 
@@ -99,7 +99,7 @@ describe("ListControls", () => {
     });
 
     expect(navigation.replace).toHaveBeenLastCalledWith(
-      "/dashboard/tasks?priority=&linked=unlinked&sort=position&direction=asc"
+      "/dashboard/tasks?priority=&linked=unlinked&sort=position&direction=asc&pinned=false"
     );
   });
 
@@ -120,11 +120,21 @@ describe("ListControls", () => {
     vi.advanceTimersByTime(260);
 
     expect(navigation.replace).toHaveBeenCalledWith(
-      "/dashboard/tasks?q=demo&priority=medium&linked=task&sort=priority&direction=asc"
+      "/dashboard/tasks?q=demo&priority=medium&linked=task&sort=priority&direction=asc&pinned=false"
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Reset" }));
 
-    expect(navigation.replace).toHaveBeenLastCalledWith("/dashboard/tasks?sort=position&direction=asc&priority=&linked=");
+    expect(navigation.replace).toHaveBeenLastCalledWith("/dashboard/tasks?sort=created&direction=desc&pinned=false&priority=&linked=");
   });
+  it("restores pinned-only and keeps it enabled while changing other controls", () => {
+    render(<ListControls entityType="tasks" searchValue="" sortValue="position" sortDirection="asc" clearHref="/dashboard/tasks" pinnedValue />);
+    expect(screen.getByLabelText("Pinned")).toHaveValue("true");
+    fireEvent.change(screen.getByLabelText("Priority"), { target: { value: "high" } });
+    expect(navigation.replace).toHaveBeenLastCalledWith("/dashboard/tasks?priority=high&linked=&sort=position&direction=asc&pinned=true");
+    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+    expect(screen.getByLabelText("Pinned")).toHaveValue("false");
+    expect(navigation.replace).toHaveBeenLastCalledWith("/dashboard/tasks?sort=created&direction=desc&pinned=false&priority=&linked=");
+  });
+
 });
