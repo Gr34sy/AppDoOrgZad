@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { badRequestResponse, tooManyRequestsResponse } from "@/lib/api-responses";
 import { parseJsonBody } from "@/lib/api-request";
+import { createLinkedNotes } from "@/lib/create-linked-notes";
 import { areValidNoteIds, syncEntityNoteLinks } from "@/lib/entity-note-links";
 import { validOwnedChecklistIds } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
   }
 
   await connectDatabase();
-  const { newChecklists, noteIds, ...taskData } = data;
+  const { newChecklists, noteIds, newNotes, ...taskData } = data;
   const payload = sanitizeMutation(taskData);
   if (payload.projectId) {
     const projectExists = await Project.exists({
@@ -116,6 +117,13 @@ export async function POST(request: NextRequest) {
       noteIds
     });
   }
+
+  await createLinkedNotes({
+    ownerId,
+    targetType: "task",
+    targetId: task.id,
+    notes: newNotes ?? []
+  });
 
   if (task.projectId) {
     await Project.updateOne(

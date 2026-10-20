@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isValidObjectId } from "mongoose";
 import { badRequestResponse, tooManyRequestsResponse } from "@/lib/api-responses";
 import { parseJsonBody } from "@/lib/api-request";
+import { createLinkedNotes } from "@/lib/create-linked-notes";
 import { areValidNoteIds, syncEntityNoteLinks } from "@/lib/entity-note-links";
 import { cleanupEntityReferences, validOwnedChecklistIds } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
@@ -73,7 +74,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
   }
 
   await connectDatabase();
-  const { newTasks, newChecklists, noteIds, ...projectData } = data;
+  const { newTasks, newChecklists, noteIds, newNotes, ...projectData } = data;
   const payload = sanitizeMutation(projectData);
   delete payload.taskIds;
 
@@ -142,6 +143,13 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
       noteIds
     });
   }
+
+  await createLinkedNotes({
+    ownerId,
+    targetType: "project",
+    targetId: project.id,
+    notes: newNotes ?? []
+  });
 
   await recordActivityEvent({
     ownerId,

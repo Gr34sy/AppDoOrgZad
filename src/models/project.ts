@@ -100,6 +100,10 @@ const projectSchema = new Schema(
         { id: "done", title: "Done", position: 4, color: "#16a34a", isDone: true }
       ] satisfies KanbanColumn[]
     },
+    taskViewExpanded: {
+      type: Boolean,
+      default: false
+    },
     taskView: {
       type: String,
       enum: ["kanban", "list"],

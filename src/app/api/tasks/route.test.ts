@@ -5,6 +5,7 @@ import { recordActivityEvent } from "@/lib/activity-events";
 import { validOwnedChecklistIds } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
 import { Project } from "@/models/project";
+import { Note } from "@/models/note";
 import { Task } from "@/models/task";
 import { GET, POST } from "./route";
 
@@ -32,6 +33,8 @@ vi.mock("@/models/project", () => ({
     updateOne: vi.fn()
   }
 }));
+
+vi.mock("@/models/note", () => ({ Note: { create: vi.fn(), updateMany: vi.fn() } }));
 
 vi.mock("@/models/task", () => ({
   Task: {
@@ -176,4 +179,23 @@ describe("/api/tasks", () => {
     expect(response.status).toBe(400);
     expect(Task.create).not.toHaveBeenCalled();
   });
+  it("creates title-only notes linked to the saved task after syncing existing links", async () => {
+    vi.mocked(getCurrentUserId).mockResolvedValue("user-1");
+    vi.mocked(Task.findOne).mockReturnValue({ sort: vi.fn().mockReturnValue({ select: vi.fn().mockResolvedValue(null) }) } as never);
+    vi.mocked(Task.create).mockResolvedValue({ id: "task-1", _id: "task-1", title: "Parent" } as never);
+    vi.mocked(Note.create).mockResolvedValue({ id: "new-note" } as never);
+    const response = await POST(createJsonRequest({
+      title: "Parent", noteIds: [], newNotes: [{ title: "  Delivery details  " }]
+    }) as never);
+    expect(response.status).toBe(201);
+    expect(Note.create).toHaveBeenCalledWith({
+      title: "Delivery details", content: "", ownerId: "user-1",
+      linkedItems: [{ targetType: "task", targetId: "task-1" }]
+    });
+    expect(vi.mocked(Note.updateMany).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(Note.create).mock.invocationCallOrder[0]);
+    expect(recordActivityEvent).toHaveBeenCalledWith({
+      ownerId: "user-1", entityType: "note", entityId: "new-note", action: "created"
+    });
+  });
+
 });

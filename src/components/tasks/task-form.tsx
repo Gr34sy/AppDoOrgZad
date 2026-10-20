@@ -1,8 +1,11 @@
 "use client";
 
+import { formatPriority } from "@/lib/priority";
+
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Save, Trash2, X } from "lucide-react";
+import { NoteLinksFields } from "@/components/notes/note-links-fields";
 import { FormShell } from "@/components/dashboard/form-shell";
 import { TagEditor } from "@/components/dashboard/tag-editor";
 import { getCreatedEntityId } from "@/lib/created-entity-response";
@@ -64,6 +67,7 @@ export function TaskForm({
   const [tags, setTags] = useState(initialTags.length ? initialTags : [""]);
   const [checklistIds, setChecklistIds] = useState(initialChecklistIds);
   const [noteIds, setNoteIds] = useState(initialNoteIds);
+  const [newNoteTitles, setNewNoteTitles] = useState<string[]>([]);
   const [newChecklistTitles, setNewChecklistTitles] = useState<string[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState(initialProjectId);
   const [selectedStatusId, setSelectedStatusId] = useState(initialStatusId);
@@ -143,6 +147,7 @@ export function TaskForm({
         newChecklists: newChecklistTitles
           .map((checklistTitle) => ({ title: checklistTitle.trim() }))
           .filter((checklist) => checklist.title),
+        newNotes: newNoteTitles.map((title) => ({ title: title.trim() })).filter((note) => note.title),
         noteIds
       })
     });
@@ -211,7 +216,7 @@ export function TaskForm({
           <select id="priority" name="priority" defaultValue={initialPriority} className="app-form-control">
             {priorityOptions.map((priority) => (
               <option key={priority} value={priority}>
-                {priority}
+                {formatPriority(priority)}
               </option>
             ))}
           </select>
@@ -356,34 +361,13 @@ export function TaskForm({
         ) : null}
       </fieldset>
 
-      <fieldset className="grid gap-3">
-        <legend className="app-form-legend">
-          Linked notes
-        </legend>
-        {noteOptions.length ? (
-          <div className="grid gap-2 sm:grid-cols-2">
-            {noteOptions.map((note) => (
-              <label key={note.id} className="app-form-checkbox-card">
-                <input
-                  type="checkbox"
-                  checked={noteIds.includes(note.id)}
-                  onChange={(event) => {
-                    setNoteIds((currentNoteIds) =>
-                      event.target.checked
-                        ? [...currentNoteIds, note.id]
-                        : currentNoteIds.filter((id) => id !== note.id)
-                    );
-                  }}
-                  className="app-form-checkbox"
-                />
-                <span className="min-w-0 break-words">{note.title}</span>
-              </label>
-            ))}
-          </div>
-        ) : (
-          <p className="app-form-hint px-3 py-2">No notes available.</p>
-        )}
-      </fieldset>
+      <NoteLinksFields
+        options={noteOptions}
+        selectedIds={noteIds}
+        onSelectedIdsChange={setNoteIds}
+        newTitles={newNoteTitles}
+        onNewTitlesChange={setNewNoteTitles}
+      />
 
       {error ? (
         <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200">

@@ -4,6 +4,7 @@ import { resetRateLimitCache } from "@/lib/rate-limit";
 import { getCurrentUserId } from "@/lib/session";
 import { recordActivityEvent } from "@/lib/activity-events";
 import { connectDatabase } from "@/lib/mongoose";
+import { areValidNoteLinks } from "@/lib/note-links";
 import { Note } from "@/models/note";
 import { GET, POST } from "./route";
 
@@ -19,6 +20,8 @@ vi.mock("@/lib/mongoose", () => ({
 vi.mock("@/lib/activity-events", () => ({
   recordActivityEvent: vi.fn()
 }));
+
+vi.mock("@/lib/note-links", () => ({ areValidNoteLinks: vi.fn() }));
 
 vi.mock("@/models/note", () => ({
   Note: {
@@ -41,6 +44,7 @@ describe("/api/notes", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resetRateLimitCache();
+    vi.mocked(areValidNoteLinks).mockResolvedValue(true);
   });
 
   it("rejects unauthenticated list requests", async () => {
@@ -119,4 +123,22 @@ describe("/api/notes", () => {
     expect(response.status).toBe(429);
     expect(response.headers.get("Retry-After")).toBeTruthy();
   });
+  it.each(["task", "project"] as const)("creates a note linked to an owned %s", async (targetType) => {
+    vi.mocked(getCurrentUserId).mockResolvedValue("user-1");
+    vi.mocked(Note.create).mockResolvedValue({ id: "note-1" } as never);
+    const linkedItems = [{ targetType, targetId: "665f1f77bcf86cd799439011" }];
+    const response = await POST(createJsonRequest({ title: "Linked note", linkedItems }) as never);
+    expect(response.status).toBe(201);
+    expect(areValidNoteLinks).toHaveBeenCalledWith(linkedItems, "user-1");
+    expect(Note.create).toHaveBeenCalledWith({ title: "Linked note", linkedItems, ownerId: "user-1" });
+  });
+
+  it("rejects a note link to an unavailable or foreign element", async () => {
+    vi.mocked(getCurrentUserId).mockResolvedValue("user-1");
+    vi.mocked(areValidNoteLinks).mockResolvedValue(false);
+    const response = await POST(createJsonRequest({ title: "Linked note", linkedItems: [{ targetType: "task", targetId: "665f1f77bcf86cd799439011" }] }) as never);
+    expect(response.status).toBe(400);
+    expect(Note.create).not.toHaveBeenCalled();
+  });
+
 });

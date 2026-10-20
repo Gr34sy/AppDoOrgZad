@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { badRequestResponse, tooManyRequestsResponse } from "@/lib/api-responses";
 import { parseJsonBody } from "@/lib/api-request";
+import { createLinkedNotes } from "@/lib/create-linked-notes";
 import { areValidNoteIds, syncEntityNoteLinks } from "@/lib/entity-note-links";
 import { validOwnedChecklistIds } from "@/lib/entity-relations";
 import { connectDatabase } from "@/lib/mongoose";
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
   }
 
   await connectDatabase();
-  const { newTasks, newChecklists, noteIds, ...projectData } = data;
+  const { newTasks, newChecklists, noteIds, newNotes, ...projectData } = data;
   const payload = sanitizeMutation(projectData);
   delete payload.taskIds;
 
@@ -116,6 +117,13 @@ export async function POST(request: NextRequest) {
       noteIds
     });
   }
+
+  await createLinkedNotes({
+    ownerId,
+    targetType: "project",
+    targetId: project.id,
+    notes: newNotes ?? []
+  });
 
   await recordActivityEvent({
     ownerId,

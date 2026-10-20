@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { ProjectDetailsPanel } from "@/components/projects/project-details-panel";
 import { ProjectTaskView } from "@/components/projects/project-task-view";
 import { authOptions } from "@/lib/auth";
+import { getNoteOptions } from "@/lib/note-options";
 import { connectDatabase } from "@/lib/mongoose";
 import { getSafeReturnTo } from "@/lib/return-to";
 import { Checklist } from "@/models/checklist";
@@ -41,6 +42,7 @@ type ProjectDetails = {
   taskIds?: unknown[];
   kanbanColumns?: KanbanColumnDetails[];
   taskView?: "kanban" | "list";
+  taskViewExpanded?: boolean;
   completedAt?: Date | null;
   createdAt?: Date;
   updatedAt?: Date;
@@ -89,7 +91,7 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
 
   await connectDatabase();
 
-  const [project, checklists, projectTasks, pin] = await Promise.all([
+  const [project, checklists, projectTasks, pin, notes] = await Promise.all([
     Project.findOne({
       _id: params.projectId,
       ownerId: session.user.id,
@@ -109,7 +111,8 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
       ownerId: session.user.id,
       targetType: "project",
       targetId: params.projectId
-    }).lean<{ _id: unknown }>()
+    }).lean<{ _id: unknown }>(),
+    getNoteOptions(session.user.id)
   ]);
 
   if (!project) {
@@ -124,8 +127,10 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
   return (
       <section className="app-page">
         <ProjectTaskView
+          key={params.projectId}
           projectId={params.projectId}
           initialView={project.taskView ?? "kanban"}
+          initialExpanded={project.taskViewExpanded ?? false}
           projectInformation={<><Link
             href={returnTo}
             className="inline-flex w-fit items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
@@ -144,6 +149,7 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
             parentType: checklist.parentType ?? null,
             parentId: checklist.parentId ? String(checklist.parentId) : null
           }))}
+          noteOptions={notes}
           title={project.title}
           description={project.description ?? ""}
           priority={project.priority ?? "medium"}

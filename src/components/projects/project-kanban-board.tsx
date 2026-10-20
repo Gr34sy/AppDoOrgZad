@@ -1,5 +1,7 @@
 'use client';
 
+import { formatPriority } from "@/lib/priority";
+
 import { useRouter } from 'next/navigation';
 import {
   CalendarClock,
@@ -881,7 +883,7 @@ export function ProjectKanbanBoard({
                           }`}
                         >
                           <Gauge aria-hidden="true" className="h-3 w-3 shrink-0" />
-                          {task.priority}
+                          {formatPriority(task.priority)}
                         </span>
                         {task.dueDateLabel ? (
                           <span className="inline-flex items-center gap-1 rounded-md bg-zinc-100 px-2 py-1 text-sm text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">

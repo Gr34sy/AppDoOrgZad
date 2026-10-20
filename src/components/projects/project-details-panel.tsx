@@ -1,8 +1,11 @@
 "use client";
 
+import { formatPriority } from "@/lib/priority";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, CalendarClock, FolderKanban, Gauge, ListChecks, Plus, Tag, X } from "lucide-react";
+import { LinkedNoteList, type LinkedNoteOption } from "@/components/notes/linked-note-list";
 import { LinkedChecklistList, type LinkedChecklistOption } from "@/components/checklists/linked-checklist-list";
 import { DeleteEntityButton } from "@/components/dashboard/delete-entity-button";
 import { InlineEditableField } from "@/components/dashboard/inline-editable-field";
@@ -26,6 +29,7 @@ type KanbanColumn = {
 type ProjectDetailsPanelProps = {
   projectId: string;
   checklistOptions: EntityOption[];
+  noteOptions: LinkedNoteOption[];
   title: string;
   description: string;
   priority: string;
@@ -66,6 +70,7 @@ function ProjectTagPreview({ tags }: { tags: string[] }) {
 export function ProjectDetailsPanel({
   projectId,
   checklistOptions,
+  noteOptions,
   title,
   description,
   priority,
@@ -285,7 +290,7 @@ export function ProjectDetailsPanel({
               >
                 {priorityOptions.map((priorityOption) => (
                   <option key={priorityOption} value={priorityOption}>
-                    {priorityOption}
+                    {formatPriority(priorityOption)}
                   </option>
                 ))}
               </select>
@@ -296,7 +301,7 @@ export function ProjectDetailsPanel({
                 className={inlineMetaButtonClass}
               >
                 <strong className="font-semibold text-zinc-700 dark:text-zinc-200">Priority</strong>{" "}
-                {formatMetaValue(draftPriority)}
+                {formatPriority(draftPriority)}
               </button>
             )}
           </span>
@@ -422,6 +427,14 @@ export function ProjectDetailsPanel({
           parentId={projectId}
           checklistIds={checklistIds}
           checklistOptions={checklistOptions}
+          className="mt-6"
+        />
+
+        <LinkedNoteList
+          key={projectId}
+          parentType="project"
+          parentId={projectId}
+          noteOptions={noteOptions}
           className="mt-6"
         />
 

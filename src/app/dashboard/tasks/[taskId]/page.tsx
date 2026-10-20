@@ -5,6 +5,7 @@ import { isValidObjectId } from "mongoose";
 import { ArrowLeft } from "lucide-react";
 import { TaskDetailsPanel } from "@/components/tasks/task-details-panel";
 import { authOptions } from "@/lib/auth";
+import { getNoteOptions } from "@/lib/note-options";
 import { connectDatabase } from "@/lib/mongoose";
 import { getSafeReturnTo } from "@/lib/return-to";
 import { Checklist } from "@/models/checklist";
@@ -72,7 +73,7 @@ export default async function TaskPage({ params, searchParams }: TaskPageProps) 
 
   await connectDatabase();
 
-  const [task, projects, checklists, pin] = await Promise.all([
+  const [task, projects, checklists, pin, notes] = await Promise.all([
     Task.findOne({
       _id: params.taskId,
       ownerId: session.user.id,
@@ -88,7 +89,8 @@ export default async function TaskPage({ params, searchParams }: TaskPageProps) 
       ownerId: session.user.id,
       targetType: "task",
       targetId: params.taskId
-    }).lean<{ _id: unknown }>()
+    }).lean<{ _id: unknown }>(),
+    getNoteOptions(session.user.id)
   ]);
 
   if (!task) {
@@ -127,6 +129,7 @@ export default async function TaskPage({ params, searchParams }: TaskPageProps) 
             parentType: checklist.parentType ?? null,
             parentId: checklist.parentId ? String(checklist.parentId) : null
           }))}
+          noteOptions={notes}
           title={task.title}
           description={task.description ?? ""}
           priority={task.priority ?? "medium"}

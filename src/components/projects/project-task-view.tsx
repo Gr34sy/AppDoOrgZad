@@ -1,5 +1,6 @@
 "use client";
 
+import { formatPriority } from "@/lib/priority";
 import { useState, type ReactNode } from "react";
 import { Columns3, List, Maximize2, Minimize2, Plus } from "lucide-react";
 import { ReturnToLink } from "@/components/dashboard/return-to-link";
@@ -30,6 +31,7 @@ type Task = {
 type ProjectTaskViewProps = {
   projectId: string;
   initialView: ProjectTaskViewMode;
+  initialExpanded?: boolean;
   columns: Column[];
   tasks: Task[];
   projectInformation: ReactNode;
@@ -82,13 +84,15 @@ function ViewToggle({ view, savingView, onChange }: ViewToggleProps) {
 
 function ExpandButton({
   expanded,
+  savingView,
   onToggle
 }: {
   expanded: boolean;
+  savingView: boolean;
   onToggle: () => void;
 }) {
   return (
-    <button type="button" onClick={onToggle} className="app-form-secondary-button">
+    <button type="button" disabled={savingView} aria-expanded={expanded} onClick={onToggle} className="app-form-secondary-button">
       {expanded ? (
         <Minimize2 aria-hidden="true" className="h-4 w-4" />
       ) : (
@@ -103,34 +107,34 @@ function ProjectTaskListItem({ task, column }: { task: Task; column?: Column }) 
   return (
     <ReturnToLink
       href={`/dashboard/tasks/${task.id}`}
-      className="grid gap-3 rounded-md border border-zinc-200 bg-white p-3 transition hover:border-[var(--app-accent)] sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:pl-28 dark:border-zinc-800 dark:bg-zinc-950"
+      className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 rounded-md border border-zinc-200 bg-white p-3 transition hover:border-[var(--app-accent)] sm:pl-28 dark:border-zinc-800 dark:bg-zinc-950"
     >
-      <div className="min-w-0">
-        <h3 className="truncate text-sm font-semibold text-zinc-950 dark:text-zinc-50">
+      <div className="flex min-w-0 flex-auto flex-wrap items-center gap-x-3 gap-y-2">
+        <h3 className="min-w-0 max-w-full break-words text-sm font-semibold text-zinc-950 [overflow-wrap:anywhere] dark:text-zinc-50">
           {task.title}
         </h3>
         {task.description ? (
-          <p className="mt-1 line-clamp-1 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="min-w-0 max-w-full break-words text-sm text-zinc-500 [overflow-wrap:anywhere] dark:text-zinc-400">
             {task.description}
           </p>
         ) : null}
-        <TagList tags={task.tags} className="mt-2" limit={4} size="compact" />
+        <TagList tags={task.tags} className="max-w-full" limit={4} size="compact" />
+        {task.dueDateLabel ? (
+          <span className="text-xs text-zinc-500 dark:text-zinc-400">{task.dueDateLabel}</span>
+        ) : null}
       </div>
-      <div className="flex flex-wrap items-center gap-2 text-xs">
+      <div className="ml-auto flex max-w-full shrink-0 flex-wrap items-center justify-end gap-2 text-xs">
         <span className="rounded-md bg-zinc-100 px-2 py-1 font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-          {task.priority}
+          {formatPriority(task.priority)}
         </span>
-        <span className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 px-2 py-1 dark:border-zinc-700">
+        <span className="inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-md border border-zinc-200 px-2 py-1 [overflow-wrap:anywhere] dark:border-zinc-700">
           <i
             aria-hidden="true"
-            className="h-2 w-2 rounded-full"
+            className="h-2 w-2 shrink-0 rounded-full"
             style={{ backgroundColor: column?.color ?? "#71717a" }}
           />
           {column?.title ?? task.statusId}
         </span>
-        {task.dueDateLabel ? (
-          <span className="text-zinc-500 dark:text-zinc-400">{task.dueDateLabel}</span>
-        ) : null}
       </div>
     </ReturnToLink>
   );
@@ -183,37 +187,42 @@ function ProjectTaskList({ projectId, columns, tasks }: ProjectTaskListProps) {
 export function ProjectTaskView({
   projectId,
   initialView,
+  initialExpanded = false,
   columns,
   tasks,
   projectInformation
 }: ProjectTaskViewProps) {
   const [view, setView] = useState<ProjectTaskViewMode>(initialView);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(initialExpanded);
   const [savingView, setSavingView] = useState(false);
   const [error, setError] = useState("");
 
-  async function changeView(nextView: ProjectTaskViewMode) {
-    if (nextView === view || savingView) {
+  async function changeView(nextView: ProjectTaskViewMode, nextExpanded = expanded) {
+    if ((nextView === view && nextExpanded === expanded) || savingView) {
       return;
     }
 
     const previousView = view;
-
+    const previousExpanded = expanded;
     setView(nextView);
+    setExpanded(nextExpanded);
     setSavingView(true);
     setError("");
 
-    const response = await fetch(`/api/projects/${projectId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ taskView: nextView })
-    });
-
-    setSavingView(false);
-
-    if (!response.ok) {
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskView: nextView, taskViewExpanded: nextExpanded }),
+        keepalive: true
+      });
+      if (!response.ok) throw new Error("Could not save the task view.");
+    } catch {
       setView(previousView);
+      setExpanded(previousExpanded);
       setError("Could not save the task view.");
+    } finally {
+      setSavingView(false);
     }
   }
 
@@ -234,7 +243,7 @@ export function ProjectTaskView({
             savingView={savingView}
             onChange={(nextView) => void changeView(nextView)}
           />
-          <ExpandButton expanded={expanded} onToggle={() => setExpanded((value) => !value)} />
+          <ExpandButton expanded={expanded} savingView={savingView} onToggle={() => void changeView(view, !expanded)} />
         </div>
 
         {error ? (
